@@ -1189,7 +1189,7 @@ function startHtml() {
 const LICENSE = {
   price: '£12',
   launchPrice: '£9',
-  launchEnds: '',      // last day of launch week (LAUNCH_ENDS at build time), e.g. '2026-11-07'; £9 shows until that day ends
+  launchEnds: '',      // last day of launch week (LAUNCH_ENDS at build time), e.g. '2026-11-16'; £9 shows until 23:59 UK time that day
   launchCode: 'LAUNCH', // Lemon Squeezy discount code applied at checkout during launch week
   checkoutUrl: '',  // filled in at build time from LS_CHECKOUT_URL (tools/build.mjs); empty means no paywall, everything unlocked
   recoverUrl: 'https://app.lemonsqueezy.com/my-orders',
@@ -1215,7 +1215,17 @@ const getLic = () => readJson('licence');
 const licensed = () => { const l = getLic(); return !!(l && l.status === 'active'); };
 const isPro = () => !licensingOn() || licensed();
 const liveFiles = () => LIVE_FILES && isPro();
-const launchOn = () => !!LICENSE.launchEnds && Date.now() < new Date(LICENSE.launchEnds + 'T23:59:59').getTime();
+// the launch price ends at 23:59:59 UK time on LAUNCH_ENDS, wherever the visitor is
+function launchEndsAt(day) {
+  const t = Date.parse(day + 'T23:59:59Z');
+  try {
+    const p = {};
+    new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hourCycle: 'h23', year: 'numeric', month: '2-digit',
+      day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(t).forEach(x => { p[x.type] = x.value; });
+    return t - (Date.UTC(+p.year, p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - t);  // minus London's UTC offset
+  } catch { return t; }
+}
+const launchOn = () => !!LICENSE.launchEnds && Date.now() < launchEndsAt(LICENSE.launchEnds);
 const priceNow = () => launchOn() ? LICENSE.launchPrice : LICENSE.price;
 function checkoutHref() {
   if (!launchOn() || !LICENSE.launchCode) return LICENSE.checkoutUrl;

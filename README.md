@@ -418,7 +418,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
   refused; conflict detection.
 - **Layout:** desktop (1400px), iPad landscape and portrait, iPad mini, and phone with touch mode, including the
   editor, panels, backdrop and tap-to-edit.
-- **Web version:** start screen, creating and naming a journal, autosave surviving a reload, download (with the
+- **Web version (the earlier $5 trial build, 2026-10-07):** start screen, creating and naming a journal, autosave surviving a reload, download (with the
   stamp), eject and undo, opening an older copy (warning shown), the paywall after the trial, wrong and right keys,
   refunded key locking writing, offline never locking.
 - **Licence function** (with faked Lemon Squeezy replies): activation, foreign-product rejection, personal data
