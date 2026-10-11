@@ -24,10 +24,11 @@ logo (`d/` tile), `images/out/og-image.png`, `screenshots/desktop-dark.png`, `sc
 | Uneed | Productivity | — | Daily launch queue; pick a weekday. |
 | Indie Hackers Products | — | — | Add revenue later if comfortable. |
 | Product Hunt | see `launch-posts.md` | — | Launch day + 1. |
-| Open-source lists (awesome-*) | only where it genuinely fits | — | Open a PR with one line; follow each list's rules. |
+| Curated lists (awesome-*) | only where it genuinely fits | — | Many require an OSI licence; Daycell is source-available (FSL-1.1-MIT), so check each list's rules first. |
 
 ## Licence and platform fields
 - **Price:** Freemium; one-time purchase (£12). Not "free trial", not "subscription".
 - **Platforms:** Web (Chrome, Edge, Safari, Firefox), iPad and phone browsers; Windows launcher. [Add "installable
   (PWA)" only once it ships.]
-- **Open source:** Yes, code public at [repo URL] under [licence].
+- **Open source:** Source-available. The code is public at [repo URL] under FSL-1.1-MIT, and each version becomes MIT
+  two years after release. If a form only offers yes/no, answer "no" rather than overclaim.

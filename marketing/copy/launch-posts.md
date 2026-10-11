@@ -53,7 +53,7 @@ Don't ask anyone to upvote.
 **Name:** Daycell
 **Tagline (60 chars max):** `A journal that's just a markdown file. Commit your day.` (55)
 **Alternative:** `Notebook-style journal. One .md file. No subscription.` (54)
-**Topics:** Productivity, Writing, Note-taking, Open Source, Developer Tools
+**Topics:** Productivity, Writing, Note-taking, Developer Tools
 **Gallery:** `images/out/ph-gallery.png`, `images/out/ph-gallery-shot-insights-light.png`, `screenshots/phone-dark.png`,
 `video/out/04-app-demo-dark.mp4` (as the video), `images/out/ig-04-file.png`.
 
@@ -171,7 +171,8 @@ Short, honest answers for the questions that will come up. Adjust to what has ac
   entry-per-cell view, insights. Some days that's the difference between writing and not.
 - **"No sync?"** — Not through my servers, on purpose. In Chrome/Edge it saves into a file in whatever folder you
   pick, so iCloud/Dropbox/OneDrive/Syncthing carries it.
-- **"Is it open source?"** — The code is public at [repo URL] under [licence the product thread chose]. Pro is how I fund
-  it.
+- **"Is it open source?"** — Source-available: the code is public at [repo URL] under FSL-1.1-MIT, so you can read,
+  run and modify it for yourself, and every version becomes plain MIT two years after release. The one thing it rules
+  out is selling a competing copy. Pro is how I fund it.
 - **"£12 for a text file?"** — Fair! Writing is free forever, so you may never need Pro. Pro is for [features].
 - **"Bug: …"** — Thanks, reproduced, fixing now. (Then actually post when it's fixed.)

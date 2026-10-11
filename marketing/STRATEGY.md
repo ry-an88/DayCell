@@ -98,7 +98,7 @@ single dark pattern would cost more than it earns.
 - **"Why not just use Obsidian / a text editor?"** You can, and Daycell's file works there. Daycell adds the
   daily ritual: prompts, a streak, insights, an entry-per-cell view. Use both.
 - **"Why pay if the code is public?"** Pro is a one-time £12 that funds the work, and it's the easy way to get Pro on
-  every device. Same reason people buy open-source apps on app stores.
+  every device. Same reason people pay for source-available apps they could build themselves.
 - **"Does it sync?"** Not through a server. On Chrome/Edge it saves straight into a file you choose, so any folder sync
   you already use (iCloud, Dropbox, OneDrive, Syncthing) carries it. Be upfront about this; don't fudge it.
 - **"Will it be around in 5 years?"** It doesn't need to be. Your journal is a markdown file, and the app is one HTML
@@ -146,10 +146,13 @@ Ranked by expected return for the effort, for a solo maker with no budget.
 - Listings: AlternativeTo (as an alternative to Day One, Journey, Diarium), SaaSHub, Uneed, Indie Hackers products,
   There's An AI For That is **not** relevant (no AI). Text in `copy/directories.md`.
 
-### G. Open source as marketing — from the day the repo goes public
+### G. Public code as marketing — from the day the repo goes public
+- The licence is **FSL-1.1-MIT**: the code is public and free for personal use, and each version becomes plain MIT
+  two years after release. That is *source-available*, not OSI open source, so never call Daycell "open source"
+  in copy. Say "the code is public" instead.
 - A good README with the GIF at the top, the file format spec as its own page, `good first issue` labels.
-- Submit to "awesome" lists that fit (awesome-markdown, awesome-obsidian if the template ships, awesome-selfhosted
-  only if it qualifies).
+- Submit only to lists whose rules accept source-available projects (most "awesome" lists, and awesome-selfhosted,
+  require an OSI licence, so check first).
 - GitHub stars are honest social proof; show the live count on the landing page.
 
 ### H. Creators and newsletters — weeks −2 to +4
@@ -184,7 +187,9 @@ These are product-side ideas that make marketing compound. They need the product
 5. **"Journal in git" guide.** A short post: keep your Daycell file in a private git repo and every save is a real
    commit. Pure developer catnip, and true to the product.
 6. **Prompt pack posts.** The app's own 30 prompts become a year of daily social posts at zero cost.
-7. **Channel discount codes** (`HN`, `REDDIT`, `PH`, `IG`, `YT`) on launch week tell us which post sold, without tracking anyone.
+7. **Channel discount codes** tell us which post sold, without tracking anyone. The launch-plan thread set up one
+   `LAUNCH` code (£3 off, launch week). Optionally add same-value copies per channel (`HN`, `REDDIT`, `PH`, `IG`) in
+   Lemon Squeezy so sales can be attributed.
 
 ---
 
