@@ -1,0 +1,17 @@
+# Hosting the web version on Netlify.
+# Only daycell.html is published (as index.html). The Journals folder, the launcher and
+# everything else in this folder stay off the internet.
+
+[build]
+  command = "mkdir -p dist && cp daycell.html dist/index.html"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    X-Frame-Options = "DENY"

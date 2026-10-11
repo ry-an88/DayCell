@@ -1,0 +1,1989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#11151b">
+<title>Daycell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7f8;
+  --grid: #e3e6ea;
+  --chrome: #ffffff;
+  --surface: #ffffff;
+  --code: #f6f8fa;
+  --border: #e4e7eb;
+  --border-strong: #c9ced6;
+  --text: #1c2128;
+  --muted: #667085;
+  --faint: #a0a8b4;
+  --accent: #0d9488;
+  --accent-soft: rgba(13, 148, 136, .14);
+  --amber: #d97706;
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, .1);
+  --ok: #16a34a;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --sans: "Inter", system-ui, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0f13; --grid: #171c23; --chrome: #11151b; --surface: #141920; --code: #0f1318;
+    --border: #232a33; --border-strong: #36404c; --text: #e3e8ee; --muted: #8b95a3; --faint: #56606d;
+    --accent: #2dd4bf; --accent-soft: rgba(45, 212, 191, .13); --amber: #fbbf24;
+    --danger: #f87171; --danger-soft: rgba(248, 113, 113, .12); --ok: #4ade80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c0f13; --grid: #171c23; --chrome: #11151b; --surface: #141920; --code: #0f1318;
+  --border: #232a33; --border-strong: #36404c; --text: #e3e8ee; --muted: #8b95a3; --faint: #56606d;
+  --accent: #2dd4bf; --accent-soft: rgba(45, 212, 191, .13); --amber: #fbbf24;
+  --danger: #f87171; --danger-soft: rgba(248, 113, 113, .12); --ok: #4ade80;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased; overflow: hidden; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+button:disabled { cursor: default; opacity: .35; }
+svg { display: block; flex: none; }
+.mono { font-family: var(--mono); }
+kbd { font: 500 10.5px var(--mono); padding: 1px 5px; border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; color: var(--muted); }
+
+.shell { display: grid; grid-template-rows: 44px minmax(0, 1fr) calc(26px + env(safe-area-inset-bottom)); height: 100vh; height: 100dvh; }
+
+/* ---------- menubar ---------- */
+.menubar { display: flex; align-items: center; gap: 14px; padding: 0 12px 0 0; background: var(--chrome); border-bottom: 1px solid var(--border); }
+.logo { width: 48px; height: 44px; display: grid; place-items: center; border-right: 1px solid var(--border); }
+.logo span { width: 20px; height: 20px; border-radius: 5px; background: var(--text); color: var(--chrome); display: grid; place-items: center; font: 600 11px var(--mono); }
+.wordmark { font: 600 13px var(--mono); letter-spacing: -.02em; }
+.wordmark i { font-style: normal; color: var(--faint); font-weight: 400; }
+.filetab { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border: 1px solid var(--border); border-radius: 7px; font: 12px var(--mono); color: var(--muted); max-width: 40vw; }
+.filetab b { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filetab .mod { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); display: none; }
+.filetab.unsaved .mod { display: block; }
+.grow { flex: 1; }
+.kernel { display: flex; align-items: center; gap: 8px; font: 11.5px var(--mono); color: var(--muted); }
+.led { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); box-shadow: 0 0 0 3px transparent; }
+.kernel.ok .led { background: var(--ok); }
+.kernel.busy .led { background: var(--amber); animation: pulse 1s infinite; }
+.kernel.warn .led { background: var(--amber); }
+.kernel.err .led { background: var(--danger); }
+@keyframes pulse { 50% { opacity: .3; } }
+.ib { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: var(--muted); position: relative; }
+.ib:hover:not(:disabled) { background: var(--grid); color: var(--text); }
+.ib.danger:hover:not(:disabled) { background: var(--danger-soft); color: var(--danger); }
+
+/* ---------- workspace ---------- */
+.work { display: grid; grid-template-columns: 48px auto minmax(0, 1fr); min-height: 0; }
+.rail { grid-column: 1; }
+.panel { grid-column: 2; }
+main { grid-column: 3; }
+.rail { background: var(--chrome); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; }
+.rail .ib { width: 36px; height: 36px; }
+.rail .ib.active { color: var(--text); }
+.rail .ib.active::before { content: ""; position: absolute; left: -6px; top: 8px; bottom: 8px; width: 2px; border-radius: 2px; background: var(--accent); }
+.badge { position: absolute; top: 3px; right: 2px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 8px; background: var(--danger); color: #fff; font: 600 9.5px/15px var(--mono); text-align: center; }
+
+.panel { width: 280px; background: var(--chrome); border-right: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+.panel[hidden] { display: none; }
+.p-head { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 8px 0 14px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); flex: none; }
+.p-filter { margin: 10px 10px 4px; display: flex; align-items: center; gap: 8px; padding: 0 10px; height: 32px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--faint); }
+.p-filter:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.p-filter input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 12px var(--mono); color: var(--text); }
+.p-body { flex: 1; overflow-y: auto; padding: 4px 6px 16px; }
+.p-group { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 14px 8px 4px; }
+.row { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 6px; }
+.row:hover { background: var(--grid); }
+.row.active { background: var(--accent-soft); }
+.row .n { font: 11px var(--mono); color: var(--faint); }
+.row.active .n { color: var(--accent); }
+.row .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+.row .d { font: 11px var(--mono); color: var(--faint); }
+.p-empty { padding: 28px 14px; text-align: center; font: 12px var(--mono); color: var(--faint); line-height: 1.7; }
+.p-note { margin: 14px 8px 0; padding: 10px 12px; border: 1px dashed var(--border-strong); border-radius: 7px; font: 11px/1.6 var(--mono); color: var(--muted); }
+
+.trow { padding: 10px 8px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
+.trow .tt { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trow .tm { font: 11px var(--mono); color: var(--faint); grid-column: 1; }
+.trow .ta { grid-row: 1 / 3; grid-column: 2; display: flex; gap: 2px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--border); font: 500 11.5px var(--mono); background: var(--surface); }
+.btn:hover:not(:disabled) { border-color: var(--border-strong); }
+.btn.primary { background: var(--text); border-color: var(--text); color: var(--chrome); }
+.btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+.btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+.btn.danger:hover:not(:disabled) { background: var(--danger-soft); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--text); background: var(--grid); }
+.btn.block { width: 100%; justify-content: flex-start; height: 34px; }
+.stack { display: grid; gap: 6px; padding: 10px 8px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 4px 8px; font: 11.5px var(--mono); }
+.kv span:nth-child(odd) { color: var(--text); }
+.kv span:nth-child(even) { color: var(--muted); }
+.fmt { margin: 6px 8px; padding: 10px 12px; background: var(--code); border: 1px solid var(--border); border-radius: 7px; font: 11px/1.65 var(--mono); color: var(--muted); white-space: pre; overflow-x: auto; }
+.fmt b { color: var(--accent); font-weight: 500; }
+
+/* ---------- notebook ---------- */
+main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.toolbar { display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 10px; background: var(--chrome); border-bottom: 1px solid var(--border); flex: none; }
+.sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; }
+.mode { font: 600 10.5px var(--mono); letter-spacing: .08em; padding: 4px 9px; border-radius: 5px; background: var(--grid); color: var(--muted); }
+.mode.edit { background: var(--accent-soft); color: var(--accent); }
+.nb { flex: 1; overflow-y: auto; background-color: var(--bg); background-image: radial-gradient(var(--grid) 1px, transparent 1.2px); background-size: 22px 22px; }
+.cells { max-width: 880px; margin: 0 auto; padding: 28px 28px 40vh 12px; }
+
+.banner { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 0 0 18px 64px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: color-mix(in srgb, var(--amber) 9%, var(--surface)); border-radius: 8px; font: 12px var(--mono); }
+
+.cell { display: grid; grid-template-columns: 64px 1fr; margin-bottom: 12px; }
+.prompt { font: 12px var(--mono); color: var(--faint); text-align: right; padding: 12px 12px 0 0; user-select: none; }
+.cell.selected .prompt { color: var(--accent); }
+.cell.editing .prompt { color: var(--amber); }
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 9px; min-width: 0; transition: border-color .12s, box-shadow .12s; position: relative; }
+.cell:hover .box { border-color: var(--border-strong); }
+.cell.selected .box { border-color: var(--border-strong); box-shadow: inset 3px 0 0 var(--accent); }
+.cell.editing .box { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 40px; padding: 6px 8px 0 18px; font: 11.5px var(--mono); color: var(--muted); }
+.head .ts b { font-weight: 500; color: var(--text); }
+.meter { display: inline-flex; align-items: center; gap: 2px; }
+.meter i { width: 4px; height: 10px; border-radius: 1px; background: var(--border-strong); }
+.meter i.on { background: var(--accent); }
+.meter em { font-style: normal; margin-left: 6px; }
+.tag { color: var(--accent); }
+.actions { margin-left: auto; display: flex; gap: 2px; opacity: 0; transition: opacity .12s; }
+.cell:hover .actions, .cell.selected .actions, .cell.editing .actions { opacity: 1; }
+
+.md { padding: 2px 18px 16px; font-size: 14.5px; line-height: 1.7; overflow-wrap: anywhere; cursor: text; }
+.md .title { font-size: 18px; font-weight: 600; letter-spacing: -.015em; margin: 4px 0 6px; }
+.md .title.untitled { color: var(--faint); font-weight: 500; }
+.md p { margin: 0 0 10px; }
+.md h3, .md h4, .md h5, .md h6 { font-size: 15px; font-weight: 600; margin: 14px 0 6px; }
+.md ul, .md ol { margin: 0 0 10px; padding-left: 22px; }
+.md li.task { list-style: none; margin-left: -20px; display: flex; gap: 8px; align-items: baseline; }
+.md .cb { width: 11px; height: 11px; border: 1.5px solid var(--border-strong); border-radius: 3px; flex: none; transform: translateY(1px); }
+.md .cb.on { background: var(--accent); border-color: var(--accent); }
+.md code { font: 12.5px var(--mono); background: var(--code); border: 1px solid var(--border); padding: 1px 5px; border-radius: 4px; }
+.md pre { background: var(--code); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; overflow-x: auto; margin: 0 0 10px; }
+.md pre code { border: 0; padding: 0; background: none; }
+.md blockquote { margin: 0 0 10px; padding: 2px 14px; border-left: 2px solid var(--accent); color: var(--muted); }
+.md hr { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+.md a { color: var(--accent); }
+.md > :last-child { margin-bottom: 0; }
+
+.ed { padding: 4px 18px 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.f-title { border: 0; outline: none; background: transparent; font-size: 18px; font-weight: 600; letter-spacing: -.015em; padding: 4px 0; }
+.f-title::placeholder, .f-body::placeholder, .f-tags::placeholder { color: var(--faint); }
+.f-date, .f-time { border: 1px solid transparent; border-radius: 5px; background: transparent; font: 11.5px var(--mono); color: var(--text); padding: 2px 4px; outline: none; }
+.f-date:hover, .f-time:hover, .f-date:focus, .f-time:focus { border-color: var(--border); }
+.moodseg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow-x: auto; width: max-content; max-width: 100%; scrollbar-width: none; }
+.moodseg button { white-space: nowrap; }
+.moodseg button { display: flex; align-items: center; gap: 6px; padding: 5px 11px; font: 11.5px var(--mono); color: var(--muted); border-right: 1px solid var(--border); }
+.moodseg button:last-child { border-right: 0; }
+.moodseg button:hover { background: var(--grid); color: var(--text); }
+.moodseg button.on { background: var(--accent-soft); color: var(--accent); }
+.moodseg .lbl { padding: 5px 10px; font: 11px var(--mono); color: var(--faint); border-right: 1px solid var(--border); }
+.f-body { width: 100%; min-height: 150px; resize: none; overflow: hidden; outline: none; border: 1px solid var(--border); border-radius: 7px; background: var(--code); padding: 12px 14px; font: 13px/1.75 var(--mono); tab-size: 2; }
+.f-body:focus { border-color: var(--border-strong); }
+.f-tags { border: 0; outline: none; background: transparent; font: 12px var(--mono); color: var(--accent); padding: 2px 0; }
+.ed-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 10px; font: 11px var(--mono); color: var(--faint); }
+.ed-foot .hint { display: flex; align-items: center; gap: 5px; }
+
+.empty-nb { margin: 12vh auto 0; max-width: 420px; text-align: center; font: 12.5px/1.9 var(--mono); color: var(--muted); }
+.empty-nb .big { font-size: 13px; color: var(--text); margin-bottom: 8px; }
+.add-cell { display: flex; align-items: center; gap: 8px; margin: 6px 0 0 64px; width: calc(100% - 64px); height: 38px; padding: 0 14px; border: 1px dashed var(--border-strong); border-radius: 9px; font: 12px var(--mono); color: var(--muted); }
+.add-cell:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- status bar ---------- */
+.statusbar { display: flex; align-items: center; gap: 18px; padding: 0 max(14px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(14px, env(safe-area-inset-left)); background: var(--chrome); border-top: 1px solid var(--border); font: 11px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; }
+.statusbar b { font-weight: 500; color: var(--text); }
+
+/* ---------- toast + modal ---------- */
+.toast { position: fixed; left: 50%; bottom: 42px; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 14px; padding: 9px 10px 9px 16px; background: var(--text); color: var(--chrome); border-radius: 9px; font: 12px var(--mono); transition: .2s; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { font: 600 11.5px var(--mono); color: var(--accent); padding: 4px 8px; border-radius: 5px; }
+.toast button:hover { background: rgba(127,127,127,.2); }
+.toast:not(.has-action) button { display: none; }
+
+.modal { position: fixed; inset: 0; background: rgba(10, 12, 16, .45); display: grid; place-items: center; z-index: 60; padding: 16px; }
+.modal[hidden] { display: none; }
+.dialog { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; }
+.dialog h3 { margin: 0; padding: 16px 18px 6px; font: 600 13px var(--mono); }
+.dialog p { margin: 0; padding: 0 18px 18px; color: var(--muted); font-size: 13.5px; }
+.dialog .d-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border); background: var(--code); }
+
+/* ---------- status cell [0] ---------- */
+.cell.status .box { background: transparent; border-style: dashed; }
+.cell.status:hover .box { border-color: var(--border-strong); }
+.code-line { padding: 10px 18px 0; font: 12.5px var(--mono); color: var(--muted); }
+.code-line .fn { color: var(--accent); }
+.out { padding: 6px 18px 14px; font: 12.5px/1.9 var(--mono); }
+.out .k { color: var(--faint); display: inline-block; min-width: 78px; }
+.out .hi { color: var(--accent); font-weight: 500; }
+.out .q { color: var(--text); }
+.out .lnk { color: var(--text); border-bottom: 1px dashed var(--faint); }
+.out .lnk:hover { color: var(--accent); border-color: var(--accent); }
+.out .acts { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
+.out .btn { height: 24px; padding: 0 9px; font-size: 11px; }
+.prompt-line { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px dashed var(--border-strong); border-radius: 7px; font: 12px var(--mono); color: var(--muted); }
+.prompt-line b { color: var(--accent); font-weight: 500; }
+.prompt-line .ptext { flex: 1; color: var(--text); }
+.prompt-line .btn { height: 24px; padding: 0 9px; font-size: 11px; }
+
+/* ---------- insights panel ---------- */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 8px 4px; }
+.stat { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--surface); }
+.stat b { display: block; font: 600 18px var(--mono); letter-spacing: -.02em; }
+.stat span { font: 10.5px var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
+.stat.hot b { color: var(--accent); }
+.heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 9px); gap: 2px; padding: 6px 8px 2px; }
+.heat i { width: 9px; height: 9px; border-radius: 2px; background: var(--grid); cursor: default; }
+.heat i[data-date] { cursor: pointer; }
+.heat i.l1 { background: color-mix(in srgb, var(--accent) 30%, var(--grid)); }
+.heat i.l2 { background: color-mix(in srgb, var(--accent) 55%, var(--grid)); }
+.heat i.l3 { background: color-mix(in srgb, var(--accent) 78%, var(--grid)); }
+.heat i.l4 { background: var(--accent); }
+.heat i.today { outline: 1px solid var(--text); outline-offset: 1px; }
+.heat i.pad { visibility: hidden; }
+.heat-legend { display: flex; align-items: center; gap: 3px; justify-content: flex-end; padding: 4px 10px 0; font: 10px var(--mono); color: var(--faint); }
+.heat-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 44px; padding: 6px 10px 0; }
+.bars i { flex: 1; border-radius: 2px 2px 0 0; background: var(--accent); opacity: .75; min-height: 3px; }
+.bars i.none { background: var(--border); opacity: 1; }
+.taglist { padding: 4px 8px; display: grid; gap: 4px; }
+.taglist div { display: grid; grid-template-columns: 1fr auto; gap: 8px; font: 11.5px var(--mono); align-items: center; }
+.taglist .tbar { grid-column: 1 / -1; height: 3px; border-radius: 2px; background: var(--grid); overflow: hidden; }
+.taglist .tbar i { display: block; height: 100%; background: var(--accent); }
+
+/* ---------- web: start screen, eject, unlock ---------- */
+.start { max-width: 600px; margin: 9vh auto 0; padding: 0 12px; text-align: center; }
+.start-logo { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 14px; background: var(--text); color: var(--chrome); display: grid; place-items: center; font: 600 20px var(--mono); }
+.start h1 { margin: 0; font: 600 30px var(--mono); letter-spacing: -.03em; }
+.start h1 span { color: var(--faint); font-weight: 400; }
+.start-sub { margin: 10px 0 30px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.start-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; }
+.start-card { display: grid; justify-items: start; text-align: left; gap: 4px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--muted); transition: border-color .12s, box-shadow .12s, transform .12s; }
+.start-card svg { color: var(--accent); margin-bottom: 8px; }
+.start-card b { color: var(--text); font: 600 14px var(--mono); }
+.start-card span { font-size: 13px; }
+.start-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); transform: translateY(-1px); }
+.start-how { margin-top: 22px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 9px; font: 12px/1.7 var(--mono); color: var(--muted); text-align: left; }
+.start-how b { color: var(--text); font-weight: 500; }
+.start-price { margin-top: 14px; font: 11.5px var(--mono); color: var(--faint); }
+.eject-card { position: fixed; left: 50%; top: 40%; z-index: 70; display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.3); color: var(--accent); font: 12px var(--mono); pointer-events: none; animation: eject 1.8s cubic-bezier(.5, 0, .3, 1) forwards; }
+.eject-card div { display: grid; gap: 2px; }
+.eject-card b { color: var(--text); font-weight: 600; font-size: 13px; }
+.eject-card span { color: var(--muted); }
+@keyframes eject {
+  0% { transform: translate(-50%, 20px) scale(.96); opacity: 0; }
+  18% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  55% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -46vh) scale(.82); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .eject-card { animation-duration: .01s; } }
+.m-input { display: flex; align-items: center; margin: 0 18px 18px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--code); padding: 0 12px; font: 13px var(--mono); color: var(--faint); }
+.m-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.m-input[hidden] { display: none; }
+.m-input input { flex: 1; min-width: 0; height: 38px; border: 0; outline: none; background: transparent; font: 14px var(--mono); color: var(--text); }
+.u-body { display: grid; gap: 12px; padding: 0 18px 18px; }
+.u-buy { justify-content: center; height: 40px; font-size: 13px; text-decoration: none; }
+.u-key { display: grid; gap: 6px; font: 11.5px var(--mono); color: var(--muted); }
+.u-key input { height: 38px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--code); padding: 0 12px; font: 12.5px var(--mono); color: var(--text); outline: none; }
+.u-key input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.u-err { min-height: 16px; font: 11.5px var(--mono); color: var(--danger); }
+.u-small { font: 11px/1.6 var(--mono); color: var(--faint); }
+.u-link { font: 11.5px var(--mono); color: var(--muted); }
+#filetab { cursor: pointer; }
+#filetab:hover { border-color: var(--border-strong); }
+@media (max-width: 600px) { .start-cards { grid-template-columns: 1fr; } .start { margin-top: 5vh; } }
+@media (hover: none) and (pointer: coarse) { .m-input input, .u-key input { font-size: 16px; } }
+
+/* ---------- pairing ---------- */
+.qr-wrap { display: flex; justify-content: center; padding: 10px 8px 2px; }
+#qr { background: #fff; padding: 10px; border-radius: 10px; min-height: 60px; }
+#qr img, #qr canvas { display: block; }
+
+/* ---------- command palette ---------- */
+.palette { position: fixed; inset: 0; z-index: 55; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 0; background: rgba(10, 12, 16, .3); }
+.palette[hidden] { display: none; }
+.pal { width: min(520px, 100%); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.35); overflow: hidden; }
+.pal-in { display: flex; align-items: center; gap: 10px; padding: 0 14px; height: 48px; border-bottom: 1px solid var(--border); color: var(--accent); font: 600 15px var(--mono); }
+.pal-in input { flex: 1; border: 0; outline: none; background: transparent; font: 14px var(--mono); color: var(--text); }
+.pal-list { max-height: 320px; overflow-y: auto; padding: 6px; }
+.pal-item { display: grid; grid-template-columns: 110px 1fr; gap: 12px; width: 100%; text-align: left; padding: 8px 10px; border-radius: 7px; font: 12.5px var(--mono); }
+.pal-item b { font-weight: 500; color: var(--accent); }
+.pal-item span { color: var(--muted); }
+.pal-item.on { background: var(--accent-soft); }
+.pal-foot { display: flex; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--border); font: 10.5px var(--mono); color: var(--faint); background: var(--code); }
+
+/* ---------- small screens ---------- */
+.btn { white-space: nowrap; }
+.scrim { display: none; }
+.touch-only { display: none; }
+
+@media (max-width: 900px) {
+  .panel { position: fixed; top: 44px; bottom: calc(26px + env(safe-area-inset-bottom)); left: 48px; z-index: 20; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+  .scrim.show { display: block; position: fixed; inset: 44px 0 0 48px; background: rgba(8, 10, 14, .45); z-index: 19; }
+  .wordmark, .sb-hide { display: none; }
+}
+@media (max-width: 600px) {
+  .cells { padding: 16px 12px 40vh 4px; }
+  .cell { grid-template-columns: 34px 1fr; }
+  .prompt { font-size: 10px; padding-right: 6px; }
+  .banner, .add-cell { margin-left: 34px; width: calc(100% - 34px); }
+  .head { padding-left: 12px; } .md, .ed { padding-left: 12px; padding-right: 12px; }
+  .out, .code-line { padding-left: 12px; padding-right: 12px; }
+  .out .k { display: block; min-width: 0; margin-top: 6px; line-height: 1.4; }
+  .kernel span, .tb-hide { display: none; }
+  .panel { width: calc(100vw - 48px); }
+}
+
+/* touch devices (iPad, tablets, phones): no hover, bigger targets, no keyboard hints */
+@media (hover: none) and (pointer: coarse) {
+  .actions { opacity: 1; }
+  .ib { width: 38px; height: 38px; }
+  .rail .ib { width: 40px; height: 40px; }
+  .row { padding: 10px 8px; }
+  .moodseg button { padding: 8px 12px; }
+  .ed-foot .hint, .add-cell kbd, .kb-only { display: none; }
+  .touch-only { display: inline; }
+  /* iOS zooms into any field under 16px — keep inputs at 16px */
+  .f-body, .f-tags, .f-date, .f-time, .p-filter input, #palInput, #newJournal { font-size: 16px; }
+  .btn { height: 34px; }
+  .heat { grid-template-rows: repeat(7, 10px); }
+  .heat i { width: 10px; height: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="menubar">
+    <div class="logo"><span>d/</span></div>
+    <div class="wordmark">daycell<i>.md</i></div>
+    <div class="filetab" id="filetab" title="Current journal file"><span id="fileIcon"></span><b id="fname">not linked</b><i class="mod"></i></div>
+    <button class="ib" id="ejectBtn" title="Eject journal" hidden></button>
+    <div class="grow"></div>
+    <div class="kernel" id="kernel"><i class="led"></i><span>idle</span></div>
+    <button class="ib" id="themeBtn" title="Toggle theme"></button>
+  </header>
+
+  <div class="work">
+    <nav class="rail">
+      <button class="ib" data-panel="contents" title="Contents"></button>
+      <button class="ib" data-panel="trash" title="Trash"></button>
+      <button class="ib" data-panel="insights" title="Insights"></button>
+      <button class="ib" data-panel="files" title="File & shortcuts"></button>
+    </nav>
+    <section class="panel" id="panel"></section>
+    <div class="scrim" id="scrim"></div>
+    <main>
+      <div class="toolbar">
+        <button class="ib" id="tbNew" title="New entry (b)"></button>
+        <button class="ib" id="tbSave" title="Save to file (ctrl+s)"></button>
+        <span class="sep"></span>
+        <button class="ib" id="tbEdit" title="Edit selected (enter)"></button>
+        <button class="ib" id="tbRun" title="Commit cell (shift+enter)"></button>
+        <button class="ib danger" id="tbTrash" title="Move selected to trash (d d)"></button>
+        <span class="sep"></span>
+        <button class="ib" id="tbCmd" title="Command palette (/)"></button>
+        <span class="sep tb-hide"></span>
+        <span class="mono tb-hide" style="font-size:11.5px;color:var(--faint)">markdown</span>
+        <span class="grow"></span>
+        <span class="mode" id="mode">COMMAND</span>
+      </div>
+      <div class="nb" id="nb"><div class="cells" id="cells"></div></div>
+    </main>
+  </div>
+
+  <footer class="statusbar">
+    <span id="sbMode">mode <b>command</b></span>
+    <span id="sbCount"></span>
+    <span id="sbTrash"></span>
+    <span id="sbWords" class="sb-hide"></span>
+    <span class="grow"></span>
+    <span class="sb-hide">markdown · utf-8</span>
+    <span id="sbLic" class="sb-hide"></span>
+    <span id="sbFile"></span>
+  </footer>
+</div>
+
+<div class="palette" id="palette" hidden>
+  <div class="pal" role="dialog" aria-label="Command palette">
+    <div class="pal-in">/<input id="palInput" placeholder="type a command…" autocomplete="off" spellcheck="false"></div>
+    <div class="pal-list" id="palList"></div>
+    <div class="pal-foot"><span>↑↓ navigate</span><span>enter run</span><span>esc close</span></div>
+  </div>
+</div>
+<div class="modal" id="unlock" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="uTitle">
+    <h3 id="uTitle"></h3>
+    <p id="uText"></p>
+    <div class="u-body">
+      <a class="btn primary u-buy" id="uBuy" target="_blank" rel="noopener"></a>
+      <label class="u-key"><span>already bought? paste your licence key</span><input id="uKey" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
+      <div class="u-err" id="uErr"></div>
+      <div class="u-small">the key is checked once with the payment provider. your journal never leaves your device.</div>
+    </div>
+    <div class="d-foot"><a class="u-link" id="uRecover" target="_blank" rel="noopener">lost your key?</a><span class="grow"></span><button class="btn ghost" id="uCancel">not now</button><button class="btn primary" id="uOk">unlock</button></div>
+  </div>
+</div>
+<input type="file" id="uploadInput" accept=".md,.markdown,text/markdown,text/plain" hidden>
+<div class="toast" id="toast"><span></span><button>undo</button></div>
+<div class="modal" id="modal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div class="m-input" id="mInputWrap" hidden><input id="mInput" autocomplete="off" spellcheck="false"><span>.md</span></div>
+    <div class="d-foot"><button class="btn ghost" id="mCancel">cancel</button><button class="btn" id="mOk">ok</button></div>
+  </div>
+</div>
+
+<script>
+/* ============ icons (lucide) ============ */
+const P = {
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+  pencil: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  play: '<path d="M6 3l14 9-14 9z"/>',
+  restore: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+  file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
+  fileplus: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/>',
+  folder: '<path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  contrast: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/>',
+  activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+  shuffle: '<path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-7.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.289 1.722l.442.678"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/>',
+  terminal: '<path d="m4 17 6-6-6-6"/><path d="M12 19h8"/>',
+  eject: '<path d="M12 4 4 14h16z"/><path d="M4 19h16"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+};
+const I = (n, s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`;
+
+/* ============ state + helpers ============ */
+/* ============ identity + voice (rename the app here) ============ */
+const APP = { name: 'Daycell', slug: 'daycell', glyph: 'd/' };
+// storage keys never change with the display name, so renaming can't orphan anyone's saved data
+const STORE_KEY = 'daycell';
+// before the rename the prefix was 'daybook'; migrateStorage() moves anything saved under it
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const VOICE = {
+  commit: [
+    'committed. your future self says thanks.',
+    'saved to disk. thoughts persisted.',
+    'cell executed. exit code 0.',
+    'written. that’s one more day on the record.',
+    'committed. no merge conflicts with yourself.',
+    'saved. the kernel feels lighter.',
+  ],
+  edited: ['patched. history rewritten, responsibly.', 'changes saved. hot reload complete.'],
+  trash: ['moved to trash. it can come back.', 'binned. not gone, just resting.'],
+  restore: ['restored. welcome back.', 'un-deleted. second chances are free.'],
+  empty: ['trash emptied. clean slate.', 'gone for good. garbage collected.'],
+  milestones: {
+    3: '3-day streak. a pattern is forming.',
+    7: 'achievement unlocked: 7-day streak.',
+    14: 'two weeks straight. this is a habit now.',
+    30: '30-day streak. you are the cron job.',
+    50: '50 days. legendary uptime.',
+    100: '100-day streak. frame this one.',
+    365: 'a whole year. absolutely unreal.',
+  },
+};
+const PROMPTS = [
+  'what did you debug in your life today?',
+  'if today had a commit message, what would it be?',
+  'what’s one thing you’d refactor about today?',
+  'what’s running in the background of your mind?',
+  'what gave you energy today, and what drained it?',
+  'write the changelog for this week.',
+  'what’s a small win worth committing?',
+  'what are you avoiding, and why?',
+  'who made today better?',
+  'what would tomorrow-you want to know?',
+  'describe today in three words, then explain them.',
+  'what question can’t you stop thinking about?',
+  'what did you learn that surprised you?',
+  'what’s blocking you right now?',
+  'what did you ship today, big or small?',
+  'where did your time actually go?',
+  'what’s one thing you want to remember from today?',
+  'what would you tell yourself a year ago?',
+  'what habit are you building? how’s it going?',
+  'what felt hard today, and what made it easier?',
+  'what’s an idea you haven’t told anyone?',
+  'rate today 1–10. why not one higher?',
+  'what conversation stuck with you?',
+  'what did you notice today that others missed?',
+  'what’s a bug in your routine?',
+  'what are you looking forward to?',
+  'what’s the TODO you keep moving to tomorrow?',
+  'what made you laugh today?',
+  'what would you do with a free day tomorrow?',
+  'what are you grateful for that you usually ignore?',
+];
+const dayNum = d => Math.floor(new Date(d + 'T12:00').getTime() / 864e5);
+const todaysPrompt = (offset = 0) => PROMPTS[(dayNum(now().date) + offset) % PROMPTS.length];
+function greeting() {
+  const h = new Date().getHours();
+  return h < 5 ? 'still up?' : h < 12 ? 'good morning.' : h < 18 ? 'good afternoon.' : 'good evening.';
+}
+
+/* ============ stats ============ */
+const words = s => (s.match(/\S+/g) || []).length;
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+function addDays(date, n) { const d = new Date(date + 'T12:00'); d.setDate(d.getDate() + n); return isoDate(d); }
+function computeStats(excludeId) {
+  const es = live().filter(e => hasContent(e) && e.id !== excludeId);
+  const byDay = new Map();
+  for (const e of es) byDay.set(e.date, (byDay.get(e.date) || 0) + words(e.title + ' ' + e.body));
+  const today = now().date;
+  // current streak: alive if you wrote today or yesterday
+  let streak = 0, d = byDay.has(today) ? today : addDays(today, -1);
+  while (byDay.has(d)) { streak++; d = addDays(d, -1); }
+  let longest = 0, run = 0, prev = null;
+  for (const day of [...byDay.keys()].sort()) {
+    run = prev && addDays(prev, 1) === day ? run + 1 : 1;
+    longest = Math.max(longest, run);
+    prev = day;
+  }
+  const dow = (new Date(today + 'T12:00').getDay() + 6) % 7; // monday = 0
+  const weekStart = addDays(today, -dow);
+  const week = es.filter(e => e.date >= weekStart);
+  const tags = new Map();
+  for (const e of es) for (const t of e.tags) tags.set(t, (tags.get(t) || 0) + 1);
+  const md = today.slice(5);
+  const onThisDay = es.filter(e => e.date.slice(5) === md && e.date < today).sort(byOldest).pop()
+    || es.find(e => e.date === addDays(today, -30));
+  return {
+    es, byDay, today, streak, longest, weekStart, onThisDay,
+    wroteToday: byDay.has(today),
+    weekEntries: week.length,
+    weekWords: week.reduce((s, e) => s + words(e.title + ' ' + e.body), 0),
+    totalWords: [...byDay.values()].reduce((a, b) => a + b, 0),
+    tags: [...tags.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6),
+    moods: es.slice(-21).map(e => MOODS.indexOf(e.mood) + 1),
+  };
+}
+function streakLine(s) {
+  if (!s.streak) return 'no streak yet. today is a good day 0.';
+  if (s.streak === 1) return s.wroteToday ? 'day 1. every streak starts here.' : '1 day. write today to keep it alive.';
+  return s.wroteToday ? `${s.streak}-day streak. keep the loop running.` : `${s.streak}-day streak. write today to keep it alive.`;
+}
+
+const MOODS = ['rough', 'meh', 'okay', 'good', 'great'];
+const COARSE = matchMedia('(hover: none) and (pointer: coarse)');
+const NARROW = matchMedia('(max-width: 900px)');
+const DEFAULT_PREAMBLE = '# Journal';
+const FS = 'showOpenFilePicker' in window;
+const MD_TYPES = [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }];
+
+const state = {
+  preamble: DEFAULT_PREAMBLE, entries: [], target: null, pending: null, server: null, serverFiles: [],
+  selectedId: null, editingId: null, snapshot: null, panel: 'contents', builtPanel: null,
+  query: '', purged: new Set(), unsaved: false, saving: false, error: '', localEdits: false, chain: Promise.resolve(),
+};
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const pad = n => String(n).padStart(2, '0');
+const byId = id => state.entries.find(e => e.id === id);
+const hasContent = e => !!(e.title.trim() || e.body.trim());
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+// one-time move of browser data saved under the pre-rename 'daybook-' prefix
+function migrateStorage() {
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (!k.startsWith('daybook-')) continue;
+      const nk = STORE_KEY + k.slice('daybook'.length);
+      if (localStorage.getItem(nk) == null) localStorage.setItem(nk, localStorage.getItem(k));
+      localStorage.removeItem(k);
+    }
+  } catch {}
+}
+migrateStorage();
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function now() {
+  const d = new Date();
+  return { date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
+}
+const stamp = () => { const n = now(); return n.date + ' ' + n.time; };
+const sortKey = e => e.date + ' ' + (e.time || '00:00').padStart(5, '0');
+const byOldest = (a, b) => sortKey(a).localeCompare(sortKey(b));
+const parseTags = s => s.split(/[\s,]+/).map(t => t.replace(/^#+/, '')).filter(Boolean);
+const live = () => state.entries.filter(e => !e.deleted).sort(byOldest);
+const trashed = () => state.entries.filter(e => e.deleted).sort((a, b) => b.deleted.localeCompare(a.deleted));
+function ago(s) {
+  const t = new Date(s.replace(' ', 'T'));
+  if (isNaN(t)) return s;
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.round(m / 60);
+  return h < 24 ? h + 'h ago' : Math.round(h / 24) + 'd ago';
+}
+
+/* ============ markdown file format ============
+   # Journal
+
+   ## 2026-10-02 · 21:14 — Title
+   mood:: good
+   tags:: #work #ideas
+
+   Body (markdown)
+
+   ---
+
+   # Trash
+   ## 2026-09-30 · 08:12 — Old entry
+   deleted:: 2026-10-02 21:20
+   ...
+*/
+const HEAD_RE = /^##\s+(\d{4}-\d{2}-\d{2})(?:\s*[·|]\s*(\d{1,2}:\d{2}))?(?:\s*[—–-]\s*(.*?))?\s*$/;
+const TRASH_RE = /^#\s+trash\s*$/i;
+
+function stripRule(s) {
+  s = s.trimEnd();
+  while (s.endsWith('---')) s = s.slice(0, -3).trimEnd();
+  return s.trim();
+}
+
+function parse(text) {
+  const pre = [], entries = [];
+  let cur = null, inTrash = false, savedStamp = null;
+  for (const line of text.replace(/\r\n?/g, '\n').split('\n')) {
+    if (TRASH_RE.test(line)) { inTrash = true; cur = null; continue; }
+    const m = line.match(HEAD_RE);
+    if (m) {
+      const title = (m[3] || '').trim();
+      cur = { id: uid(), date: m[1], time: m[2] ? m[2].padStart(5, '0') : '', title: title === 'Untitled' ? '' : title,
+              mood: '', tags: [], deleted: inTrash ? stamp() : '', raw: [] };
+      entries.push(cur);
+    } else if (cur) cur.raw.push(line);
+    else if (!inTrash) {
+      const st = line.match(/^<!--\s*\w+:saved (\S+)\s*-->$/);
+      if (st) savedStamp = st[1]; else pre.push(line);
+    }
+  }
+  for (const e of entries) {
+    let i = 0;
+    while (i < e.raw.length && !e.raw[i].trim()) i++;
+    for (; i < e.raw.length; i++) {
+      const mm = e.raw[i].match(/^(mood|tags|deleted)::\s*(.*)$/i);
+      if (!mm) break;
+      const k = mm[1].toLowerCase(), v = mm[2].trim();
+      if (k === 'mood') e.mood = MOODS.find(x => v.toLowerCase().includes(x)) || '';
+      else if (k === 'tags') e.tags = parseTags(v);
+      else if (e.deleted) e.deleted = v;
+    }
+    e.body = stripRule(e.raw.slice(i).join('\n'));
+    delete e.raw;
+  }
+  return { preamble: stripRule(pre.join('\n')) || DEFAULT_PREAMBLE, entries, savedStamp };
+}
+
+function block(e) {
+  let s = `## ${e.date}${e.time ? ' · ' + e.time : ''} — ${e.title.trim() || 'Untitled'}\n`;
+  if (e.mood) s += `mood:: ${e.mood}\n`;
+  if (e.tags.length) s += `tags:: ${e.tags.map(t => '#' + t).join(' ')}\n`;
+  if (e.deleted) s += `deleted:: ${e.deleted}\n`;
+  return s + '\n' + e.body.trim() + '\n\n---\n\n';
+}
+
+function serialize() {
+  let out = state.preamble.trim() + '\n\n';
+  out += live().filter(hasContent).map(block).join('');
+  const t = trashed().filter(hasContent).sort(byOldest);
+  if (t.length) out += '# Trash\n\n' + t.map(block).join('');
+  return out.trimEnd() + '\n';
+}
+
+/* ============ tiny markdown renderer ============ */
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*/g, '$1<em>$2</em>')
+    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function renderMd(src) {
+  const L = src.split('\n');
+  let out = '', i = 0, m;
+  const isBlockStart = l => /^(#{1,6}\s|```|>|\s*[-*+]\s|\s*\d+[.)]\s|\s*(---|\*\*\*)\s*$)/.test(l);
+  while (i < L.length) {
+    const l = L[i];
+    if (/^```/.test(l)) {
+      const code = []; i++;
+      while (i < L.length && !/^```/.test(L[i])) code.push(L[i++]);
+      i++; out += `<pre><code>${esc(code.join('\n'))}</code></pre>`; continue;
+    }
+    if ((m = l.match(/^(#{1,6})\s+(.*)/))) { const n = Math.min(m[1].length + 2, 6); out += `<h${n}>${inline(m[2])}</h${n}>`; i++; continue; }
+    if (/^\s*[-*+]\s+/.test(l)) {
+      out += '<ul>';
+      while (i < L.length && /^\s*[-*+]\s+/.test(L[i])) {
+        const t = L[i++].replace(/^\s*[-*+]\s+/, ''), cb = t.match(/^\[([ xX])\]\s*(.*)/);
+        out += cb ? `<li class="task"><span class="cb${cb[1] !== ' ' ? ' on' : ''}"></span><span>${inline(cb[2])}</span></li>` : `<li>${inline(t)}</li>`;
+      }
+      out += '</ul>'; continue;
+    }
+    if (/^\s*\d+[.)]\s+/.test(l)) {
+      out += '<ol>';
+      while (i < L.length && /^\s*\d+[.)]\s+/.test(L[i])) out += `<li>${inline(L[i++].replace(/^\s*\d+[.)]\s+/, ''))}</li>`;
+      out += '</ol>'; continue;
+    }
+    if (/^>\s?/.test(l)) {
+      const q = [];
+      while (i < L.length && /^>\s?/.test(L[i])) q.push(inline(L[i++].replace(/^>\s?/, '')));
+      out += `<blockquote>${q.join('<br>')}</blockquote>`; continue;
+    }
+    if (/^\s*(---|\*\*\*)\s*$/.test(l)) { out += '<hr>'; i++; continue; }
+    if (!l.trim()) { i++; continue; }
+    const p = [];
+    while (i < L.length && L[i].trim() && !(p.length && isBlockStart(L[i]))) p.push(inline(L[i++]));
+    out += `<p>${p.join('<br>')}</p>`;
+  }
+  return out;
+}
+
+/* ============ file I/O ============ */
+function idb(mode, fn, db = STORE_KEY) {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(db, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onerror = () => rej(r.error);
+    r.onsuccess = () => {
+      const tx = r.result.transaction('kv', mode);
+      const q = fn(tx.objectStore('kv'));
+      tx.oncomplete = () => res(q && q.result);
+      tx.onerror = () => rej(tx.error);
+    };
+  });
+}
+const saveHandle = h => idb('readwrite', s => s.put(h, 'handle')).catch(() => {});
+const loadHandle = async () => {
+  const h = await idb('readonly', s => s.get('handle')).catch(() => null);
+  if (h) return h;
+  // a live file picked before the rename lives in the old 'daybook' database
+  const old = await idb('readonly', s => s.get('handle'), 'daybook').catch(() => null);
+  if (old) saveHandle(old);
+  return old;
+};
+
+let writeTimer;
+function scheduleWrite() {
+  state.unsaved = true;
+  setStatus();
+  clearTimeout(writeTimer);
+  writeTimer = setTimeout(writeFile, 700);
+}
+function writeFile() {
+  clearTimeout(writeTimer);
+  const md = serialize();
+  store.set(STORE_KEY + '-md', md);
+  if (!state.target) {
+    if (state.pending) state.localEdits = true;
+    state.unsaved = false;
+    setStatus(); renderPanel();
+    return Promise.resolve(true);
+  }
+  const tg = state.target;
+  state.saving = true; setStatus();
+  state.chain = state.chain.then(async () => {
+    try {
+      await tg.write(md);
+      state.error = '';
+      return true;
+    } catch (err) { state.error = err.message; return false; }
+  }).then(ok => {
+    state.saving = false;
+    if (ok) state.unsaved = false;
+    setStatus(); renderPanel();
+    if (ok !== state.lastOk && !state.editingId) renderCells(); // show/clear the write-error banner
+    state.lastOk = ok;
+    return ok;
+  });
+  return state.chain;
+}
+
+// A target is where the journal is saved: a file picked in Chrome/Edge, or a file served by daycell.py.
+const handleTarget = h => ({
+  kind: 'handle', name: h.name, handle: h,
+  read: async () => (await h.getFile()).text(),
+  write: async md => { const w = await h.createWritable(); await w.write(md); await w.close(); },
+});
+const entrySig = e => e.date + ' ' + e.time;
+function serverTarget(name) {
+  const url = '/api/file?name=' + encodeURIComponent(name);
+  const t = {
+    kind: 'server', name, version: null,
+    read: async () => {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) throw new Error('server read failed (' + r.status + ')');
+      const d = await r.json();
+      t.version = d.version;
+      return d.text;
+    },
+    write: async md => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const headers = { 'Content-Type': 'text/markdown; charset=utf-8' };
+        if (t.version) headers['X-Base-Version'] = t.version;
+        const r = await fetch(url, { method: 'PUT', body: md, headers, keepalive: md.length < 60000 });
+        if (r.status === 409) {
+          // another device saved in the meantime: fold its new entries in, then retry
+          const d = await r.json();
+          t.version = d.version;
+          const added = mergeRemote(d.text);
+          md = serialize();
+          store.set(STORE_KEY + '-md', md);
+          if (added) afterRemoteChange(`synced ${added} ${added === 1 ? 'entry' : 'entries'} from another device`);
+          continue;
+        }
+        if (!r.ok) throw new Error('server write failed (' + r.status + ')');
+        t.version = (await r.json()).version;
+        return;
+      }
+      throw new Error('another device keeps saving — try again in a moment');
+    },
+  };
+  return t;
+}
+
+// entries are matched across devices by their date + time; trashed state travels with the file
+function mergeRemote(text) {
+  const mine = new Set(state.entries.map(entrySig));
+  let added = 0;
+  for (const e of parse(text).entries) {
+    if (mine.has(entrySig(e)) || state.purged.has(entrySig(e))) continue;
+    state.entries.push(e);
+    added++;
+  }
+  return added;
+}
+function afterRemoteChange(msg) {
+  if (state.editingId) renderPanel(); else renderAll();
+  toast(msg);
+}
+// when you come back to this tab/device, pull in anything another device wrote
+async function refreshFromServer() {
+  const t = state.target;
+  if (!t || t.kind !== 'server' || state.editingId || state.unsaved || state.saving || document.hidden) return;
+  try {
+    const r = await fetch('/api/file?name=' + encodeURIComponent(t.name), { cache: 'no-store' });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!t.version || d.version === t.version || state.editingId || state.unsaved) return;
+    t.version = d.version;
+    const sel = byId(state.selectedId), selSig = sel && entrySig(sel);
+    Object.assign(state, parse(d.text));
+    const m = selSig && state.entries.find(e => entrySig(e) === selSig);
+    state.selectedId = m ? m.id : null;
+    store.set(STORE_KEY + '-md', serialize());
+    afterRemoteChange('updated with changes from another device');
+  } catch {}
+}
+document.addEventListener('visibilitychange', refreshFromServer);
+window.addEventListener('focus', refreshFromServer);
+setInterval(refreshFromServer, 20000);
+
+async function refreshServerFiles() {
+  try { state.serverFiles = (await (await fetch('/api/files', { cache: 'no-store' })).json()).files; } catch {}
+}
+
+async function connect(target, { fromFile = true } = {}) {
+  state.target = target;
+  state.pending = null;
+  if (fromFile) {
+    const text = await target.read();
+    if (text.trim()) Object.assign(state, parse(text), { editingId: null, selectedId: null });
+  }
+  if (target.kind === 'handle') saveHandle(target.handle);
+  else { store.set(STORE_KEY + '-server-file', target.name); }
+  await writeFile();
+  if (target.kind === 'server') await refreshServerFiles();
+  const l = live();
+  state.selectedId = l.length ? l[l.length - 1].id : null;
+  renderAll();
+  $('#nb').scrollTop = $('#nb').scrollHeight;
+}
+
+/* ============ web version: open, download & eject ============ */
+// On the hosted site there's no launcher. A journal is either a live file (Chrome/Edge save straight into
+// the .md you pick) or a copy kept in this browser until you download or eject it (Safari, Firefox, iPad).
+const FORCE_BROWSER = new URLSearchParams(location.search).get('storage') === 'browser';
+const LIVE_FILES = FS && !FORCE_BROWSER;
+const webMode = () => !state.server && !state.unpaired;
+const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 ^ s.charCodeAt(i)) >>> 0; return h.toString(36); };
+const readJson = k => { try { return JSON.parse(store.get(STORE_KEY + '-' + k) || 'null'); } catch { return null; } };
+const writeJson = (k, v) => v == null ? store.del(STORE_KEY + '-' + k) : store.set(STORE_KEY + '-' + k, JSON.stringify(v));
+const getMount = () => readJson('mount');
+const setMount = m => writeJson('mount', m);
+const browserTarget = name => ({ kind: 'browser', name, read: async () => store.get(STORE_KEY + '-md') || '', write: async () => {} });
+function safeName(raw) {
+  const base = String(raw || '').trim().replace(/ \(\d+\)(?=\.md$)/i, '').replace(/\.md$/i, '')
+    .replace(/[\\/:*?"<>|]+/g, '-').slice(0, 60).trim();
+  return (base || 'daycell') + '.md';
+}
+const fmtStamp = iso => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+// a browser-kept journal has changes that aren't on the device yet
+function notDownloaded() {
+  const m = getMount();
+  return !!(m && m.kind === 'browser' && state.target && live().some(hasContent) && m.downloadedHash !== hash(serialize()));
+}
+function daysSinceDownload() {
+  const m = getMount();
+  const since = m && (m.lastDownload || m.created);
+  return since ? (Date.now() - new Date(since)) / 864e5 : 0;
+}
+
+async function startNew() {
+  const raw = await ask('New journal', 'Give it a name. You can keep as many journals as you like.', 'create', '', 'cancel', { input: 'my-journal' });
+  if (!raw) return;
+  const name = safeName(raw);
+  const fresh = { entries: [], preamble: '# ' + name.replace(/\.md$/, '').replace(/[-_]+/g, ' '), selectedId: null, editingId: null, error: '' };
+  if (LIVE_FILES) {
+    try {
+      const h = await showSaveFilePicker({ suggestedName: name, types: MD_TYPES });
+      Object.assign(state, fresh);
+      setMount({ name: h.name, kind: 'handle' });
+      await connect(handleTarget(h), { fromFile: false });
+    } catch (err) { if (err.name !== 'AbortError') toast(err.message); return; }
+  } else {
+    Object.assign(state, fresh);
+    setMount({ name, kind: 'browser', downloadedHash: null, lastDownload: null, created: new Date().toISOString() });
+    state.target = browserTarget(name);
+    await writeFile();
+  }
+  startTrial();
+  renderAll();
+  toast(`${state.target.name} created. day 0 starts now.`);
+}
+
+async function startOpen() {
+  if (!LIVE_FILES) return $('#uploadInput').click();
+  try {
+    const [h] = await showOpenFilePicker({ types: MD_TYPES });
+    if (await h.requestPermission({ mode: 'readwrite' }) !== 'granted') return;
+    Object.assign(state, { entries: [], preamble: DEFAULT_PREAMBLE, selectedId: null, error: '' });
+    setMount({ name: h.name, kind: 'handle' });
+    await connect(handleTarget(h));
+    startTrial();
+    toast(`opened ${h.name} · ${live().filter(hasContent).length} entries`);
+  } catch (err) { if (err.name !== 'AbortError') toast(err.message); }
+}
+
+async function openUploaded(file) {
+  const parsed = parse(await file.text());
+  const name = safeName(file.name);
+  // browsers rename repeat downloads to "journal (1).md"; catch someone opening a stale copy
+  const known = (readJson('exports') || {})[name];
+  if (known && parsed.savedStamp && parsed.savedStamp < known &&
+      !await ask('Older copy?', `This copy of ${name} was saved ${fmtStamp(parsed.savedStamp)}, but you downloaded a newer one ${fmtStamp(known)}. Open this older copy anyway?`, 'open anyway')) return;
+  if (!parsed.entries.length && file.size > 0 &&
+      !await ask('No entries found', `${file.name} doesn't contain any ${APP.name} entries. Open it anyway? New entries will be added to it.`, 'open anyway')) return;
+  Object.assign(state, parsed, { selectedId: null, editingId: null, error: '' });
+  state.target = browserTarget(name);
+  await writeFile();
+  setMount({ name, kind: 'browser', downloadedHash: hash(serialize()), lastDownload: parsed.savedStamp || new Date().toISOString() });
+  startTrial();
+  const l = live();
+  state.selectedId = l.length ? l[l.length - 1].id : null;
+  renderAll();
+  $('#nb').scrollTop = $('#nb').scrollHeight;
+  toast(`opened ${name} · ${l.filter(hasContent).length} entries`);
+}
+
+function downloadMd() {
+  const m = getMount();
+  if (!m || !state.target) return;
+  exitEdit(false);
+  const savedAt = new Date().toISOString();
+  let md = serialize();
+  const tag = `<!-- ${STORE_KEY}:saved ${savedAt} -->\n`;
+  md = /^# .*\n/.test(md) ? md.replace(/^(# .*\n)/, '$1' + tag) : tag + md;
+  const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown;charset=utf-8' }));
+  Object.assign(document.createElement('a'), { href: url, download: m.name }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  Object.assign(m, { downloadedHash: hash(serialize()), lastDownload: savedAt });
+  setMount(m);
+  writeJson('exports', { ...(readJson('exports') || {}), [m.name]: savedAt });
+  renderAll();
+  return md;
+}
+
+async function eject() {
+  const m = getMount();
+  if (!m || !(state.target || state.pending)) return;
+  exitEdit(false);
+  const isLive = m.kind === 'handle';
+  const ok = await ask(`Eject ${m.name}?`, isLive
+    ? `${m.name} stays in its folder on your device. ${APP.name} will forget it in this browser until you open it again.`
+    : `${m.name} will download to your device and be cleared from this browser. To keep writing later, open it again from your downloads.`,
+    'eject');
+  if (!ok) return;
+  let size = 0;
+  if (isLive && state.target) { await writeFile(); size = serialize().length; }
+  else if (!isLive) size = (downloadMd() || '').length;
+  const n = live().filter(hasContent).length;
+  const snap = { md: serialize(), mount: getMount(), target: state.target, pending: state.pending, handle: state.target && state.target.handle };
+  // forget the journal in this browser
+  Object.assign(state, { target: null, pending: null, entries: [], preamble: DEFAULT_PREAMBLE, selectedId: null, editingId: null, error: '' });
+  setMount(null);
+  store.del(STORE_KEY + '-md');
+  if (isLive) idb('readwrite', s => s.delete('handle')).catch(() => {});
+  if (NARROW.matches) state.panel = null;
+  renderAll();
+  playEject(m.name, n, size);
+  toast(isLive ? `${m.name} ejected. it's safe in its folder.` : `${m.name} ejected to your downloads.`, () => {
+    Object.assign(state, parse(snap.md), { target: snap.target, pending: snap.pending });
+    setMount(snap.mount);
+    store.set(STORE_KEY + '-md', snap.md);
+    if (snap.handle) saveHandle(snap.handle);
+    renderAll();
+    $('#nb').scrollTop = $('#nb').scrollHeight;
+    toast('un-ejected. welcome back.');
+  }, 9000);
+}
+
+function playEject(name, n, bytes) {
+  const el = document.createElement('div');
+  el.className = 'eject-card';
+  el.innerHTML = `${I('file', 22)}<div><b>${esc(name)}</b><span>${n} ${n === 1 ? 'entry' : 'entries'} · ${bytes < 1024 ? bytes + ' B' : (bytes / 1024).toFixed(1) + ' KB'}</span></div>${I('eject', 16)}`;
+  document.body.append(el);
+  setTimeout(() => el.remove(), 1900);
+}
+
+function startHtml() {
+  return `<div class="start">
+    <div class="start-logo">${esc(APP.glyph)}</div>
+    <h1>${esc(APP.slug)}<span>.md</span></h1>
+    <p class="start-sub">a journal that's just a markdown file.<br>no account, no cloud. the file is yours.</p>
+    <div class="start-cards">
+      <button class="start-card" data-act="startNew">${I('fileplus', 20)}<b>new journal</b><span>name it and start writing</span></button>
+      <button class="start-card" data-act="startOpen">${I('folder', 20)}<b>open a .md</b><span>${LIVE_FILES ? 'pick a journal on your device' : 'load a journal from your device'}</span></button>
+    </div>
+    <div class="start-how">${LIVE_FILES
+      ? `<b>how it works</b> · ${esc(APP.name)} saves straight into the .md file you pick. eject whenever you like and the file stays right where it is.`
+      : `<b>how it works</b> · your journal lives in this browser while you write. download a copy any time, or eject to take it with you and clear it from this browser.`}</div>
+    ${licensingOn() ? `<div class="start-price">${esc(licenceLine())}</div>` : ''}
+  </div>`;
+}
+
+/* ============ licence + trial (web version only) ============ */
+const LICENSE = {
+  price: '$5',
+  trialDays: 2,
+  checkoutUrl: '',  // paste your Lemon Squeezy checkout link here; licensing stays off until you do
+  recoverUrl: 'https://app.lemonsqueezy.com/my-orders',
+  endpoint: '/api/license',  // the small server function in netlify/functions/license.mjs
+  recheckDays: 30,
+};
+const licensingOn = () => webMode() && !!LICENSE.checkoutUrl;
+const getLic = () => readJson('licence');
+const licensed = () => { const l = getLic(); return !!(l && l.status === 'active'); };
+function startTrial() { if (!store.get(STORE_KEY + '-trial')) store.set(STORE_KEY + '-trial', new Date().toISOString()); }
+function trialDaysLeft() {
+  const s = store.get(STORE_KEY + '-trial');
+  if (!s) return LICENSE.trialDays;
+  return Math.max(0, Math.ceil(LICENSE.trialDays - (Date.now() - new Date(s)) / 864e5));
+}
+// after the trial you can still read, search and eject; only writing needs a licence
+const canWrite = () => !licensingOn() || licensed() || trialDaysLeft() > 0;
+function licenceLine() {
+  if (licensed()) return 'licensed. thank you, really.';
+  const l = getLic();
+  if (l && l.status !== 'active') return `this licence is ${l.status}. reading and eject still work.`;
+  const d = trialDaysLeft();
+  return d > 0 ? `free for ${d} more ${d === 1 ? 'day' : 'days'}, then ${LICENSE.price} once. no subscription.`
+               : `trial ended. ${LICENSE.price} once to keep writing; reading and eject stay free.`;
+}
+function deviceLabel() {
+  const ua = navigator.userAgent;
+  const b = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+  const p = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone'
+    : /Android/.test(ua) ? 'Android' : /Mac/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
+  return `${b} on ${p} · ${now().date}`;
+}
+async function licenceApi(action, params) {
+  const r = await fetch(LICENSE.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...params }) });
+  let d = {};
+  try { d = await r.json(); } catch {}
+  return { httpOk: r.ok, ...d };
+}
+async function activateKey(key) {
+  key = key.trim();
+  if (!key) return 'paste your licence key first.';
+  if (!navigator.onLine) return "you're offline. connect once to activate; after that it works offline.";
+  try {
+    const d = await licenceApi('activate', { license_key: key, instance_name: deviceLabel() });
+    if (d.activated) {
+      writeJson('licence', { key, instanceId: d.instance_id, device: deviceLabel(), status: 'active', validatedAt: Date.now() });
+      return null;
+    }
+    return friendlyLicenceError(d.error);
+  } catch { return "couldn't reach the licence server. try again in a moment."; }
+}
+function friendlyLicenceError(err = '') {
+  const e = String(err).toLowerCase();
+  if (e.includes('not found')) return "that key wasn't recognised. check for typos, or tap “lost your key?” below.";
+  if (e.includes('activation limit')) return 'this key is already active on its maximum number of devices. remove one from the licence section on another device, then try again.';
+  if (e.includes('disabled') || e.includes('expired')) return 'this key is no longer active (refunded or disabled). get in touch if that looks wrong.';
+  if (e.includes('different product')) return "that key is for a different product.";
+  return err || "that key didn't work. check it and try again.";
+}
+// re-check quietly about once a month; offline or server trouble never locks anyone out
+async function recheckLicence() {
+  const l = getLic();
+  if (!l || !licensingOn() || !navigator.onLine || Date.now() - l.validatedAt < LICENSE.recheckDays * 864e5) return;
+  try {
+    const d = await licenceApi('validate', { license_key: l.key, instance_id: l.instanceId });
+    if (d.valid) Object.assign(l, { status: 'active', validatedAt: Date.now() });
+    else if (d.valid === false) l.status = d.status && d.status !== 'active' ? d.status : 'invalid'; // refunded or disabled
+    writeJson('licence', l);
+    renderChrome();
+  } catch {}
+}
+async function deactivateDevice() {
+  const l = getLic();
+  if (!l || !await ask('Remove this device?', `Frees up one of your licence activations so you can use ${APP.name} somewhere else. You'll need the key again to write here.`, 'remove device')) return;
+  try {
+    const d = await licenceApi('deactivate', { license_key: l.key, instance_id: l.instanceId });
+    if (!d.deactivated) return toast(d.error || "couldn't remove this device. try again later.");
+  } catch { return toast("couldn't reach the licence server."); }
+  writeJson('licence', null);
+  renderAll();
+  toast('device removed. the activation is free again.');
+}
+function showUnlock() {
+  const ended = trialDaysLeft() === 0;
+  $('#uTitle').textContent = ended ? `keep writing for ${LICENSE.price}` : `unlock ${APP.name}`;
+  $('#uText').textContent = (ended ? 'your free trial has ended. ' : '') +
+    'one payment, yours for good. no subscription. your journal stays readable and you can always eject it, paid or not.';
+  $('#uBuy').href = LICENSE.checkoutUrl;
+  $('#uBuy').textContent = `buy · ${LICENSE.price} ↗`;
+  $('#uRecover').href = LICENSE.recoverUrl;
+  $('#uErr').textContent = '';
+  $('#uKey').value = '';
+  $('#unlock').hidden = false;
+  $('#uKey').focus();
+}
+async function submitUnlock() {
+  $('#uOk').disabled = true;
+  $('#uErr').textContent = 'checking…';
+  const err = await activateKey($('#uKey').value);
+  $('#uOk').disabled = false;
+  if (err) { $('#uErr').textContent = err; return; }
+  $('#unlock').hidden = true;
+  renderAll();
+  toast('unlocked. thank you, seriously.');
+}
+function licenceHtml() {
+  if (!licensingOn()) return '';
+  const l = getLic();
+  return `<div class="p-group">licence</div>` + (licensed()
+    ? `<div class="kv"><span>status</span><span>active</span><span>device</span><span>${esc(l.device || '')}</span></div>
+       <div class="stack"><button class="btn block" data-fact="deactivate">${I('x', 14)} remove this device</button></div>`
+    : `<div class="p-note">${esc(licenceLine())}</div><div class="stack"><button class="btn block primary" data-fact="unlock">unlock · ${esc(LICENSE.price)}</button></div>`);
+}
+
+async function reconnect() {
+  const h = state.pending;
+  if (!h || await h.requestPermission({ mode: 'readwrite' }) !== 'granted') return;
+  exitEdit(false);
+  let keepLocal = false;
+  if (state.localEdits) {
+    keepLocal = await ask('Unsynced changes',
+      `You wrote while ${h.name} was disconnected. Write those browser changes into the file, or discard them and load the file as it is?`,
+      'write to file', '', 'load file');
+  }
+  state.localEdits = false;
+  await connect(handleTarget(h), { fromFile: !keepLocal });
+  toast('reconnected ' + h.name);
+}
+async function switchServerFile(name, { create = false } = {}) {
+  name = (name || '').trim().replace(/[\\/:*?"<>|]/g, '-');
+  if (!name) return;
+  if (!/\.md$/i.test(name)) name += '.md';
+  if (create && state.serverFiles.includes(name)) create = false;
+  exitEdit(false);
+  Object.assign(state, { entries: [], preamble: DEFAULT_PREAMBLE, selectedId: null });
+  await connect(serverTarget(name));
+  toast((create ? 'created ' : 'opened ') + name);
+}
+/* ============ entry actions ============ */
+function newEntry(prompt) {
+  if (!canWrite()) return showUnlock();
+  if (webMode() && !state.target) return state.pending ? reconnect() : startNew();
+  exitEdit(false);
+  const e = { id: uid(), ...now(), title: '', body: typeof prompt === 'string' ? `> ${prompt}\n\n` : '', mood: '', tags: [], deleted: '' };
+  state.entries.push(e);
+  state.query = '';
+  const f = $('#filterInput'); if (f) f.value = '';
+  startEdit(e.id);
+}
+
+function startEdit(id) {
+  if (state.editingId === id) return;
+  if (!canWrite()) return showUnlock();
+  exitEdit(false);
+  const e = byId(id);
+  if (!e || e.deleted) return;
+  state.editingId = state.selectedId = id;
+  state.snapshot = JSON.parse(JSON.stringify(e));
+  renderAll();
+  const cell = cellEl(id);
+  if (cell) {
+    grow(cell.querySelector('.f-body'));
+    const f = e.title ? cell.querySelector('.f-body') : cell.querySelector('.f-title');
+    f.focus();
+    if (f.setSelectionRange) f.setSelectionRange(f.value.length, f.value.length);
+    cell.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function syncEditor() {
+  const e = byId(state.editingId), c = state.editingId && cellEl(state.editingId);
+  if (!e || !c) return e;
+  e.title = c.querySelector('.f-title').value;
+  e.body = c.querySelector('.f-body').value;
+  e.tags = parseTags(c.querySelector('.f-tags').value);
+  const d = c.querySelector('.f-date').value, t = c.querySelector('.f-time').value;
+  if (d) e.date = d;
+  if (t) e.time = t;
+  return e;
+}
+
+function exitEdit(render = true) {
+  if (!state.editingId) return;
+  const e = syncEditor();
+  const snap = state.snapshot;
+  const before = e ? computeStats(e.id).streak : 0;
+  state.editingId = null;
+  state.snapshot = null;
+  if (e) {
+    e.title = e.title.trim();
+    if (!hasContent(e)) {
+      state.entries = state.entries.filter(x => x !== e);
+      if (state.selectedId === e.id) state.selectedId = null;
+    } else if (snap) {
+      const changed = ['title', 'body', 'mood', 'date', 'time'].some(k => (snap[k] || '').trim() !== (e[k] || '').trim())
+        || snap.tags.join() !== e.tags.join();
+      const isNew = !snap.title.trim() && !snap.body.replace(/^>.*\n*/, '').trim();
+      const after = computeStats().streak;
+      if (isNew && after > before && VOICE.milestones[after]) toast(VOICE.milestones[after]);
+      else if (changed) toast(pick(isNew ? VOICE.commit : VOICE.edited));
+    }
+  }
+  writeFile();
+  if (render) { renderAll(); scrollToSelected(); }
+}
+
+function revert() {
+  const e = byId(state.editingId);
+  if (e && state.snapshot) Object.assign(e, state.snapshot);
+  state.editingId = null;
+  state.snapshot = null;
+  if (e && !hasContent(e)) state.entries = state.entries.filter(x => x !== e);
+  writeFile(); renderAll();
+}
+
+let undoFn = null;
+function trash(id) {
+  const e = byId(id);
+  if (!e) return;
+  if (state.editingId === id) { syncEditor(); state.editingId = null; state.snapshot = null; }
+  const l = live().filter(x => hasContent(x) || x.id === id), i = l.findIndex(x => x.id === id);
+  const next = l[i + 1] || l[i - 1];
+  if (!hasContent(e)) {
+    state.entries = state.entries.filter(x => x !== e);
+    state.selectedId = next ? next.id : null;
+    writeFile(); renderAll();
+    return;
+  }
+  e.deleted = stamp();
+  state.selectedId = next ? next.id : null;
+  writeFile(); renderAll();
+  toast(pick(VOICE.trash), () => { e.deleted = ''; state.selectedId = e.id; writeFile(); renderAll(); scrollToSelected(); });
+}
+function restore(id) {
+  const e = byId(id);
+  if (!e) return;
+  e.deleted = '';
+  state.selectedId = e.id;
+  writeFile(); renderAll(); scrollToSelected();
+  toast(pick(VOICE.restore));
+}
+async function purge(id) {
+  const e = byId(id);
+  if (!e) return;
+  if (!await ask('Delete forever?', `“${e.title || 'untitled'}” (${e.date}) will be removed from the file permanently. This can't be undone.`, 'delete forever', 'danger')) return;
+  state.purged.add(entrySig(e));
+  state.entries = state.entries.filter(x => x !== e);
+  writeFile(); renderAll();
+  toast('entry deleted permanently');
+}
+async function emptyTrash() {
+  const n = trashed().length;
+  if (!n) return;
+  if (!await ask('Empty trash?', `${n} ${n === 1 ? 'entry' : 'entries'} will be permanently removed from the file. This can't be undone.`, 'empty trash', 'danger')) return;
+  state.entries.filter(e => e.deleted).forEach(e => state.purged.add(entrySig(e)));
+  state.entries = state.entries.filter(e => !e.deleted);
+  writeFile(); renderAll();
+  toast(pick(VOICE.empty));
+}
+
+function select(id, scroll = true) {
+  state.selectedId = id;
+  document.querySelectorAll('#cells .cell').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  document.querySelectorAll('#panel .row').forEach(r => r.classList.toggle('active', r.dataset.id === id));
+  renderChrome();
+  if (scroll) scrollToSelected();
+}
+function scrollToSelected() {
+  const c = state.selectedId && cellEl(state.selectedId);
+  if (c) c.scrollIntoView({ block: 'nearest' });
+}
+function move(dir) {
+  const ids = [...document.querySelectorAll('#cells .cell[data-id]')].map(c => c.dataset.id);
+  if (!ids.length) return;
+  const i = ids.indexOf(state.selectedId);
+  select(ids[i < 0 ? (dir > 0 ? 0 : ids.length - 1) : Math.max(0, Math.min(ids.length - 1, i + dir))]);
+}
+
+function jumpTo(id) {
+  const e = byId(id);
+  if (!e) return;
+  exitEdit(false);
+  if (state.query) { state.query = ''; const f = $('#filterInput'); if (f) f.value = ''; }
+  state.selectedId = id;
+  if (NARROW.matches) state.panel = null;
+  renderAll();
+  const c = cellEl(id);
+  if (c) c.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function shufflePrompt() {
+  state.promptOffset = (state.promptOffset || 0) + 1;
+  const p = todaysPrompt(state.promptOffset);
+  document.querySelectorAll('.ptext').forEach(x => { x.textContent = p; });
+  const q = document.querySelector('.cell.status .q');
+  if (q) q.textContent = `“${p}”`;
+}
+
+/* ============ rendering ============ */
+const cellEl = id => document.querySelector(`#cells .cell[data-id="${id}"]`);
+const matches = (e, q) => [e.title, e.body, e.tags.map(t => '#' + t).join(' '), e.mood, e.date].join(' ').toLowerCase().includes(q);
+const meter = m => {
+  const lv = MOODS.indexOf(m) + 1;
+  return `<span class="meter" title="mood: ${m}">${MOODS.map((_, i) => `<i class="${i < lv ? 'on' : ''}"></i>`).join('')}<em>${m}</em></span>`;
+};
+
+function renderCells() {
+  const box = $('#cells');
+  const q = state.query.trim().toLowerCase();
+  const l = live();
+  let html = '';
+  if (state.pending) html += `<div class="banner">${I('link', 14)}<span>${esc(state.pending.name)} needs permission to sync</span><span class="grow"></span><button class="btn primary" data-act="reconnect">reconnect</button></div>`;
+  else if (!state.target && state.unpaired) html += `<div class="banner">${I('link', 14)}<span>this device isn't paired yet. on your PC, start ${esc(APP.name)} with the <b>iPad &amp; tablet</b> launcher and scan the QR code in the folder panel.</span></div>`;
+  else if (!state.target) { box.innerHTML = startHtml(); return; }
+  else if (notDownloaded() && daysSinceDownload() >= 3) {
+    const d = Math.floor(daysSinceDownload());
+    html += `<div class="banner">${I('download', 14)}<span>${esc(state.target.name)} lives in this browser and hasn't been downloaded in ${d} days. keep a copy on your device.</span><span class="grow"></span><button class="btn primary" data-act="download">download copy</button></div>`;
+  }
+  if (state.error) html += `<div class="banner">${I('x', 14)}<span>couldn't write ${esc(state.target ? state.target.name : 'file')}: ${esc(state.error)}</span></div>`;
+  let n = 0, shown = 0;
+  for (const e of l) {
+    if (hasContent(e)) n++;
+    if (q && e.id !== state.editingId && !matches(e, q)) continue;
+    shown++;
+    html += cellHtml(e, hasContent(e) ? n : ' ');
+  }
+  if (!l.length) html += `<div class="empty-nb"><div class="big">empty notebook</div><span class="kb-only">press <kbd>b</kbd> or click below</span><span class="touch-only">tap <b>+ new entry</b> below</span> to write your first entry.<br>everything is saved to one markdown file.</div>`;
+  else if (!shown) html += `<div class="empty-nb">no cells match “${esc(state.query)}”</div>`;
+  if (!q) html += statusCellHtml();
+  if (!q) html += `<button class="add-cell" data-act="new">${I('plus', 14)} new entry <span class="grow"></span><kbd>b</kbd></button>`;
+  box.innerHTML = html;
+  const ed = state.editingId && cellEl(state.editingId);
+  if (ed) { grow(ed.querySelector('.f-body')); countWords(); }
+}
+
+function statusCellHtml() {
+  const s = computeStats();
+  const d = new Date();
+  const date = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }).toLowerCase();
+  const otd = s.onThisDay;
+  const otdLabel = otd && (otd.date.slice(5) === s.today.slice(5) ? `${s.today.slice(0, 4) - otd.date.slice(0, 4)}y ago` : '30 days ago');
+  return `<div class="cell status"><div class="prompt">[~]:</div><div class="box">
+    <div class="code-line">${APP.slug}.<span class="fn">today</span>()</div>
+    <div class="out">
+      <div>${greeting()} it's ${date}.</div>
+      <div><span class="k">streak</span><span class="${s.streak ? 'hi' : ''}">${streakLine(s)}</span></div>
+      ${licensingOn() && !licensed() ? `<div><span class="k">licence</span>${esc(licenceLine())} <a href="#" class="lnk" data-act="unlock">unlock</a></div>` : ''}
+      <div><span class="k">this week</span>${s.weekEntries} ${s.weekEntries === 1 ? 'entry' : 'entries'} · ${s.weekWords.toLocaleString()} words</div>
+      ${otd ? `<div><span class="k">${otdLabel}</span><a href="#" class="lnk" data-act="jump" data-id="${otd.id}">${esc(otd.title || 'untitled')}</a></div>` : ''}
+      <div><span class="k">prompt</span><span class="q">“${esc(todaysPrompt(state.promptOffset || 0))}”</span>
+        <span class="acts"><button class="btn primary" data-act="writePrompt">write about this</button><button class="ib" data-act="shufflePrompt" title="another prompt">${I('shuffle', 13)}</button></span></div>
+    </div></div></div>`;
+}
+
+function cellHtml(e, n) {
+  const editing = e.id === state.editingId, sel = e.id === state.selectedId;
+  const wd = new Date(e.date + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short' }).toLowerCase();
+  const trashBtn = `<button class="ib danger" data-act="trash" title="Move to trash (d d)">${I('trash', 15)}</button>`;
+  let inner;
+  if (editing) {
+    inner = `
+      <div class="head">
+        <input type="date" class="f-date" value="${e.date}"><input type="time" class="f-time" value="${e.time}">
+        <span style="color:var(--amber)">● editing</span>
+        <div class="actions">${trashBtn}</div>
+      </div>
+      <div class="ed">
+        <input class="f-title" placeholder="untitled" value="${esc(e.title)}" autocomplete="off">
+        ${!e.body.trim() ? `<div class="prompt-line"><b>prompt ›</b><span class="ptext">${esc(todaysPrompt(state.promptOffset || 0))}</span><button class="btn" data-act="usePrompt">use</button><button class="ib" data-act="shufflePrompt" title="another prompt">${I('shuffle', 13)}</button></div>` : ''}
+        <div class="moodseg"><span class="lbl">mood</span>${MOODS.map(m => `<button data-mood="${m}" class="${e.mood === m ? 'on' : ''}">${m}</button>`).join('')}</div>
+        <textarea class="f-body" placeholder="write in markdown — **bold**, - lists, - [ ] tasks, \`code\`, > quotes" spellcheck="true">${esc(e.body)}</textarea>
+        <input class="f-tags" placeholder="#add #tags" value="${esc(e.tags.map(t => '#' + t).join(' '))}" autocomplete="off">
+        <div class="ed-foot">
+          <span class="hint"><kbd>shift</kbd>+<kbd>enter</kbd> commit</span><span class="hint"><kbd>esc</kbd> exit</span>
+          <span class="grow"></span><span class="wc"></span>
+          <button class="btn ghost" data-act="revert">revert</button>
+          <button class="btn primary" data-act="commit">${I('play', 11)} commit</button>
+        </div>
+      </div>`;
+  } else {
+    const tags = e.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join(' ');
+    inner = `
+      <div class="head">
+        <span class="ts">${e.date} <b>${e.time}</b></span><span>${wd}</span>
+        ${e.mood ? meter(e.mood) : ''}${tags ? `<span>${tags}</span>` : ''}
+        <div class="actions"><button class="ib" data-act="edit" title="Edit (enter)">${I('pencil', 14)}</button>${trashBtn}</div>
+      </div>
+      <div class="md">${e.title ? `<div class="title">${inline(e.title)}</div>` : '<div class="title untitled">untitled</div>'}${renderMd(e.body)}</div>`;
+  }
+  return `<div class="cell${sel ? ' selected' : ''}${editing ? ' editing' : ''}" data-id="${e.id}"><div class="prompt">[${editing ? '*' : n}]:</div><div class="box">${inner}</div></div>`;
+}
+
+function renderPanel() {
+  const p = $('#panel');
+  document.querySelectorAll('.rail .ib[data-panel]').forEach(b => b.classList.toggle('active', b.dataset.panel === state.panel));
+  const tc = trashed().length;
+  $('.rail [data-panel="trash"]').innerHTML = I('trash', 18) + (tc ? `<span class="badge">${tc}</span>` : '');
+  $('#scrim').classList.toggle('show', !!state.panel);
+  if (!state.panel) { p.hidden = true; state.builtPanel = null; return; }
+  p.hidden = false;
+  if (state.builtPanel !== state.panel) {
+    state.builtPanel = state.panel;
+    if (state.panel === 'contents') {
+      p.innerHTML = `<div class="p-head">contents</div>
+        <label class="p-filter">${I('search', 13)}<input id="filterInput" placeholder="grep entries…" value="${esc(state.query)}" autocomplete="off"></label>
+        <div class="p-body" id="pBody"></div>`;
+      $('#filterInput').addEventListener('input', ev => { state.query = ev.target.value; renderCells(); renderPanelBody(); });
+    } else if (state.panel === 'trash') {
+      p.innerHTML = `<div class="p-head">trash<span class="grow"></span><button class="btn danger" id="emptyBtn">${I('trash', 12)} empty</button></div><div class="p-body" id="pBody"></div>`;
+      $('#emptyBtn').onclick = emptyTrash;
+    } else if (state.panel === 'insights') {
+      p.innerHTML = `<div class="p-head">insights</div><div class="p-body" id="pBody"></div>`;
+    } else {
+      p.innerHTML = `<div class="p-head">file</div><div class="p-body" id="pBody"></div>`;
+    }
+  }
+  renderPanelBody();
+}
+
+function insightsHtml() {
+  const s = computeStats();
+  if (!s.es.length) return `<div class="p-empty">no data yet.<br>write an entry and this panel<br>starts telling stories.</div>`;
+  // activity grid: 22 weeks, monday-first columns
+  const WEEKS = 22;
+  const dow = (new Date(s.today + 'T12:00').getDay() + 6) % 7;
+  const start = addDays(s.today, -dow - (WEEKS - 1) * 7);
+  let cells = '';
+  for (let i = 0; i < WEEKS * 7; i++) {
+    const d = addDays(start, i);
+    if (d > s.today) { cells += '<i class="pad"></i>'; continue; }
+    const w = s.byDay.get(d);
+    const lv = w === undefined ? 0 : w < 50 ? 1 : w < 150 ? 2 : w < 300 ? 3 : 4;
+    cells += `<i class="${lv ? 'l' + lv : ''}${d === s.today ? ' today' : ''}" ${w !== undefined ? `data-date="${d}"` : ''} title="${d} · ${w === undefined ? 'no entry' : w + ' words'}"></i>`;
+  }
+  const bars = s.moods.map(m => `<i class="${m ? '' : 'none'}" style="height:${m ? m * 20 : 8}%" title="${m ? MOODS[m - 1] : 'no mood'}"></i>`).join('');
+  const maxTag = s.tags.length ? s.tags[0][1] : 1;
+  const tags = s.tags.map(([t, c]) => `<div><span class="tag">#${esc(t)}</span><span style="color:var(--faint)">${c}</span><span class="tbar"><i style="width:${c / maxTag * 100}%"></i></span></div>`).join('');
+  return `
+    <div class="stat-grid">
+      <div class="stat${s.streak ? ' hot' : ''}"><b>${s.streak}d</b><span>streak</span></div>
+      <div class="stat"><b>${s.longest}d</b><span>longest</span></div>
+      <div class="stat"><b>${s.es.length}</b><span>entries</span></div>
+      <div class="stat"><b>${s.totalWords >= 10000 ? (s.totalWords / 1000).toFixed(1) + 'k' : s.totalWords.toLocaleString()}</b><span>words</span></div>
+    </div>
+    <div class="p-group">activity · ${WEEKS} weeks</div>
+    <div class="heat">${cells}</div>
+    <div class="heat-legend">less <i style="background:var(--grid)"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> more</div>
+    <div class="p-group">this week</div>
+    <div class="kv"><span>entries</span><span>${s.weekEntries}</span><span>words</span><span>${s.weekWords.toLocaleString()}</span><span>status</span><span>${streakLine(s)}</span></div>
+    <div class="p-group">mood · last ${s.moods.length} entries</div>
+    <div class="bars">${bars}</div>
+    ${tags ? `<div class="p-group">top tags</div><div class="taglist">${tags}</div>` : ''}`;
+}
+
+// "open on iPad / tablet" — pairing via QR when the launcher runs with --lan
+function deviceHtml() {
+  if (!state.server) return '';
+  if (state.server.remote) return `<div class="p-group">this device</div><div class="p-note">connected to your PC. entries save to <b>${esc(state.target ? state.target.name : 'daycell.md')}</b> on the PC — keep it on and on the same Wi-Fi.<br><br>tip: tap share → <b>add to home screen</b> to open ${esc(APP.name)} like an app.</div>`;
+  if (!state.server.lan) return `<div class="p-group">ipad / tablet</div><div class="p-note">want to write on your iPad or tablet? close this window and start <b>Start ${esc(APP.name)} (iPad &amp; tablet).bat</b> instead — a QR code will appear here.</div>`;
+  setTimeout(drawQr);
+  return `<div class="p-group">open on ipad / tablet</div>
+    <div class="qr-wrap"><div id="qr"></div></div>
+    <div class="p-note">1. iPad on the same Wi-Fi as this PC<br>2. point the camera at the code, tap the link<br>3. share → <b>add to home screen</b><br><br>entries from both devices save into the same .md file here.<br><span style="overflow-wrap:anywhere">${esc(state.server.lan.address)}</span></div>`;
+}
+let qrLib;
+async function drawQr() {
+  const el = $('#qr');
+  if (!el || !state.server || !state.server.lan) return;
+  try {
+    qrLib = qrLib || new Promise((res, rej) => {
+      const sc = Object.assign(document.createElement('script'), { src: 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js', onload: res, onerror: rej });
+      document.head.append(sc);
+    });
+    await qrLib;
+    el.innerHTML = '';
+    new QRCode(el, { text: state.server.lan.url, width: 168, height: 168, colorDark: '#111111', colorLight: '#ffffff' });
+  } catch {
+    el.innerHTML = `<div class="p-note" style="margin:0">couldn't load the QR code (offline?). type the address shown in the launcher window instead.</div>`;
+  }
+}
+
+function renderPanelBody() {
+  const b = $('#pBody');
+  if (!b) return;
+  if (state.panel === 'contents') {
+    const q = state.query.trim().toLowerCase();
+    const l = live().filter(hasContent);
+    const rows = l.map((e, i) => ({ e, n: i + 1 })).reverse().filter(({ e }) => !q || matches(e, q));
+    if (!rows.length) { b.innerHTML = `<div class="p-empty">${q ? 'no matches' : 'no entries yet'}</div>`; return; }
+    let month = '', html = '';
+    for (const { e, n } of rows) {
+      const d = new Date(e.date + 'T00:00');
+      const m = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+      if (m !== month) { month = m; html += `<div class="p-group">${m}</div>`; }
+      html += `<button class="row${e.id === state.selectedId ? ' active' : ''}" data-id="${e.id}"><span class="n">[${n}]</span><span class="t">${esc(e.title || 'untitled')}</span><span class="d">${pad(d.getDate())} ${d.toLocaleDateString('en-GB', { weekday: 'short' }).toLowerCase()}</span></button>`;
+    }
+    b.innerHTML = html;
+  } else if (state.panel === 'insights') {
+    b.innerHTML = insightsHtml();
+  } else if (state.panel === 'trash') {
+    const t = trashed();
+    $('#emptyBtn').disabled = !t.length;
+    b.innerHTML = t.length
+      ? t.map(e => `<div class="trow"><div class="tt">${esc(e.title || 'untitled')}</div><div class="tm">${e.date} · deleted ${ago(e.deleted)}</div>
+          <div class="ta"><button class="ib" data-tact="restore" data-id="${e.id}" title="Restore">${I('restore', 15)}</button><button class="ib danger" data-tact="purge" data-id="${e.id}" title="Delete forever">${I('x', 15)}</button></div></div>`).join('')
+        + `<div class="p-note">trashed entries live in a <b># Trash</b> section at the bottom of your .md file until you empty it.</div>`
+      : `<div class="p-empty">${I('trash', 22).replace('<svg', '<svg style="margin:0 auto 10px"')}trash is empty</div>`;
+  } else {
+    const name = state.target ? state.target.name : state.pending ? state.pending.name : null;
+    let btns = '', journals = '';
+    if (state.server) {
+      journals = `<div class="p-group">journals in folder</div>`
+        + state.serverFiles.map(f => `<button class="row${state.target && f === state.target.name ? ' active' : ''}" data-sfile="${esc(f)}"><span class="n">${I('file', 12)}</span><span class="t">${esc(f)}</span><span class="d">${state.target && f === state.target.name ? 'open' : ''}</span></button>`).join('')
+        + `<label class="p-filter" style="margin:8px 2px">${I('fileplus', 13)}<input id="newJournal" placeholder="new-journal.md + enter" autocomplete="off"></label>`;
+    } else if (webMode()) {
+      const m = getMount();
+      if (state.pending) btns += `<button class="btn block primary" data-fact="reconnect">${I('link', 14)} reconnect ${esc(state.pending.name)}</button>`;
+      if (m && m.kind === 'browser' && state.target) btns += `<button class="btn block${notDownloaded() ? ' primary' : ''}" data-fact="download">${I('download', 14)} download a copy</button>`;
+      if (m) btns += `<button class="btn block" data-fact="eject">${I('eject', 14)} eject ${esc(m.name)}</button>`;
+      else btns += `<button class="btn block primary" data-fact="startNew">${I('fileplus', 14)} new journal</button><button class="btn block" data-fact="startOpen">${I('folder', 14)} open a .md</button>`;
+    }
+    b.innerHTML = `
+      <div class="kv" style="padding-top:12px">
+        <span>file</span><span>${name ? esc(name) : 'no journal open'}</span>
+        ${webMode() && getMount() ? `<span>kept</span><span>${getMount().kind === 'handle' ? 'live file on your device' : 'in this browser'}</span>` : ''}
+        ${webMode() && getMount() && getMount().kind === 'browser' ? `<span>downloaded</span><span>${getMount().lastDownload ? ago(getMount().lastDownload.slice(0, 16).replace('T', ' ')) : 'not yet'}</span>` : ''}
+        ${state.server ? `<span>folder</span><span style="overflow-wrap:anywhere">${esc(state.server.dir)}</span>` : ''}
+        <span>entries</span><span>${live().filter(hasContent).length}</span>
+        <span>trash</span><span>${trashed().length}</span>
+      </div>
+      ${journals}
+      <div class="stack">${btns}</div>
+      ${deviceHtml()}
+      ${licenceHtml()}
+      <div class="p-group">shortcuts</div>
+      <div class="kv">
+        <span>b</span><span>new entry</span><span>enter</span><span>edit selected</span>
+        <span>shift+enter</span><span>commit cell</span><span>esc</span><span>exit edit</span>
+        <span>↑ ↓ / j k</span><span>move selection</span><span>d d</span><span>move to trash</span>
+        <span>ctrl+s</span><span>save now</span><span>/ or ctrl+k</span><span>command palette</span>
+      </div>
+      <div class="p-group">format</div>
+      <div class="fmt"><b>## 2026-10-02 · 21:14 — Title</b>
+mood:: good
+tags:: #work #ideas
+
+body in markdown…
+
+---
+
+<b># Trash</b>
+## … deleted:: 2026-10-02 21:20</div>`;
+  }
+}
+
+function setStatus() {
+  const k = $('#kernel'), s = k.querySelector('span');
+  let cls = '', msg;
+  if (state.error) { cls = 'err'; msg = 'write failed'; k.title = state.error; }
+  else if (state.saving) { cls = 'busy'; msg = 'saving…'; }
+  else if (state.unsaved) { cls = 'busy'; msg = 'unsaved'; }
+  else if (state.target && state.target.kind === 'browser') { cls = notDownloaded() ? 'warn' : 'ok'; msg = notDownloaded() ? 'in browser · not downloaded' : 'downloaded'; }
+  else if (state.target) { cls = 'ok'; msg = 'saved to file'; }
+  else if (state.pending) { cls = 'warn'; msg = 'disconnected'; }
+  else if (webMode()) { msg = 'no journal open'; }
+  else { cls = 'warn'; msg = 'not saved to a file'; }
+  k.className = 'kernel ' + cls;
+  if (!state.error) k.title = '';
+  s.textContent = msg;
+  const name = state.target ? state.target.name : state.pending ? state.pending.name : webMode() ? 'no journal' : 'not linked';
+  $('#fname').textContent = name;
+  $('#ejectBtn').hidden = !(webMode() && (state.target || state.pending));
+  $('#sbLic').innerHTML = !licensingOn() || licensed() ? '' : trialDaysLeft() ? `trial <b>${trialDaysLeft()}d left</b>` : 'trial <b>ended</b>';
+  $('#filetab').classList.toggle('unsaved', state.unsaved || state.saving);
+  $('#sbFile').textContent = name;
+}
+
+function renderChrome() {
+  const editing = !!state.editingId;
+  $('#mode').textContent = editing ? 'EDIT' : 'COMMAND';
+  $('#mode').className = 'mode' + (editing ? ' edit' : '');
+  $('#sbMode').innerHTML = `mode <b>${editing ? 'edit' : 'command'}</b>`;
+  $('#sbCount').innerHTML = `entries <b>${live().filter(hasContent).length}</b>`;
+  $('#sbTrash').innerHTML = `trash <b>${trashed().length}</b>`;
+  $('#tbEdit').disabled = !state.selectedId || editing;
+  $('#tbRun').disabled = !editing;
+  $('#tbTrash').disabled = !state.selectedId;
+  if (!editing) $('#sbWords').textContent = '';
+  setStatus();
+}
+
+function renderAll() { renderCells(); renderPanel(); renderChrome(); }
+
+function grow(t) { if (!t) return; t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; }
+function countWords() {
+  const c = state.editingId && cellEl(state.editingId);
+  if (!c) return;
+  const n = (c.querySelector('.f-body').value.match(/\S+/g) || []).length;
+  c.querySelector('.wc').textContent = `${n} ${n === 1 ? 'word' : 'words'}`;
+  $('#sbWords').innerHTML = `words <b>${n}</b>`;
+}
+
+let toastTimer;
+function toast(msg, undo, ms) {
+  const t = $('#toast');
+  t.querySelector('span').textContent = msg;
+  undoFn = undo || null;
+  t.classList.toggle('has-action', !!undo);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); undoFn = null; }, ms || (undo ? 5000 : 2000));
+}
+
+let modalResolve = null;
+function ask(title, text, okLabel, kind = '', cancelLabel = 'cancel', opts = {}) {
+  $('#mTitle').textContent = title;
+  $('#mInputWrap').hidden = opts.input === undefined;
+  $('#mInput').value = opts.input || '';
+  $('#mText').textContent = text;
+  $('#mOk').textContent = okLabel;
+  $('#mOk').className = 'btn ' + (kind === 'danger' ? 'danger' : 'primary');
+  $('#mCancel').textContent = cancelLabel;
+  $('#modal').hidden = false;
+  if (opts.input !== undefined) { $('#mInput').focus(); $('#mInput').select(); } else $('#mOk').focus();
+  return new Promise(r => { modalResolve = r; });
+}
+function closeModal(v) {
+  $('#modal').hidden = true;
+  if (v && !$('#mInputWrap').hidden) v = $('#mInput').value.trim() || false;
+  if (modalResolve) modalResolve(v);
+  modalResolve = null;
+}
+
+function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+
+/* ============ command palette ============ */
+function openPanel(name) { state.panel = name; store.set(STORE_KEY + '-panel', name); renderPanel(); }
+const COMMANDS = [
+  { k: 'new', d: 'new entry', run: () => newEntry() },
+  { k: 'prompt', d: 'write about today’s prompt', run: () => newEntry(todaysPrompt(state.promptOffset || 0)) },
+  { k: 'today', d: 'jump to today’s entry', run: () => {
+      const t = live().filter(e => hasContent(e) && e.date === now().date).pop();
+      if (t) jumpTo(t.id); else { toast('nothing yet today. starting one.'); newEntry(); }
+    } },
+  { k: 'random', d: 'time travel to a random past entry', run: () => {
+      const es = live().filter(hasContent);
+      if (!es.length) return toast('nothing to travel to yet.');
+      const e = pick(es); jumpTo(e.id); toast('time travel → ' + e.date);
+    } },
+  { k: 'stats', d: 'streaks, activity, moods, tags', run: () => openPanel('insights') },
+  { k: 'search', d: 'grep your entries', run: () => { openPanel('contents'); setTimeout(() => { const f = $('#filterInput'); if (f) f.focus(); }); } },
+  { k: 'trash', d: 'open the trash', run: () => openPanel('trash') },
+  { k: 'files', d: 'journals & shortcuts', run: () => openPanel('files') },
+  { k: 'theme', d: 'toggle light / dark', run: () => $('#themeBtn').click() },
+  { k: 'save', d: 'save to file now', run: () => $('#tbSave').click() },
+  { k: 'download', d: 'download a copy of this journal', run: () => webMode() && getMount()?.kind === 'browser' ? downloadMd() : toast('this journal already saves straight to its file.') },
+  { k: 'eject', d: 'eject this journal', run: () => webMode() ? eject() : toast('eject is for the web version.') },
+  { k: 'unlock', d: 'enter a licence key', run: () => licensingOn() ? showUnlock() : toast('nothing to unlock here.') },
+];
+let palIdx = 0, palItems = [];
+function openPalette() {
+  if (state.editingId) syncEditor();
+  $('#palette').hidden = false;
+  $('#palInput').value = '';
+  renderPalette();
+  $('#palInput').focus();
+}
+function closePalette() { $('#palette').hidden = true; }
+function renderPalette() {
+  const q = $('#palInput').value.trim().toLowerCase().replace(/^\//, '');
+  palItems = COMMANDS.filter(c => !q || c.k.startsWith(q) || c.d.includes(q));
+  palIdx = Math.min(palIdx, Math.max(0, palItems.length - 1));
+  $('#palList').innerHTML = palItems.length
+    ? palItems.map((c, i) => `<button class="pal-item${i === palIdx ? ' on' : ''}" data-i="${i}"><b>/${c.k}</b><span>${c.d}</span></button>`).join('')
+    : `<div class="p-empty">command not found. try /help… just kidding, try /stats</div>`;
+}
+function runPalette(i) { const c = palItems[i]; closePalette(); if (c) c.run(); }
+$('#palInput').addEventListener('input', () => { palIdx = 0; renderPalette(); });
+$('#palInput').addEventListener('keydown', ev => {
+  if (ev.key === 'ArrowDown') { ev.preventDefault(); palIdx = (palIdx + 1) % Math.max(1, palItems.length); renderPalette(); }
+  else if (ev.key === 'ArrowUp') { ev.preventDefault(); palIdx = (palIdx - 1 + palItems.length) % Math.max(1, palItems.length); renderPalette(); }
+  else if (ev.key === 'Enter') { ev.preventDefault(); runPalette(palIdx); }
+  else if (ev.key === 'Escape') { ev.preventDefault(); closePalette(); }
+  ev.stopPropagation();
+});
+$('#palList').addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (b) runPalette(+b.dataset.i); });
+$('#palette').addEventListener('mousedown', ev => { if (ev.target.id === 'palette') closePalette(); });
+
+/* ============ events ============ */
+$('#cells').addEventListener('click', ev => {
+  const act = ev.target.closest('[data-act]');
+  const cell = ev.target.closest('.cell[data-id]');
+  const mood = ev.target.closest('[data-mood]');
+  if (mood && cell) {
+    const e = byId(cell.dataset.id);
+    e.mood = e.mood === mood.dataset.mood ? '' : mood.dataset.mood;
+    cell.querySelectorAll('[data-mood]').forEach(b => b.classList.toggle('on', b.dataset.mood === e.mood));
+    syncEditor(); scheduleWrite();
+    return;
+  }
+  if (act) {
+    ev.preventDefault();
+    const id = cell && cell.dataset.id;
+    ({
+      new: () => newEntry(), reconnect, startNew, startOpen, download: downloadMd,
+      writePrompt: () => newEntry(todaysPrompt(state.promptOffset || 0)),
+      shufflePrompt: shufflePrompt,
+      usePrompt: () => {
+        const c = cellEl(state.editingId), t = c.querySelector('.f-body');
+        t.value = `> ${todaysPrompt(state.promptOffset || 0)}\n\n` + t.value;
+        c.querySelector('.prompt-line').remove();
+        t.focus(); t.setSelectionRange(t.value.length, t.value.length);
+        t.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      jump: () => jumpTo(act.dataset.id),
+      unlock: showUnlock,
+      edit: () => startEdit(id),
+      trash: () => trash(id),
+      commit: () => exitEdit(),
+      revert,
+    })[act.dataset.act]();
+    return;
+  }
+  if (cell && cell.dataset.id !== state.editingId) {
+    if (COARSE.matches && !state.editingId && state.selectedId === cell.dataset.id && !ev.target.closest('a')) return startEdit(cell.dataset.id);
+    if (state.editingId) { exitEdit(false); state.selectedId = cell.dataset.id; renderAll(); }
+    else select(cell.dataset.id, false);
+  }
+});
+$('#cells').addEventListener('dblclick', ev => {
+  const cell = ev.target.closest('.cell[data-id]');
+  if (cell && !cell.classList.contains('editing') && ev.target.closest('.md')) startEdit(cell.dataset.id);
+});
+$('#cells').addEventListener('input', ev => {
+  if (!ev.target.closest('.cell.editing')) return;
+  if (ev.target.classList.contains('f-body')) { grow(ev.target); countWords(); }
+  syncEditor();
+  scheduleWrite();
+});
+
+$('#panel').addEventListener('keydown', ev => {
+  if (ev.target.id === 'newJournal' && ev.key === 'Enter') switchServerFile(ev.target.value, { create: true });
+});
+$('#panel').addEventListener('click', ev => {
+  const day = ev.target.closest('[data-date]');
+  if (day) {
+    const e = live().filter(hasContent).find(x => x.date === day.dataset.date);
+    if (e) jumpTo(e.id);
+    return;
+  }
+  const sf = ev.target.closest('[data-sfile]');
+  if (sf) { if (!state.target || sf.dataset.sfile !== state.target.name) switchServerFile(sf.dataset.sfile); return; }
+  const row = ev.target.closest('.row');
+  if (row) {
+    if (state.editingId) { exitEdit(false); state.selectedId = row.dataset.id; renderAll(); scrollToSelected(); }
+    else select(row.dataset.id);
+    if (NARROW.matches) { state.panel = null; renderPanel(); }
+    return;
+  }
+  const t = ev.target.closest('[data-tact]');
+  if (t) return t.dataset.tact === 'restore' ? restore(t.dataset.id) : purge(t.dataset.id);
+  const f = ev.target.closest('[data-fact]');
+  if (f) ({ reconnect, download: downloadMd, eject, startNew, startOpen, deactivate: deactivateDevice, unlock: showUnlock })[f.dataset.fact]();
+});
+
+$('#scrim').addEventListener('click', () => { state.panel = null; store.set(STORE_KEY + '-panel', 'none'); renderPanel(); });
+document.querySelectorAll('.rail .ib[data-panel]').forEach(b => b.onclick = () => {
+  state.panel = state.panel === b.dataset.panel ? null : b.dataset.panel;
+  store.set(STORE_KEY + '-panel', state.panel || 'none');
+  renderPanel();
+});
+
+$('#tbNew').onclick = newEntry;
+$('#tbSave').onclick = () => { syncEditor(); writeFile().then(ok => ok && toast(state.target ? 'saved to ' + state.target.name : 'saved in browser only — no file linked')); };
+$('#tbEdit').onclick = () => state.selectedId && startEdit(state.selectedId);
+$('#tbRun').onclick = () => exitEdit();
+$('#tbTrash').onclick = () => state.selectedId && trash(state.selectedId);
+$('#themeBtn').onclick = () => {
+  const next = getComputedStyle(document.documentElement).colorScheme === 'dark' ? 'light' : 'dark';
+  applyTheme(next); store.set(STORE_KEY + '-theme', next);
+};
+$('#toast button').onclick = () => { if (undoFn) undoFn(); undoFn = null; $('#toast').classList.remove('show'); };
+$('#mOk').onclick = () => closeModal(true);
+$('#mInput').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); closeModal(true); } });
+$('#ejectBtn').onclick = eject;
+$('#filetab').onclick = () => openPanel('files');
+$('#uploadInput').addEventListener('change', ev => { const f = ev.target.files[0]; ev.target.value = ''; if (f) openUploaded(f); });
+$('#uOk').onclick = submitUnlock;
+$('#uCancel').onclick = () => { $('#unlock').hidden = true; };
+$('#uKey').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitUnlock(); if (ev.key === 'Escape') $('#unlock').hidden = true; ev.stopPropagation(); });
+$('#unlock').addEventListener('click', ev => { if (ev.target.id === 'unlock') $('#unlock').hidden = true; });
+$('#mCancel').onclick = () => closeModal(false);
+$('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') closeModal(false); });
+
+let lastD = 0;
+document.addEventListener('keydown', ev => {
+  const k = ev.key;
+  if (!$('#modal').hidden) {
+    if (k === 'Escape') closeModal(false);
+    return;
+  }
+  if (!$('#palette').hidden || !$('#unlock').hidden) return;
+  if ((ev.ctrlKey || ev.metaKey) && k.toLowerCase() === 's') { ev.preventDefault(); $('#tbSave').click(); return; }
+  if ((ev.ctrlKey || ev.metaKey) && k.toLowerCase() === 'k') { ev.preventDefault(); openPalette(); return; }
+  if (state.editingId && ev.target.closest && ev.target.closest('.cell.editing')) {
+    if (k === 'Enter' && ev.shiftKey) { ev.preventDefault(); exitEdit(); }
+    else if (k === 'Escape') { ev.preventDefault(); exitEdit(); }
+    else if (k === 'Tab' && ev.target.classList.contains('f-body')) {
+      ev.preventDefault();
+      const t = ev.target, s = t.selectionStart;
+      t.setRangeText('  ', s, t.selectionEnd, 'end');
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    return;
+  }
+  if (ev.target.matches && ev.target.matches('input, textarea')) { if (k === 'Escape') ev.target.blur(); return; }
+  if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  if (k === 'ArrowDown' || k === 'j') { ev.preventDefault(); move(1); }
+  else if (k === 'ArrowUp' || k === 'k') { ev.preventDefault(); move(-1); }
+  else if (k === 'Enter' && state.selectedId) { ev.preventDefault(); startEdit(state.selectedId); }
+  else if (k === 'b' || k === 'a') { ev.preventDefault(); newEntry(); }
+  else if (k === 'Delete' && state.selectedId) trash(state.selectedId);
+  else if (k === '/') { ev.preventDefault(); openPalette(); }
+  else if (k === 'd' && state.selectedId) {
+    if (Date.now() - lastD < 600) { lastD = 0; trash(state.selectedId); } else lastD = Date.now();
+  }
+});
+window.addEventListener('beforeunload', ev => {
+  syncEditor();
+  if (state.unsaved || state.saving) { writeFile(); if (state.target && state.target.kind === 'handle') ev.preventDefault(); }
+});
+
+/* ============ boot ============ */
+(async function init() {
+  applyTheme(store.get(STORE_KEY + '-theme'));
+  $('#fileIcon').innerHTML = I('file', 13);
+  $('#themeBtn').innerHTML = I('contrast', 16);
+  $('.rail [data-panel="contents"]').innerHTML = I('list', 18);
+  $('.rail [data-panel="files"]').innerHTML = I('folder', 18);
+  $('.rail [data-panel="insights"]').innerHTML = I('activity', 18);
+  $('#tbCmd').innerHTML = I('terminal');
+  $('#ejectBtn').innerHTML = I('eject', 15);
+  $('#tbCmd').onclick = openPalette;
+  document.title = APP.name;
+  $('.wordmark').innerHTML = `${APP.slug}<i>.md</i>`;
+  $('.logo span').textContent = APP.glyph;
+  $('#tbNew').innerHTML = I('plus');
+  $('#tbSave').innerHTML = I('save');
+  $('#tbEdit').innerHTML = I('pencil');
+  $('#tbRun').innerHTML = I('play', 14);
+  $('#tbTrash').innerHTML = I('trash');
+  // on tablets/phones the panel is an overlay, so start closed
+  const sp = store.get(STORE_KEY + '-panel');
+  state.panel = NARROW.matches ? null : sp === 'none' ? null : sp || 'contents';
+
+  const cached = store.get(STORE_KEY + '-md');
+  if (cached) Object.assign(state, parse(cached));
+  // Launched via daycell.py? Then save straight to daycell.md in its folder, no file picker needed.
+  if (location.protocol.startsWith('http')) {
+    try {
+      const r = await fetch('/api/files', { cache: 'no-store' });
+      if (r.status === 401) state.unpaired = true;
+      if (r.ok) {
+        state.server = await r.json();
+        state.serverFiles = state.server.files;
+        let name = store.get(STORE_KEY + '-server-file') || 'daycell.md';
+        // journal.md was the default before the rename; follow it to daycell.md once that exists
+        if (name === 'journal.md' && state.serverFiles.includes('daycell.md')) name = 'daycell.md';
+        if (!state.serverFiles.includes(name) && name !== 'daycell.md') name = 'daycell.md';
+        await connect(serverTarget(name));
+        return;
+      }
+    } catch {}
+  }
+  // web version: reopen whatever journal was open last time
+  const m = getMount();
+  if (LIVE_FILES && (!m || m.kind === 'handle')) {
+    const h = await loadHandle();
+    if (h) {
+      if (!m) setMount({ name: h.name, kind: 'handle' });
+      try {
+        if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') { await connect(handleTarget(h)); recheckLicence(); return; }
+        state.pending = h;
+      } catch { state.pending = h; }
+    }
+  }
+  if (!state.pending && cached && (!m || m.kind === 'browser')) {
+    // older versions kept journals in the browser without a name: keep them open rather than lose them
+    if (!m) setMount({ name: 'daycell.md', kind: 'browser', downloadedHash: null, lastDownload: null, created: new Date().toISOString() });
+    state.target = browserTarget(getMount().name);
+  }
+  recheckLicence();
+  const l = live();
+  state.selectedId = l.length ? l[l.length - 1].id : null;
+  renderAll();
+  $('#nb').scrollTop = $('#nb').scrollHeight;
+})();
+</script>
+</body>
+</html>

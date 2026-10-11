@@ -1,0 +1,16 @@
+# your private journals and the iPad pairing secret never go into git
+Journals/
+.daycell-key
+.daybook-key
+
+# build output and caches
+dist/
+__pycache__/
+*.tmp
+.netlify/
+
+# local tooling
+.claude/
+node_modules/
+.DS_Store
+Thumbs.db
