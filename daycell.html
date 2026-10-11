@@ -1172,6 +1172,7 @@ function startHtml() {
       <button class="start-card" data-act="startNew">${I('fileplus', 20)}<b>new journal</b><span>name it and start writing</span></button>
       <button class="start-card" data-act="startOpen">${I('folder', 20)}<b>open a .md</b><span>${liveFiles() ? 'pick a journal on your device' : 'load a journal from your device'}</span></button>
     </div>
+    ${getLibrary().length ? `<div class="start-how"><b>in this browser</b> · ${getLibrary().map(j => `<a href="#" class="lnk" data-act="openKept" data-name="${esc(j.name)}">${esc(j.name)}</a>`).join(' · ')}</div>` : ''}
     <div class="start-how">${liveFiles()
       ? `<b>how it works</b> · ${esc(APP.name)} saves straight into the .md file you pick. eject whenever you like and the file stays right where it is.`
       : `<b>how it works</b> · your journal lives in this browser while you write. download a copy any time, or eject to take it with you and clear it from this browser.`}</div>
@@ -1185,9 +1186,9 @@ function startHtml() {
 const LICENSE = {
   price: '£12',
   launchPrice: '£9',
-  launchEnds: '',      // last day of launch week, e.g. '2026-11-07'; the £9 price shows until the end of that day
+  launchEnds: '',      // last day of launch week (LAUNCH_ENDS at build time), e.g. '2026-11-07'; £9 shows until that day ends
   launchCode: 'LAUNCH', // Lemon Squeezy discount code applied at checkout during launch week
-  checkoutUrl: '',  // paste your Lemon Squeezy checkout link here; licensing stays off (everything unlocked) until you do
+  checkoutUrl: '',  // filled in at build time from LS_CHECKOUT_URL (tools/build.mjs); empty means no paywall, everything unlocked
   recoverUrl: 'https://app.lemonsqueezy.com/my-orders',
   endpoint: '/api/license',  // the small server function in netlify/functions/license.mjs
   recheckDays: 30,
@@ -1739,7 +1740,7 @@ function renderPanelBody() {
     } else if (webMode()) {
       const m = getMount();
       const lib = getLibrary();
-      if (lib.length > 1 || (lib.length && m && m.kind === 'handle')) {
+      if (lib.some(j => !m || j.name !== m.name)) {
         journals = `<div class="p-group">journals in this browser</div>`
           + lib.map(j => `<button class="row${m && j.name === m.name ? ' active' : ''}" data-bjournal="${esc(j.name)}"><span class="n">${I('file', 12)}</span><span class="t">${esc(j.name)}</span><span class="d">${m && j.name === m.name ? 'open' : ''}</span></button>`).join('');
       }
@@ -2088,6 +2089,7 @@ $('#cells').addEventListener('click', ev => {
       jump: () => jumpTo(act.dataset.id),
       unlock: () => showUnlock(),
       templates: () => openPalette('template'),
+      openKept: () => switchJournal(act.dataset.name),
       safariOk: () => { store.set(STORE_KEY + '-safari-ok', '1'); renderCells(); },
       edit: () => startEdit(id),
       trash: () => trash(id),
@@ -2124,7 +2126,7 @@ $('#panel').addEventListener('click', ev => {
     return;
   }
   const bj = ev.target.closest('[data-bjournal]');
-  if (bj) { if (!needPro('journals')) switchJournal(bj.dataset.bjournal); return; }
+  if (bj) { if (canAddJournal()) switchJournal(bj.dataset.bjournal); return; }
   const sf = ev.target.closest('[data-sfile]');
   if (sf) { if (!state.target || sf.dataset.sfile !== state.target.name) switchServerFile(sf.dataset.sfile); return; }
   const row = ev.target.closest('.row');

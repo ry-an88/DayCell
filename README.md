@@ -5,6 +5,9 @@ No account, no cloud. Each entry is a "cell"; your journal is a `.md` file you c
 
 > **Renamed from "Daybook" to Daycell on 2026-10-11.** An established app called "Daybook: AI Journal & Diary"
 > already exists on iOS and Android. See [Naming](#naming).
+>
+> **Launch work in progress:** see [`TASKS.md`](TASKS.md) for what's done and what's left (including the steps only
+> Dip can do), and [`CHANGELOG.md`](CHANGELOG.md) for what changed.
 
 ---
 
@@ -16,8 +19,10 @@ No account, no cloud. Each entry is a "cell"; your journal is a `.md` file you c
 - [Features](#features)
 - [Three ways it runs](#three-ways-it-runs)
 - [Web version: open, download and eject](#web-version-open-download-and-eject)
-- [Pricing, trial and licence keys](#pricing-trial-and-licence-keys)
+- [Pricing: free forever + Pro](#pricing-free-forever--pro)
+- [The website](#the-website)
 - [Deploying the web version](#deploying-the-web-version)
+- [Tests](#tests)
 - [Security and privacy](#security-and-privacy)
 - [Renaming the app](#renaming-the-app)
 - [Naming](#naming)
@@ -51,8 +56,17 @@ Requires Python 3 (already installed on this PC). No other installs.
 | `Start Daycell.bat` | Starts the launcher for this PC only. |
 | `Start Daycell (iPad & tablet).bat` | Starts the launcher with iPad/tablet access over your Wi-Fi (`--lan`). |
 | `Journals/` | Your journals (`daycell.md`, plus any others you create). **Private: never published or committed.** |
-| `netlify.toml` | Hosting config for the web version. Publishes only `daycell.html` (as `index.html`). |
+| `web/` | The app's manifest, icons and service worker (install to home screen, works offline). |
+| `site/` | The website: landing page, privacy, terms, styles, self-hosted fonts and the share image. |
+| `tools/build.mjs` | Builds `dist/`: the site at `/` and the app at `/app/`, filling in settings from the environment. |
+| `tools/check.mjs` | Syntax checks (app script, service worker, licence function, manifest). |
+| `tools/make-images.py` | Redraws the icons and the share image (needs Pillow and the JetBrains Mono font files). |
+| `tests/` | Browser smoke tests (Playwright). `npm test` builds and runs them. |
+| `netlify.toml` | Hosting config for the web version. |
 | `netlify/functions/license.mjs` | Tiny server function that checks licence keys with Lemon Squeezy. |
+| `docs/file-format.md` | The journal file format as a short open spec. |
+| `LICENSE.md` | FSL-1.1-MIT: public source, no competing products, MIT after two years. |
+| `TASKS.md` | The launch task list. |
 | `.gitignore` | Keeps `Journals/` and the iPad pairing secret out of git. |
 | `CLAUDE.md` | Working notes for Claude sessions: code map, safe-testing rules, preferences and current state. |
 | `.daycell-key` | Created automatically in iPad mode. The secret in the QR code. Delete it to un-pair all devices. |
@@ -112,7 +126,8 @@ Text of the old entry.
   - mood trend and top tags
 - **A voice:** playful save messages and streak milestones (3, 7, 14, 30, 50, 100, 365 days).
 - **Command palette** (`/` or Ctrl+K): `/new`, `/prompt`, `/today`, `/random`, `/stats`, `/search`, `/trash`,
-  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/unlock`.
+  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/year`, `/pro`, and the templates (`/review`,
+  `/gratitude`, `/retro`, `/standup`, `/decision`).
 - **Works on any screen:** desktop, iPad and phone, with touch-friendly controls. Text fields are 16px so iOS
   doesn't zoom in, and the layout respects the iPhone/iPad home bar.
 
@@ -139,7 +154,7 @@ On touch screens, tap an entry once to select it and again to edit it.
 |---|---|---|---|
 | **Launcher** (personal use) | `Start Daycell.bat` | `Journals/*.md` on this PC | never |
 | **Launcher + iPad** | `Start Daycell (iPad & tablet).bat` | `Journals/*.md` on this PC; the iPad writes into the same file | never |
-| **Web version** (the product) | open the hosted website | a live file on the user's device (Chrome/Edge) or the browser until ejected (others) | trial, then $5 |
+| **Web version** (the product) | open the hosted website (`/app/`) | in the browser until ejected; a live file on disk with Pro in Chrome/Edge | free forever; Pro £12 once |
 
 The app detects the mode by itself: if it's served by `daycell.py` it uses the launcher; otherwise it's the web version.
 
@@ -157,15 +172,18 @@ The hosted site has **no accounts**. On first visit it shows a start screen with
 - **New journal:** name it (for example "Morning Pages") and it's created and opened.
 - **Open a .md:** load an existing journal from the device.
 
-What happens next depends on the browser.
-
-| Browser | How the journal is kept |
+| How the journal is kept | When |
 |---|---|
-| **Chrome / Edge (desktop)** | **Live file.** The app saves straight into the `.md` you created or picked. Nothing to download. After a restart, one click reconnects it. |
-| **Safari, Firefox, iPad, phones** | **Kept in the browser.** Every keystroke is saved in the browser, so closing the tab loses nothing. Use **download a copy** for a backup, or **eject** to take it with you. |
+| **In the browser** (IndexedDB, with a backup copy of the open journal in localStorage) | Free, every browser. Every keystroke is saved, so closing the tab loses nothing. |
+| **Live file:** the app saves straight into the `.md` you created or picked | Pro, in Chrome/Edge on desktop. After a restart, one click reconnects it. |
 
+- **Several journals (Pro):** the file panel lists every journal kept in this browser and switches between them. Free
+  keeps one at a time: eject it to start another.
 - **Download a copy** (in-browser journals): saves the `.md` to the device and keeps the journal open. The status
   shows `in browser · not downloaded` until you do. After 3 days without a download, a reminder banner appears.
+- **Safari warning:** on iPhone, iPad and Mac Safari a banner explains that Safari clears site storage after 7 days
+  without a visit, and (on iPhone/iPad) to add Daycell to the home screen. It can be dismissed.
+- **Persistent storage:** the app asks the browser to keep its storage (`navigator.storage.persist()`).
 - **Eject** (the ⏏ button next to the file name, the file panel, or `/eject`):
   - In-browser journals: the file downloads, then the journal is cleared from the browser.
   - Live files: the file stays in its folder and the app just forgets it.
@@ -173,48 +191,48 @@ What happens next depends on the browser.
     whether a download finished.
 - **Older-copy warning:** browsers rename repeat downloads (`journal (1).md`). If you open a copy older than the one
   you last downloaded in that browser, the app asks before opening it.
+- **Installable and offline:** the app has a manifest, icons and a service worker (`web/`). Once visited, it opens
+  with no connection. The page is fetched fresh when online, so updates show on the next open.
+- **Daily reminder** (file panel or `/remind`): downloads a calendar event (`.ics`) that repeats every day at the time
+  you pick and links back to the app. Free.
 - **Testing tip:** add `?storage=browser` to the URL to force the in-browser mode in Chrome/Edge.
 
 ---
 
-## Pricing, trial and licence keys
+## Pricing: free forever + Pro
 
-**Model:** free for 2 days, then **$5 once** (no subscription), unlocked with a licence key. Sold through
-**Lemon Squeezy**, which handles VAT/sales tax as merchant of record and emails the key to the buyer automatically.
+**Model (decided 2026-10-11):** everything you need to keep a daily journal is **free forever**. **Daycell Pro** is a
+**one-time £12** unlock (**£9 in launch week**), sold through **Lemon Squeezy**, which handles VAT/sales tax as
+merchant of record and emails the licence key automatically. No subscription, and writing is never locked.
 
-**Rules decided:**
-- **The trial** starts when the user first creates or opens a journal. It's counted in the browser, so clearing site
-  data resets it. That's accepted at this price.
-- **After the trial, only writing is locked** (new entries and edits). Reading, search, insights, download and eject
-  stay free, so nobody is ever locked out of their own journal.
-- **Activation:** the key is checked once per device, and it works offline after that.
-- **Monthly re-check:** the key is quietly re-checked about every 30 days when online. If the check fails because
-  of being offline or a server problem, nothing locks. If Lemon Squeezy says the key is refunded or disabled,
-  writing locks and reading stays.
-- **Device limit:** the activation limit is set in Lemon Squeezy (recommended: **5 devices**). Users can free one with
-  **remove this device** in the file panel.
-- **Lost keys:** the unlock dialog links to Lemon Squeezy's order lookup ("lost your key?").
-- **The launcher never shows the paywall.** It's for personal use.
+| Free | Pro (one-time) |
+|---|---|
+| one journal at a time in the browser, unlimited entries | as many journals as you like, with a switcher |
+| prompts, status cell, streaks, milestones | live files: save straight into a `.md` on disk (Chrome/Edge) |
+| insights with a 22-week activity grid | a full-year grid and the **year in cells** share image (`/year`) |
+| search, command palette, trash, light/dark | templates: daily review, three good things, weekly retro, standup, decision log |
+| download, open, eject; offline; daily reminder | accent colours (teal, blue, violet, rose, orange, green) |
 
-**Licensing is switched off until you set it up.** In `daycell.html`, find the `LICENSE` settings:
+**Rules:**
+- **Upgrade prompts only appear when someone reaches for a Pro feature** (a second journal, the year view, a
+  template, an accent colour). Never in the middle of writing, and the status cell doesn't nag.
+- **Activation:** the key is checked once per device, and works offline after that.
+- **Monthly re-check:** about every 30 days when online. Offline or server trouble never changes anything. If Lemon
+  Squeezy says the key is refunded or disabled, Pro features switch off; journals are untouched.
+- **Device limit:** set in Lemon Squeezy (recommended: **5 devices**). Users free one with **remove this device**.
+- **Lost keys:** the dialog links to Lemon Squeezy's order lookup ("lost your key?").
+- **Launch week:** set `LAUNCH_ENDS` (a date). Until the end of that day the app and site show £9, and the checkout
+  link carries the discount code `LAUNCH` (`checkout[discount_code]`), which must exist in Lemon Squeezy as £3 off.
+- **The launcher never shows a paywall.** Everything is unlocked there.
+- **Licensing is off until a checkout link is set.** With no `LS_CHECKOUT_URL`, the hosted app has everything
+  unlocked.
 
-```js
-const LICENSE = {
-  price: '$5',
-  trialDays: 2,
-  checkoutUrl: '',  // paste your Lemon Squeezy checkout link here; licensing stays off until you do
-  recoverUrl: 'https://app.lemonsqueezy.com/my-orders',
-  endpoint: '/api/license',
-  recheckDays: 30,
-};
-```
-
-**Setting up Lemon Squeezy (you do this; it needs your identity and bank details):**
+**Setting up Lemon Squeezy (Dip does this; it needs identity and bank details):**
 1. Create a Lemon Squeezy account and store.
-2. Create a product priced at $5, a single payment.
-3. Turn on **license keys** for the product and set the activation limit (5 recommended).
-4. Copy the product's checkout link into `checkoutUrl`.
-5. Note your **store ID** and **product ID** for the deploy step.
+2. Create a product **Daycell Pro**, **£12**, single payment.
+3. Turn on **license keys** and set the activation limit (5 recommended).
+4. Add a discount code **`LAUNCH`**, £3 off, for launch week.
+5. Note the **checkout link**, **store ID** and **product ID** for the deploy step.
 
 **Why there's a server function:** Lemon Squeezy's licence API blocks calls made directly from web pages, so
 `netlify/functions/license.mjs` forwards them. It also:
@@ -224,35 +242,77 @@ const LICENSE = {
 
 ---
 
+## The website
+
+`node tools/build.mjs` builds `dist/`:
+
+| Path | From | What |
+|---|---|---|
+| `/` | `site/index.html` | landing page: hero, the file format, features, free vs Pro, privacy, FAQ |
+| `/privacy.html`, `/terms.html` | `site/` | privacy policy and terms (refunds within 14 days) |
+| `/app/` | `daycell.html` + `web/` | the app, its manifest, icons and service worker |
+| `/fonts/` | `site/fonts/` | Inter and JetBrains Mono, self-hosted so visitors never contact Google |
+| `/og.png` | `site/og.png` | share image for links |
+
+The support address on the site is `hello@daycell.app` (replace it if the inbox is different).
+
+---
+
 ## Deploying the web version
 
 Netlify (free tier is enough):
 
-1. Put this folder in a GitHub repository. `.gitignore` keeps `Journals/` and `.daycell-key` out.
-2. In Netlify: **Add new site → Import from GitHub**, then pick the repo. `netlify.toml` already sets the build:
-   it copies `daycell.html` to `dist/index.html` and publishes only that.
-3. **Site configuration → Environment variables:** add `LS_STORE_ID` and `LS_PRODUCT_ID`.
-4. Deploy, then (optionally) connect your domain.
-5. Set `checkoutUrl` in `daycell.html`, commit, and Netlify redeploys.
+1. In Netlify: **Add new site → Import from GitHub**, then pick the repo. `netlify.toml` runs `node tools/build.mjs`
+   and publishes `dist/` plus the licence function.
+2. **Site configuration → Environment variables:**
 
-The site must be served over **HTTPS** (Netlify does this). Live-file saving in Chrome and Edge requires it.
+   | Variable | Needed? | What |
+   |---|---|---|
+   | `LS_STORE_ID`, `LS_PRODUCT_ID` | yes, for licences | used by the licence function to reject other products' keys |
+   | `LS_CHECKOUT_URL` | to switch the paywall on | the Lemon Squeezy checkout link for Daycell Pro |
+   | `LAUNCH_ENDS` | launch week only | last day of the £9 price, `YYYY-MM-DD` |
+   | `UMAMI_SRC`, `UMAMI_WEBSITE_ID` | optional | cookie-free analytics (Umami Cloud has a free tier) |
+   | `SITE_URL` | optional | the public address for share links (Netlify's own `URL` is used otherwise) |
+
+3. Deploy, then connect your domain. Changing a variable needs a redeploy (Deploys → Trigger deploy).
+4. Do one test-mode purchase and activate the key in the app.
+
+The site must be served over **HTTPS** (Netlify does this). Live files and the service worker require it.
+
+**Analytics** only count events, never journal text: `journal-new`, `journal-open`, `first-entry`, `return-day3`,
+`pro-prompt`, `pro-checkout`, `pro-activated`, `reminder`, `year-card`, plus page views.
+
+---
+
+## Tests
+
+- `npm ci` once, then `npm test`: builds the site with a fake checkout link and runs the Playwright smoke tests in
+  `tests/` (landing page, writing and reloading, free vs Pro gates, journal switching, templates, accents, year image,
+  reminder file, eject, the move from localStorage to IndexedDB, opening offline).
+- `npm run check`: syntax checks with no browser.
+- GitHub Actions (`.github/workflows/ci.yml`) runs both on every push and pull request.
 
 ---
 
 ## Security and privacy
 
 - **The web version never receives journal text.** Entries stay on the user's device: in their file, or in their
-  browser until ejected. The only thing sent anywhere is the licence key, during activation and the monthly check.
+  browser until ejected. The only things sent anywhere are the licence key (activation and the monthly check) and,
+  if analytics are switched on, anonymous event counts.
+- **Fonts are self-hosted** on the website, so visitors' browsers don't contact Google. (The launcher still loads
+  them from Google Fonts.)
 - **The launcher:**
   - Normal mode listens on this PC only (`127.0.0.1`).
   - iPad mode listens on the local network, but every device must be paired with the secret key from the QR code.
     Pairing sets a 1-year, HttpOnly cookie.
   - Unpaired devices get a "not paired" page, and requests with an unexpected `Host` are refused.
-  - It only ever serves `daycell.html` and its own API, never `daycell.py`, `.daycell-key` or raw files from `Journals/`.
+  - It only ever serves `daycell.html`, the icons and manifest from `web/`, and its own API, never `daycell.py`,
+    `.daycell-key` or raw files from `Journals/`.
   - Writes are atomic (temp file then rename), so a crash can't leave a half-written journal.
-- **Hosting** publishes only `index.html` plus the licence function. Your `Journals/` folder is never uploaded.
-- **Storage keys** in the browser always use the fixed prefix `daycell-` (the `STORE_KEY` constant), even after a
-  rename, so renaming can't make anyone's saved journal disappear.
+- **Hosting** publishes only `dist/` (the site and the app) plus the licence function. `Journals/` is never uploaded.
+- **Storage keys** in the browser always use the fixed prefix `daycell-` (the `STORE_KEY` constant), and in-browser
+  journals are stored in IndexedDB as `journal:<name>`. Renaming the app can't make anyone's saved journal disappear.
+- **The source is public** under FSL-1.1-MIT. Git history was checked for secrets and journal content on 2026-10-11.
 
 ---
 
@@ -310,6 +370,14 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-07 | Never lock reading/eject behind the paywall | Trust, reviews, and the "your file" promise |
 | 2026-10-07 | Accept that a client-side licence can be bypassed | At $5 it's an honesty system; anti-piracy effort isn't worth it |
 | 2026-10-11 | Name: **Daycell**, internals included (files, storage keys, stamp, default journal `daycell.md`) | No journaling app clash found; old `daybook` data is migrated automatically |
+| 2026-10-11 | **Free forever + one-time Pro** instead of a 2-day trial; writing is never locked | The free version keeps the essence; habits take weeks to form, and the free tier is the marketing |
+| 2026-10-11 | **Pro: £12 once, £9 in launch week** (was $5) | At $5, fees take ~15% and it reads as a toy; still far below Day One's $49.99/yr |
+| 2026-10-11 | Pro = more journals, live files, a year of insights + share image, templates, accent colours | Costs nothing to run (all in the browser); gates extras, never your own writing |
+| 2026-10-11 | In-browser journals move to IndexedDB, request persistent storage, warn Safari users | Safari clears site storage after 7 days without a visit; localStorage caps at ~5 MB |
+| 2026-10-11 | Installable web app with a service worker | A journal has to open offline |
+| 2026-10-11 | Landing page at `/`, app at `/app/`; self-hosted fonts; cookie-free analytics (optional) | People need to understand the product before starting a journal; privacy story stays clean |
+| 2026-10-11 | **Code goes public** under **FSL-1.1-MIT** | Builds trust with developers; blocks competing copies; becomes MIT after two years |
+| 2026-10-11 | Daily reminder as a downloadable calendar event | Reminders drive journaling habits; no server or push needed |
 
 ---
 
@@ -318,8 +386,10 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 - **Same-entry edits on two devices:** if both edit the same entry at once, the last save wins (new entries are
   always merged safely).
 - **The iPad mode needs the PC switched on** and on the same Wi-Fi.
-- **The trial can be reset** by clearing site data or using a private window (accepted).
-- **The licence check can be removed** by someone editing the page's code (accepted).
+- **The licence check can be removed** by someone editing the page's code (accepted; the code is public anyway).
+- **Safari can clear in-browser journals** after 7 days without a visit unless the app is on the home screen. The app
+  warns about this and nudges downloads; it can't prevent it.
+- **Pro's journal switcher covers in-browser journals.** Live files are one at a time (open another to switch).
 - **The QR code** loads a small library from cdnjs. If you're offline, use the address printed in the launcher window.
 - **Older-copy warnings** only know about downloads made in the same browser.
 - **Entries are matched across devices by date + time**, so two different entries saved in the same minute on two
@@ -342,11 +412,19 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 - **Licence function** (with faked Lemon Squeezy replies): activation, foreign-product rejection, personal data
   stripped, bad requests refused.
 
+**Tested on 2026-10-11 (automated, `npm test`, Chromium):** landing page and legal pages; free writing surviving a
+reload; free users getting the upgrade dialog for every Pro feature; Pro journal switching, templates (an untouched
+template is discarded), accent colours, the year view and image; the reminder `.ics`; eject clearing IndexedDB; an
+older localStorage-only journal being moved to IndexedDB; the app reopening offline. The launcher was re-checked by
+hand with a scratch journal (reads, writes, serves the manifest, no service worker).
+
 **Not tested yet:**
 - **A real iPad:** the Safari camera/QR scan and the home-screen flow end to end.
 - **The QR image** (the test setup couldn't load the library).
 - **The Windows firewall prompt** (deliberately not triggered).
-- **Real Lemon Squeezy calls** and a **real Netlify deploy** (they need your accounts).
+- **Real Lemon Squeezy calls** and a **real Netlify deploy** (they need your accounts), including the
+  `checkout[discount_code]` launch link.
+- **Safari and Firefox** for the new storage, service worker and banners (the tests run in Chromium).
 - **Chrome/Edge live-file pickers in the web version** (file dialogs can't be driven in the test browser; the same
   code path already worked in the earlier version).
 
@@ -354,16 +432,13 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 
 ## Next steps
 
-1. ~~**Pick a name** and rename~~ Done 2026-10-11: **Daycell**. Still to do by hand: register the domain and run
-   a proper UKIPO/USPTO search (see [Naming](#naming)).
-2. **Set up Lemon Squeezy** (product, licence keys, activation limit 5), then paste the checkout link.
-3. **Deploy to Netlify** with `LS_STORE_ID` / `LS_PRODUCT_ID` set; do one real purchase in test mode.
-4. **Try it on a real iPad** (web version and launcher iPad mode).
-5. **Marketing:**
-   - short vertical videos: "your journal is just a .md file", "commit your day", the streak grid filling up
-   - launch posts on Reddit (r/ObsidianMD, r/journaling, r/productivity), Show HN and Product Hunt
-   - an Instagram page, which you create; posts only go out with your go-ahead
-6. **Later:** a downloadable desktop app (Tauri) for an even stronger "your file, your computer" story.
+The live list is [`TASKS.md`](TASKS.md). In short:
+
+1. **Dip:** Lemon Squeezy product (£12, licence keys, limit 5, `LAUNCH` code), Netlify deploy with the environment
+   variables above, domain, support inbox, make the repo public, trademark search, HMRC/ICO checks, a real iPad test.
+2. **Marketing:** lives in `marketing/` (a separate thread).
+3. **Next features:** passphrase encryption (Pro), export to a styled book (Pro), images in entries, web push
+   reminders, a £12 vs £15 price test after launch, and the Tauri desktop app.
 
 ### Parked ideas
 
