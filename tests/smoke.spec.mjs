@@ -197,3 +197,77 @@ test('the app opens offline once it has been visited', async ({ page, context })
   await expect(page.locator('.start')).toBeVisible();
   await context.setOffline(false);
 });
+
+// ---------- Day One import, streak card, status cell ----------
+import { deflateRawSync, crc32 } from 'node:zlib';
+
+const DAY_ONE = {
+  metadata: { version: '1.0' },
+  entries: [
+    { uuid: 'A', creationDate: '2024-03-10T08:15:00Z', timeZone: 'Europe/London', starred: true, tags: ['travel', 'big trip'],
+      text: '# Lisbon\n\nTrams, tiles and pastéis\\. Best day\\!\n\n![](dayone-moment://ABC123)' },
+    { uuid: 'B', creationDate: '2024-07-01T22:30:00Z', timeZone: 'America/New_York', text: 'Short note from the road' },
+    { uuid: 'C', creationDate: '2024-07-02T12:00:00Z', timeZone: 'Europe/London', text: '' },
+  ],
+};
+// a minimal deflate zip, like Day One's export
+function zip(files) {
+  const locals = [], centrals = [];
+  let offset = 0;
+  for (const [name, text] of Object.entries(files)) {
+    const data = Buffer.from(text), comp = deflateRawSync(data), nm = Buffer.from(name), crc = crc32(data);
+    const lh = Buffer.alloc(30);
+    lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(8, 8);
+    lh.writeUInt32LE(crc, 14); lh.writeUInt32LE(comp.length, 18); lh.writeUInt32LE(data.length, 22); lh.writeUInt16LE(nm.length, 26);
+    const ch = Buffer.alloc(46);
+    ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6); ch.writeUInt16LE(8, 10);
+    ch.writeUInt32LE(crc, 16); ch.writeUInt32LE(comp.length, 20); ch.writeUInt32LE(data.length, 24); ch.writeUInt16LE(nm.length, 28);
+    ch.writeUInt32LE(offset, 42);
+    locals.push(lh, nm, comp); centrals.push(ch, nm);
+    offset += 30 + nm.length + comp.length;
+  }
+  const cd = Buffer.concat(centrals), end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(centrals.length / 2, 8); end.writeUInt16LE(centrals.length / 2, 10);
+  end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...locals, cd, end]);
+}
+
+test('import a Day One zip into a new journal, then skip duplicates', async ({ page }) => {
+  await page.goto(APP);
+  const buffer = zip({ 'Journal.json': JSON.stringify(DAY_ONE), 'photos/abc.jpeg': 'x' });
+  await page.locator('#importInput').setInputFiles({ name: 'export.zip', mimeType: 'application/zip', buffer });
+  await expect(page.locator('#fname')).toHaveText('day-one.md');
+  await expect(page.locator('#toast')).toContainText('imported 2 entries from Day One · 1 photo stays in Day One');
+  const lisbon = page.locator('.cell', { has: page.locator('.title', { hasText: 'Lisbon' }) });
+  await expect(lisbon).toContainText('2024-03-10 08:15');  // 08:15 UTC is 08:15 GMT in March
+  await expect(lisbon).toContainText('pastéis. Best day!');
+  await expect(lisbon).toContainText('#starred');
+  await expect(lisbon).toContainText('#big-trip');
+  // 22:30 UTC on 1 July is 18:30 in New York
+  await expect(page.locator('.cell', { has: page.locator('.title', { hasText: 'Short note from the road' }) })).toContainText('2024-07-01 18:30');
+
+  await page.locator('#importInput').setInputFiles({ name: 'Journal.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(DAY_ONE)) });
+  await expect(page.locator('#toast')).toContainText('imported 0 entries from Day One · 2 already here');
+  expect(await idbGet(page, 'journal:day-one.md')).toContain('## 2024-03-10 · 08:15 — Lisbon');
+});
+
+test('free: the streak image downloads and the status cell keeps its spacing', async ({ page }) => {
+  await page.goto(APP);
+  await newJournal(page, 'streaky');
+  await write(page, 'day one', 'started.');
+  const dl = page.waitForEvent('download');
+  await page.click('[data-act="streakCard"]');
+  expect((await dl).suggestedFilename()).toMatch(/^daycell-streak-\d{4}-\d{2}-\d{2}\.png$/);
+  await expect(page.locator('#unlock')).toBeHidden();
+
+  // an entry from 30 days ago shows as "30 days ago" next to its link, with a gap between them
+  await page.evaluate(() => {
+    const d = new Date(Date.now() - 30 * 864e5);
+    state.entries.push({ id: 'old', date: isoDate(d), time: '09:00', title: 'a month back', body: 'x', mood: '', tags: [], deleted: '' });
+    renderAll();
+  });
+  const label = page.locator('.cell.status .k', { hasText: '30 days ago' });
+  const link = page.locator('.cell.status a[data-act="jump"]');
+  const [a, b] = [await label.boundingBox(), await link.boundingBox()];
+  expect(b.x - (a.x + a.width)).toBeGreaterThanOrEqual(6);
+});

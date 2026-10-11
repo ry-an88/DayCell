@@ -107,8 +107,12 @@ In order:
       53 with `state.heatYear` for Pro),
       `deviceHtml` (iPad QR, which lazy-loads qrcodejs from cdnjs), `licenceHtml`, `setStatus` and `renderChrome`.
     - After `applyTheme`: `ACCENTS`/`accentCss()`/`applyAccent`/`chooseAccent` (Pro), `TEMPLATES`/`newFromTemplate`
-      (Pro), `downloadReminder()` (`.ics`), `saveBlob`, `yearCard()` (canvas PNG, Pro), `ANALYTICS`/`loadAnalytics`/
+      (Pro), `downloadReminder()` (`.ics`), `saveBlob`, `drawCard()` shared by `streakCard()` (free) and `yearCard()`
+      (Pro) — share images never draw entry text, `ANALYTICS`/`loadAnalytics`/
       `track(event)` (Umami; counts only, never entry text).
+    - **import from Day One:** `startImport()` → `#importInput` → `importDayOne(file)`; `unzipJson()` is a tiny zip
+      reader (stored or deflate via `DecompressionStream`), `fromDayOne()` maps entries, `localParts()` converts to the
+      entry's time zone.
 11. **command palette:** the `COMMANDS` list. `openPalette(q)` can prefill (the editor's "template" button uses it).
 12. **events:** handled by delegation on `#cells` (`data-act`, `data-mood`), `#panel` (`data-fact`, `data-tact`,
     `data-sfile`, `data-date`, `.row`) and a global `keydown` (command-mode keys: b, Enter, j/k, d d, /, Ctrl+K,
@@ -173,7 +177,8 @@ In order:
     older-copy warning, Safari storage banner, persistent storage request)
   - **free forever + one-time Pro** (more journals, live files, year insights + share image, templates, accents)
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
-  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 9 smoke tests
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 11 smoke tests
+  - free streak share image (no entry text) and a free Day One importer (zip or JSON)
   - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
 - **Not done or not verified:** see `TASKS.md`. Notably: real Lemon Squeezy/Netlify, Safari/Firefox and a real iPad,
   the Chrome/Edge file pickers.

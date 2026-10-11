@@ -17,6 +17,12 @@
 **New**
 - Daily reminder: download a repeating calendar event that opens Daycell (`/remind`).
 - Templates in the command palette and from a new entry's "template" button.
+- A free streak image to share: your streak, counts and a grid of squares, never any entry text (`/streak`).
+- Import from Day One: pick its JSON export (.zip or .json) and your entries come across with dates, times and tags.
+
+**Fixed**
+- The status cell's "30 days ago" label ran straight into the entry link on desktop.
+- The start screen opened scrolled down, hiding its heading.
 - A website: landing page, privacy policy, terms, share image. The app moves to `/app/`.
 
 **Behind the scenes**

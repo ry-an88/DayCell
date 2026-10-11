@@ -79,6 +79,11 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
 ### 7. Docs
 - [x] README, CLAUDE.md and CHANGELOG updated.
 
+### 8. From the marketing thread (approved by Dip, 2026-10-11)
+- [x] Free shareable streak image with no entry text (status cell, insights, `/streak`).
+- [x] Free import from Day One's JSON export, as a .zip or a single .json (`/import`, start screen, file panel).
+- [x] Bug: "30 days ago" in the status cell had no space before the linked entry on desktop.
+
 ### Next (not started)
 - [ ] Passphrase encryption for in-browser journals (Pro).
 - [ ] Export to a styled HTML/PDF book (Pro).

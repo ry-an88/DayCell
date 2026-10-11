@@ -231,7 +231,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .code-line { padding: 10px 18px 0; font: 12.5px var(--mono); color: var(--muted); }
 .code-line .fn { color: var(--accent); }
 .out { padding: 6px 18px 14px; font: 12.5px/1.9 var(--mono); }
-.out .k { color: var(--faint); display: inline-block; min-width: 78px; }
+.out .k { color: var(--faint); display: inline-block; min-width: 78px; margin-right: 10px; }
 .out .hi { color: var(--accent); font-weight: 500; }
 .out .q { color: var(--text); }
 .out .lnk { color: var(--text); border-bottom: 1px dashed var(--faint); }
@@ -282,6 +282,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .start-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); transform: translateY(-1px); }
 .start-how { margin-top: 22px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 9px; font: 12px/1.7 var(--mono); color: var(--muted); text-align: left; }
 .start-how b { color: var(--text); font-weight: 500; }
+.start-how a { color: var(--accent); }
 .start-price { margin-top: 14px; font: 11.5px var(--mono); color: var(--faint); }
 .eject-card { position: fixed; left: 50%; top: 40%; z-index: 70; display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.3); color: var(--accent); font: 12px var(--mono); pointer-events: none; animation: eject 1.8s cubic-bezier(.5, 0, .3, 1) forwards; }
 .eject-card div { display: grid; gap: 2px; }
@@ -453,6 +454,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
   </div>
 </div>
 <input type="file" id="uploadInput" accept=".md,.markdown,text/markdown,text/plain" hidden>
+<input type="file" id="importInput" accept=".zip,.json,application/zip,application/json" hidden>
 <div class="toast" id="toast"><span></span><button>undo</button></div>
 <div class="modal" id="modal" hidden>
   <div class="dialog" role="dialog" aria-modal="true">
@@ -1173,6 +1175,7 @@ function startHtml() {
       <button class="start-card" data-act="startOpen">${I('folder', 20)}<b>open a .md</b><span>${liveFiles() ? 'pick a journal on your device' : 'load a journal from your device'}</span></button>
     </div>
     ${getLibrary().length ? `<div class="start-how"><b>in this browser</b> · ${getLibrary().map(j => `<a href="#" class="lnk" data-act="openKept" data-name="${esc(j.name)}">${esc(j.name)}</a>`).join(' · ')}</div>` : ''}
+    <div class="start-how"><b>switching from Day One?</b> · export as JSON in Day One, then <a href="#" class="lnk" data-act="importDayOne">import the .zip</a>. photos stay in Day One.</div>
     <div class="start-how">${liveFiles()
       ? `<b>how it works</b> · ${esc(APP.name)} saves straight into the .md file you pick. eject whenever you like and the file stays right where it is.`
       : `<b>how it works</b> · your journal lives in this browser while you write. download a copy any time, or eject to take it with you and clear it from this browser.`}</div>
@@ -1566,7 +1569,7 @@ function statusCellHtml() {
     <div class="code-line">${APP.slug}.<span class="fn">today</span>()</div>
     <div class="out">
       <div>${greeting()} it's ${date}.</div>
-      <div><span class="k">streak</span><span class="${s.streak ? 'hi' : ''}">${streakLine(s)}</span></div>
+      <div><span class="k">streak</span><span class="${s.streak ? 'hi' : ''}">${streakLine(s)}</span>${s.es.length ? `<span class="acts"><button class="ib" data-act="streakCard" title="share image of your streak (no entry text)">${I('image', 13)}</button></span>` : ''}</div>
       <div><span class="k">this week</span>${s.weekEntries} ${s.weekEntries === 1 ? 'entry' : 'entries'} · ${s.weekWords.toLocaleString()} words</div>
       ${otd ? `<div><span class="k">${otdLabel}</span><a href="#" class="lnk" data-act="jump" data-id="${otd.id}">${esc(otd.title || 'untitled')}</a></div>` : ''}
       <div><span class="k">prompt</span><span class="q">“${esc(todaysPrompt(state.promptOffset || 0))}”</span>
@@ -1667,7 +1670,7 @@ function insightsHtml() {
     <div class="p-group">activity · <button class="seg${WEEKS === 22 ? ' on' : ''}" data-fact="heat22">22 weeks</button> <button class="seg${WEEKS === 53 ? ' on' : ''}" data-fact="heatYear">year</button></div>
     <div class="heat-scroll"><div class="heat">${cells}</div></div>
     <div class="heat-legend">less <i style="background:var(--grid)"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> more</div>
-    <div class="stack"><button class="btn block" data-fact="yearCard">${I('image', 14)} share image: my year in cells</button></div>
+    <div class="stack"><button class="btn block" data-fact="streakCard">${I('image', 14)} share image: my streak</button><button class="btn block" data-fact="yearCard">${I('image', 14)} share image: my year in cells${isPro() ? '' : ' · pro'}</button></div>
     <div class="p-group">this week</div>
     <div class="kv"><span>entries</span><span>${s.weekEntries}</span><span>words</span><span>${s.weekWords.toLocaleString()}</span><span>status</span><span>${streakLine(s)}</span></div>
     <div class="p-group">mood · last ${s.moods.length} entries</div>
@@ -1749,6 +1752,7 @@ function renderPanelBody() {
       if (m) btns += `<button class="btn block" data-fact="eject">${I('eject', 14)} eject ${esc(m.name)}</button>`;
       btns += `<button class="btn block${m ? '' : ' primary'}" data-fact="startNew">${I('fileplus', 14)} new journal${m && !isPro() ? ' · pro' : ''}</button><button class="btn block" data-fact="startOpen">${I('folder', 14)} open a .md${m && !isPro() ? ' · pro' : ''}</button>`;
     }
+    btns += `<button class="btn block" data-fact="importDayOne">${I('download', 14)} import from Day One</button>`;
     btns += `<button class="btn block" data-fact="remind">${I('bell', 14)} daily reminder (calendar)</button>`;
     b.innerHTML = `
       <div class="kv" style="padding-top:12px">
@@ -1939,17 +1943,9 @@ function saveBlob(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-// "year in cells" (pro): a share image of the last 12 months, drawn on a canvas
-async function yearCard() {
-  if (needPro('year')) return;
+// share images, drawn on a canvas: logo, a headline, numbers and a grid of days. never any entry text.
+async function drawCard({ title, sub, weeks, cell, foot }) {
   const s = computeStats();
-  const from = addDays(s.today, -364);
-  const days = [...s.byDay.entries()].filter(([d]) => d >= from);
-  if (!days.length) return toast('write a few entries first. the image needs something to show.');
-  let longest = 0, run = 0, prev = null;
-  for (const [d] of days.sort()) { run = prev && addDays(prev, 1) === d ? run + 1 : 1; longest = Math.max(longest, run); prev = d; }
-  const wordsYear = days.reduce((a, [, w]) => a + w, 0);
-  const entriesYear = s.es.filter(e => e.date >= from).length;
   try { await Promise.all(['600 20px "JetBrains Mono"', '400 20px "JetBrains Mono"'].map(f => document.fonts.load(f))); } catch {}
   const W = 1200, H = 630, c = document.createElement('canvas');
   c.width = W; c.height = H;
@@ -1963,35 +1959,171 @@ async function yearCard() {
   g.fillStyle = '#11151b'; g.font = F(600, 22); g.fillText(APP.glyph, 81, 96);
   g.fillStyle = '#e3e8ee'; g.font = F(600, 28); g.fillText(APP.slug, 138, 98);
   g.fillStyle = '#56606d'; g.font = F(400, 28); g.fillText('.md', 138 + g.measureText(APP.slug).width + 2, 98);
-  g.fillStyle = '#e3e8ee'; g.font = F(600, 54); g.fillText('my year in cells', 72, 200);
-  g.fillStyle = '#8b95a3'; g.font = F(400, 24);
-  g.fillText(`${entriesYear} ${entriesYear === 1 ? 'entry' : 'entries'} · ${wordsYear.toLocaleString()} words · longest streak ${longest}d`, 72, 250);
-  // grid: 53 weeks x 7 days, monday-first, today in the last column
-  const cell = 16, gap = 4, x0 = 72, y0 = 300;
+  g.fillStyle = '#e3e8ee'; g.font = F(600, 54); g.fillText(title, 72, 200);
+  g.fillStyle = '#8b95a3'; g.font = F(400, 24); g.fillText(sub, 72, 250);
+  // grid: monday-first columns, today in the last column
+  const gap = Math.round(cell / 4), x0 = 72, y0 = 300;
   const dow = (new Date(s.today + 'T12:00').getDay() + 6) % 7;
-  const start = addDays(s.today, -dow - 52 * 7);
-  for (let i = 0; i < 53 * 7; i++) {
+  const start = addDays(s.today, -dow - (weeks - 1) * 7);
+  for (let i = 0; i < weeks * 7; i++) {
     const d = addDays(start, i);
     if (d > s.today) break;
     const w = s.byDay.get(d);
     const lv = w === undefined ? 0 : w < 50 ? 1 : w < 150 ? 2 : w < 300 ? 3 : 4;
-    g.globalAlpha = 1;
-    g.fillStyle = '#171c23';
-    g.beginPath(); g.roundRect(x0 + Math.floor(i / 7) * (cell + gap), y0 + (i % 7) * (cell + gap), cell, cell, 3); g.fill();
+    const x = x0 + Math.floor(i / 7) * (cell + gap), y = y0 + (i % 7) * (cell + gap);
+    g.globalAlpha = 1; g.fillStyle = '#171c23';
+    g.beginPath(); g.roundRect(x, y, cell, cell, 3); g.fill();
     if (lv) {
-      g.globalAlpha = [0, .3, .55, .78, 1][lv];
-      g.fillStyle = accent;
-      g.beginPath(); g.roundRect(x0 + Math.floor(i / 7) * (cell + gap), y0 + (i % 7) * (cell + gap), cell, cell, 3); g.fill();
+      g.globalAlpha = [0, .3, .55, .78, 1][lv]; g.fillStyle = accent;
+      g.beginPath(); g.roundRect(x, y, cell, cell, 3); g.fill();
     }
   }
   g.globalAlpha = 1;
   g.fillStyle = '#56606d'; g.font = F(400, 20);
-  g.fillText(`${from} → ${s.today}`, 72, 480);
-  g.fillText('one markdown file. no account. no cloud.', 72, 566);
-  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  g.fillText(foot, 72, 566);
+  return new Promise(r => c.toBlob(r, 'image/png'));
+}
+// where the image says to find the app: the real site when hosted, else just the name
+const siteLabel = () => location.protocol === 'https:' && !/^localhost|^127\./.test(location.hostname) ? location.host : APP.slug;
+
+// "my streak" (free): the share card people post, which shows numbers and squares only
+async function streakCard() {
+  const s = computeStats();
+  if (!s.es.length) return toast('write your first entry, then there’s a streak to share.');
+  const title = s.streak ? `${s.streak}-day streak` : `${s.es.length} ${s.es.length === 1 ? 'entry' : 'entries'} in`;
+  const sub = `longest ${s.longest}d · ${s.es.length} ${s.es.length === 1 ? 'entry' : 'entries'} · ${s.totalWords.toLocaleString()} words`;
+  const blob = await drawCard({ title, sub, weeks: 26, cell: 22, foot: `${siteLabel()} · a journal that’s just a markdown file` });
+  saveBlob(blob, `${APP.slug}-streak-${s.today}.png`);
+  track('streak-card');
+  toast('streak image saved. no entry text in it, just squares.');
+}
+
+// "year in cells" (pro): the last 12 months
+async function yearCard() {
+  if (needPro('year')) return;
+  const s = computeStats();
+  const from = addDays(s.today, -364);
+  const days = [...s.byDay.entries()].filter(([d]) => d >= from);
+  if (!days.length) return toast('write a few entries first. the image needs something to show.');
+  let longest = 0, run = 0, prev = null;
+  for (const [d] of days.sort()) { run = prev && addDays(prev, 1) === d ? run + 1 : 1; longest = Math.max(longest, run); prev = d; }
+  const wordsYear = days.reduce((a, [, w]) => a + w, 0);
+  const entriesYear = s.es.filter(e => e.date >= from).length;
+  const blob = await drawCard({
+    title: 'my year in cells', weeks: 53, cell: 16,
+    sub: `${entriesYear} ${entriesYear === 1 ? 'entry' : 'entries'} · ${wordsYear.toLocaleString()} words · longest streak ${longest}d`,
+    foot: `${from} → ${s.today} · ${siteLabel()}`,
+  });
   saveBlob(blob, `${APP.slug}-year-${s.today.slice(0, 4)}.png`);
   track('year-card');
   toast('image saved. share it, or keep it.');
+}
+
+/* ============ import from Day One ============ */
+// Day One exports a .zip holding one JSON file per journal: { entries: [{ creationDate, timeZone, text, tags, starred }] }
+// Entries are merged into the open journal (or a new one); anything already there (same date + time) is skipped.
+async function unzipJson(buf) {
+  const v = new DataView(buf), out = [];
+  let eocd = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 66000); i--) if (v.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('that zip file looks damaged.');
+  let p = v.getUint32(eocd + 16, true);
+  const count = v.getUint16(eocd + 10, true);
+  for (let n = 0; n < count; n++) {
+    if (v.getUint32(p, true) !== 0x02014b50) break;
+    const method = v.getUint16(p + 10, true), size = v.getUint32(p + 20, true);
+    const nameLen = v.getUint16(p + 28, true), extraLen = v.getUint16(p + 30, true), noteLen = v.getUint16(p + 32, true);
+    const local = v.getUint32(p + 42, true);
+    const name = new TextDecoder().decode(new Uint8Array(buf, p + 46, nameLen));
+    p += 46 + nameLen + extraLen + noteLen;
+    if (!/\.json$/i.test(name) || /(^|\/)(__MACOSX|\.)/.test(name)) continue;
+    const start = local + 30 + v.getUint16(local + 26, true) + v.getUint16(local + 28, true);
+    const raw = new Uint8Array(buf, start, size);
+    let bytes;
+    if (method === 0) bytes = raw;
+    else if (method === 8) bytes = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+    else continue;
+    out.push({ name: name.split('/').pop(), text: new TextDecoder().decode(bytes) });
+  }
+  return out;
+}
+function localParts(iso, timeZone) {
+  const d = new Date(iso);
+  if (isNaN(d)) return null;
+  try {
+    const f = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: timeZone || undefined, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+      .formatToParts(d).map(x => [x.type, x.value]));
+    return { date: `${f.year}-${f.month}-${f.day}`, time: `${f.hour}:${f.minute}` };
+  } catch { return { date: isoDate(d), time: `${pad(d.getHours())}:${pad(d.getMinutes())}` }; }
+}
+function fromDayOne(json, journalTag) {
+  const list = Array.isArray(json) ? json : json && Array.isArray(json.entries) ? json.entries : null;
+  if (!list) return null;
+  const out = [];
+  let media = 0;
+  for (const x of list) {
+    const when = localParts(x.creationDate, x.timeZone);
+    if (!when) continue;
+    let text = String(x.text || '').replace(/\r\n?/g, '\n');
+    // photos, video and audio stay in Day One; leave a note where each one was
+    text = text.replace(/!\[[^\]]*\]\(dayone-moment:[^)]*\)/g, () => { media++; return '*(photo in Day One)*'; });
+    text = text.replace(/\\([\\`*_{}\[\]()#+\-.!>|~])/g, '$1');  // Day One escapes punctuation
+    const lines = text.split('\n');
+    let title = '';
+    if (lines.length && lines[0].trim().length && lines[0].replace(/^#+\s*/, '').trim().length <= 80) title = lines.shift().replace(/^#+\s*/, '').trim();
+    const tags = [...(x.tags || []), ...(x.starred ? ['starred'] : []), ...(journalTag ? [journalTag] : [])]
+      .map(t => String(t).trim().replace(/\s+/g, '-').replace(/^#+/, '')).filter(Boolean);
+    const e = { id: uid(), ...when, title, body: lines.join('\n').trim(), mood: '', tags: [...new Set(tags)], deleted: '' };
+    if (hasContent(e)) out.push(e);
+  }
+  return { entries: out, media };
+}
+function startImport() {
+  if (webMode() && !state.target && state.pending) return reconnect();
+  $('#importInput').click();
+}
+async function importDayOne(file) {
+  let files;
+  try {
+    const buf = await file.arrayBuffer();
+    const isZip = new Uint8Array(buf, 0, 2).join() === '80,75';
+    files = isZip ? await unzipJson(buf) : [{ name: file.name, text: new TextDecoder().decode(buf) }];
+  } catch (err) { return toast(err.message || 'couldn’t read that file.'); }
+  const sets = [];
+  for (const f of files) {
+    let json;
+    try { json = JSON.parse(f.text); } catch { continue; }
+    const tag = files.length > 1 ? f.name.replace(/\.json$/i, '').toLowerCase() : '';
+    const r = fromDayOne(json, tag);
+    if (r) sets.push(r);
+  }
+  const incoming = sets.flatMap(r => r.entries), media = sets.reduce((a, r) => a + r.media, 0);
+  if (!incoming.length) return toast('no Day One entries found. export as JSON from Day One, then pick the .zip or .json.');
+  if (webMode() && !state.target) {
+    // nothing open yet: the import becomes a new journal (the first one is always free)
+    const name = uniqueName('day-one.md');
+    Object.assign(state, { entries: [], preamble: '# Day One', selectedId: null, editingId: null, error: '', pending: null, purged: new Set() });
+    setMount({ name, kind: 'browser', downloadedHash: null, lastDownload: null, created: new Date().toISOString() });
+    state.target = browserTarget(name);
+    askPersist();
+  }
+  exitEdit(false);
+  const have = new Set(state.entries.map(entrySig));
+  let added = 0;
+  for (const e of incoming) {
+    if (have.has(entrySig(e))) continue;
+    have.add(entrySig(e));
+    state.entries.push(e);
+    added++;
+  }
+  await writeFile();
+  const l = live();
+  state.selectedId = l.length ? l[l.length - 1].id : null;
+  renderAll();
+  $('#nb').scrollTop = $('#nb').scrollHeight;
+  track('import-dayone');
+  const skipped = incoming.length - added;
+  toast(`imported ${added} ${added === 1 ? 'entry' : 'entries'} from Day One` + (skipped ? ` · ${skipped} already here` : '') + (media ? ` · ${media} ${media === 1 ? 'photo stays' : 'photos stay'} in Day One` : ''), null, 6000);
 }
 
 // cookie-free analytics (Umami): off until both fields are set; only counts events, never journal text
@@ -2027,7 +2159,9 @@ const COMMANDS = [
   { k: 'download', d: 'download a copy of this journal', run: () => webMode() && getMount()?.kind === 'browser' ? downloadMd() : toast('this journal already saves straight to its file.') },
   { k: 'eject', d: 'eject this journal', run: () => webMode() ? eject() : toast('eject is for the web version.') },
   { k: 'remind', d: 'daily reminder for your calendar', run: downloadReminder },
+  { k: 'streak', d: 'share image: my streak (no entry text)', run: streakCard },
   { k: 'year', d: 'share image: my year in cells (pro)', run: yearCard },
+  { k: 'import', d: 'import a Day One export (.zip or .json)', run: startImport },
   ...TEMPLATES.map(t => ({ k: t.k, d: `template · ${t.d} (pro)`, run: () => newFromTemplate(t) })),
   { k: 'pro', d: 'pro features and licence key', run: () => licensingOn() ? showUnlock() : toast('everything is already unlocked here.') },
 ];
@@ -2087,6 +2221,7 @@ $('#cells').addEventListener('click', ev => {
         t.dispatchEvent(new Event('input', { bubbles: true }));
       },
       jump: () => jumpTo(act.dataset.id),
+      streakCard, importDayOne: startImport,
       unlock: () => showUnlock(),
       templates: () => openPalette('template'),
       openKept: () => switchJournal(act.dataset.name),
@@ -2141,7 +2276,7 @@ $('#panel').addEventListener('click', ev => {
   const f = ev.target.closest('[data-fact]');
   if (f) ({
     reconnect, download: downloadMd, eject, startNew, startOpen, deactivate: deactivateDevice, unlock: () => showUnlock(),
-    remind: downloadReminder, yearCard, accent: () => chooseAccent(f.dataset.accent),
+    remind: downloadReminder, yearCard, streakCard, importDayOne: startImport, accent: () => chooseAccent(f.dataset.accent),
     heat22: () => { state.heatYear = false; renderPanelBody(); },
     heatYear: () => { if (!needPro('year')) { state.heatYear = true; renderPanelBody(); } },
   })[f.dataset.fact]();
@@ -2169,6 +2304,7 @@ $('#mInput').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.pr
 $('#ejectBtn').onclick = eject;
 $('#filetab').onclick = () => openPanel('files');
 $('#uploadInput').addEventListener('change', ev => { const f = ev.target.files[0]; ev.target.value = ''; if (f) openUploaded(f); });
+$('#importInput').addEventListener('change', ev => { const f = ev.target.files[0]; ev.target.value = ''; if (f) importDayOne(f); });
 $('#uOk').onclick = submitUnlock;
 $('#uBuy').addEventListener('click', () => track('pro-checkout'));
 $('#uCancel').onclick = () => { $('#unlock').hidden = true; };
@@ -2301,7 +2437,7 @@ function webExtras() {
   const l = live();
   state.selectedId = l.length ? l[l.length - 1].id : null;
   renderAll();
-  $('#nb').scrollTop = $('#nb').scrollHeight;
+  if (state.target) $('#nb').scrollTop = $('#nb').scrollHeight;  // the start screen reads from the top
 })();
 </script>
 </body>

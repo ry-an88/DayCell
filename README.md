@@ -126,7 +126,7 @@ Text of the old entry.
   - mood trend and top tags
 - **A voice:** playful save messages and streak milestones (3, 7, 14, 30, 50, 100, 365 days).
 - **Command palette** (`/` or Ctrl+K): `/new`, `/prompt`, `/today`, `/random`, `/stats`, `/search`, `/trash`,
-  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/year`, `/pro`, and the templates (`/review`,
+  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/pro`, and the templates (`/review`,
   `/gratitude`, `/retro`, `/standup`, `/decision`).
 - **Works on any screen:** desktop, iPad and phone, with touch-friendly controls. Text fields are 16px so iOS
   doesn't zoom in, and the layout respects the iPhone/iPad home bar.
@@ -193,6 +193,14 @@ The hosted site has **no accounts**. On first visit it shows a start screen with
   you last downloaded in that browser, the app asks before opening it.
 - **Installable and offline:** the app has a manifest, icons and a service worker (`web/`). Once visited, it opens
   with no connection. The page is fetched fresh when online, so updates show on the next open.
+- **Streak image** (free; the image button on the status cell's streak line, insights, or `/streak`): a 1200×630 PNG
+  with the streak, longest streak, entry and word counts and a 26-week grid. **It never contains entry text**, so
+  sharing it is safe, and it carries the site's address, so every share works as an ad.
+- **Import from Day One** (free; the start screen, the file panel or `/import`): pick Day One's JSON export (`.zip`
+  or a single `.json`). Entries merge into the open journal, or into a new `day-one.md` if none is open. Dates and
+  times are converted to each entry's own time zone; the first line becomes the title when it's short; tags carry
+  over, plus `#starred`; with several journals in the zip, each entry is also tagged with its journal's name. Photos
+  stay in Day One (each one leaves a note), and entries already in the journal (same date and time) are skipped.
 - **Daily reminder** (file panel or `/remind`): downloads a calendar event (`.ics`) that repeats every day at the time
   you pick and links back to the app. Free.
 - **Testing tip:** add `?storage=browser` to the URL to force the in-browser mode in Chrome/Edge.
@@ -212,6 +220,7 @@ merchant of record and emails the licence key automatically. No subscription, an
 | insights with a 22-week activity grid | a full-year grid and the **year in cells** share image (`/year`) |
 | search, command palette, trash, light/dark | templates: daily review, three good things, weekly retro, standup, decision log |
 | download, open, eject; offline; daily reminder | accent colours (teal, blue, violet, rose, orange, green) |
+| streak share image, import from Day One | |
 
 **Rules:**
 - **Upgrade prompts only appear when someone reaches for a Pro feature** (a second journal, the year view, a
@@ -280,7 +289,7 @@ Netlify (free tier is enough):
 The site must be served over **HTTPS** (Netlify does this). Live files and the service worker require it.
 
 **Analytics** only count events, never journal text: `journal-new`, `journal-open`, `first-entry`, `return-day3`,
-`pro-prompt`, `pro-checkout`, `pro-activated`, `reminder`, `year-card`, plus page views.
+`pro-prompt`, `pro-checkout`, `pro-activated`, `reminder`, `streak-card`, `year-card`, `import-dayone`, plus page views.
 
 ---
 
@@ -288,7 +297,8 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 
 - `npm ci` once, then `npm test`: builds the site with a fake checkout link and runs the Playwright smoke tests in
   `tests/` (landing page, writing and reloading, free vs Pro gates, journal switching, templates, accents, year image,
-  reminder file, eject, the move from localStorage to IndexedDB, opening offline).
+  reminder file, eject, the move from localStorage to IndexedDB, opening offline, Day One import from a zip and a
+  JSON, the streak image, and the status cell's spacing).
 - `npm run check`: syntax checks with no browser.
 - GitHub Actions (`.github/workflows/ci.yml`) runs both on every push and pull request.
 
@@ -378,6 +388,8 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-11 | Landing page at `/`, app at `/app/`; self-hosted fonts; cookie-free analytics (optional) | People need to understand the product before starting a journal; privacy story stays clean |
 | 2026-10-11 | **Code goes public** under **FSL-1.1-MIT** | Builds trust with developers; blocks competing copies; becomes MIT after two years |
 | 2026-10-11 | Daily reminder as a downloadable calendar event | Reminders drive journaling habits; no server or push needed |
+| 2026-10-11 | Free streak share image with no entry text | Sharing it is safe, and each share is an ad the user chose to post (from the marketing thread) |
+| 2026-10-11 | Free import from Day One's JSON export | Switching should cost nothing; Day One users are the main subscription-tired audience |
 
 ---
 
