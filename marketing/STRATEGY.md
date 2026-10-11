@@ -99,11 +99,11 @@ single dark pattern would cost more than it earns.
   daily ritual: prompts, a streak, insights, an entry-per-cell view. Use both.
 - **"Why pay if the code is public?"** Pro is a one-time £12 that funds the work, and it's the easy way to get Pro on
   every device. Same reason people pay for source-available apps they could build themselves.
-- **"Does it sync?"** Not through a server. On Chrome/Edge it saves straight into a file you choose, so any folder sync
+- **"Does it sync?"** Not through a server. With Pro on Chrome/Edge it saves straight into a file you choose, so any folder sync
   you already use (iCloud, Dropbox, OneDrive, Syncthing) carries it. Be upfront about this; don't fudge it.
 - **"Will it be around in 5 years?"** It doesn't need to be. Your journal is a markdown file, and the app is one HTML
   file you can keep a copy of.
-- **"iPad / phone?"** Works in the browser on any device. (Say "installable and offline" only after the PWA work ships.)
+- **"iPad / phone?"** Works in the browser on any device. It installs to the home screen and works offline.
 
 ---
 
@@ -209,7 +209,7 @@ the plan is relative to launch day (L).
 | L+1 (Wed) | **Product Hunt** at 08:01 UK. r/SideProject. | PH, Reddit | `images/out/ph-gallery*.png` |
 | L+2 (Thu) | r/ObsidianMD (vault angle). dev.to article. | Reddit, dev.to | `copy/launch-posts.md` |
 | L+3 (Fri) | r/journaling (ritual and ownership angle). Indie Hackers post. | Reddit, IH | `copy/launch-posts.md` |
-| L+5 (Sun) | "Last day of £9" email and post. Only if the deadline is real and honoured. | Email, socials | `copy/email.md` #3, `images/out/story-launch.png` |
+| L+6 (Mon morning) | "Last day of £9" email and post. Only if the deadline is real and honoured. | Email, socials | `copy/email.md` #3, `images/out/story-launch.png` |
 | L+6 (Mon 23:59 UK) | £9 ends. Price goes to £12 on time. | — | — |
 | L+7 → L+30 | `#commityourday` challenge, weekly changelog posts, SEO pages live, reply to every review. | All | `copy/social.md` |
 | L+30 | Read the funnel (section 7). Decide the next bet. | — | — |
@@ -240,6 +240,6 @@ Day-90 goal from the launch plan: 5,000 landing visits and 150 Pro sales.
 - Fake reviews, testimonials, upvote rings, sock-puppet comments or bought followers.
 - Ask friends to upvote on HN or Product Hunt (both penalise it, and it's dishonest).
 - Fake urgency: resetting timers, "price going up soon" without a date, extending a "final" deadline.
-- Imply sync, AI, encryption or offline support before they ship.
+- Imply sync, AI or encryption before they ship.
 - Present demo entries as a real person's journal. All marketing journals are clearly made up.
 - Post anywhere without Dip's go-ahead.

@@ -48,7 +48,7 @@ launch, then one short changelog a month. Every email has a one-click unsubscrib
 
 ---
 
-## 3. "Last day of the launch price" (send L+5 or L+6 morning; only if the deadline is real)
+## 3. "Last day of the launch price" (send L+6, Monday morning; only if the deadline is real)
 
 **Subject:** £9 ends tonight
 **Preview text:** Then Pro goes to £12. Writing stays free either way.

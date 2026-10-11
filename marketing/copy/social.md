@@ -129,8 +129,7 @@ Hooks are on screen in the first second; captions add the rest.
 > One line counts. "fix: went outside" counts.
 > Your entries stay private; only the grid gets shared.
 
-Needs the shareable streak card (see `STRATEGY.md` §5). Until it ships, people can screenshot the insights panel;
-remind them to crop out entry titles.
+Uses the free shareable streak image (insights panel → "share image: my streak"). It shows squares only, no entry text.
 
 **Weekly Sunday post:** a recap with the week's prompt and reposts of people who shared (with their permission).
 

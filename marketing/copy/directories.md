@@ -13,7 +13,7 @@ logo (`d/` tile), `images/out/og-image.png`, `screenshots/desktop-dark.png`, `sc
 > Your whole journal is one plain markdown file on your device, so you can open it in any editor, keep it in Obsidian,
 > back it up anywhere, or put it in git. There's no account and nothing is uploaded. The code is public.
 >
-> Writing is free forever. Pro is a one-time £12 for [Pro features as shipped].
+> Writing is free forever. Pro is a one-time £12 for more journals with a switcher, live file saving in Chrome and Edge, a year of insights with a shareable "year in cells" image, templates and accent colours.
 
 ## Where, and how to position it
 
@@ -28,7 +28,7 @@ logo (`d/` tile), `images/out/og-image.png`, `screenshots/desktop-dark.png`, `sc
 
 ## Licence and platform fields
 - **Price:** Freemium; one-time purchase (£12). Not "free trial", not "subscription".
-- **Platforms:** Web (Chrome, Edge, Safari, Firefox), iPad and phone browsers; Windows launcher. [Add "installable
-  (PWA)" only once it ships.]
+- **Platforms:** Web (Chrome, Edge, Safari, Firefox), iPad and phone browsers; Windows launcher. Installable
+  to the home screen or dock (PWA) and works offline.
 - **Open source:** Source-available. The code is public at [repo URL] under FSL-1.1-MIT, and each version becomes MIT
   two years after release. If a form only offers yes/no, answer "no" rather than overclaim.

@@ -18,7 +18,7 @@
   .foot { font: 500 30px var(--mono); color: var(--faint); }
 </style>
 <script>
-  // ?until=Sun 2 Nov sets the real end date of the launch price. Only use a date you will honour.
+  // ?until=Mon 16 Nov sets the real end date of the launch price. Only use a date you will honour.
   addEventListener('DOMContentLoaded', () => {
     const u = new URLSearchParams(location.search).get('until');
     document.querySelector('.until').textContent = u ? `launch price until ${u}, then £12` : 'launch week only, then £12';

@@ -67,7 +67,7 @@ Three short points with small screenshots:
 | Free · £0 forever | Pro · £12 once |
 |---|---|
 | One journal, unlimited entries | Everything in Free |
-| Daily prompts, streaks, milestones | [Pro list exactly as shipped — e.g. live file autosave, unlimited journals, passphrase encryption, all-time insights and Year in cells card, themes] |
+| Daily prompts, streaks, milestones | More journals with a switcher · live file saving (Chrome, Edge) · a year of insights and the "year in cells" image · templates · accent colours |
 | Activity grid, mood and tag insights | Up to 5 devices |
 | Search, command palette, trash | One payment. No renewal. |
 | Download, open and eject your `.md` any time | |
@@ -82,10 +82,10 @@ policy before publishing.]
 ## FAQ
 
 - **Do I need an account?** No. Open the app and start writing.
-- **Where are my entries stored?** In Chrome and Edge, in a `.md` file you choose on your device. In Safari, Firefox
-  and on iPad, in your browser, with a reminder to download a copy. Either way, never on our servers.
+- **Where are my entries stored?** With Pro in Chrome and Edge, in a `.md` file you choose on your device. Otherwise
+  (free, or Safari, Firefox and iPad), in your browser, with a reminder to download a copy. Either way, never on our servers.
 - **Does it sync between devices?** Not through a server. Put your file in a folder you already sync (iCloud Drive,
-  Dropbox, OneDrive) and open it from each device. [Update when PWA/import features ship.]
+  Dropbox, OneDrive) and open it from each device.
 - **Can I use it with Obsidian?** Yes. Mood and tags are saved as `mood:: good` and `tags:: #work`, the inline-field
   style Dataview reads. Point Daycell at a file in your vault.
 - **What happens if Daycell disappears?** Your journal is still a markdown file on your device. The app is a single

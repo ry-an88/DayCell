@@ -47,7 +47,7 @@ makes text type itself.
 
 ## Before anything goes out
 
-- Fill every `[bracket]` with real details. Remove any claim about a feature that hasn't shipped (PWA/offline,
-  encryption, import).
+- Fill every `[bracket]` with real details. Don't claim features that haven't shipped (sync,
+  encryption, AI).
 - Use a real end date for the £9 launch price and honour it to the minute.
 - Re-check the Day One price on its pricing page the week you post the comparison, and update the date.

@@ -16,8 +16,8 @@ all of them; start with 1 and 2.
 1. Who this is for: you like Day One but don't want to pay yearly, or want your entries in a format you control.
 2. Honest comparison table: Day One (features it has that Daycell doesn't: photos, audio, server sync, apps) vs
    Daycell (one file, no account, one-time Pro, public code). Cite Day One's pricing page and the date checked.
-3. How to move your entries: [only if the Day One importer ships; otherwise "export from Day One as Markdown/JSON,
-   then…" with real steps].
+3. How to move your entries: in Day One, export the journal as JSON; in Daycell, choose "import from Day One" and pick the .zip. Text, dates,
+   times and tags come across; photos stay in Day One, with a note where each one was.
 4. Who should stay on Day One: if you need photo journaling and automatic sync, it's the better fit. (Saying this builds trust.)
 5. Try Daycell free.
 
@@ -44,7 +44,7 @@ all of them; start with 1 and 2.
 
 1. What "private" means here, precisely: what's stored where, the one network call (licence check).
 2. How to verify it yourself (open DevTools → Network while writing; read the code).
-3. Encrypting the file at rest: [Pro passphrase feature if shipped; otherwise OS-level options like FileVault/BitLocker].
+3. Encrypting the file at rest: Daycell doesn't encrypt the file itself, so use OS-level options like FileVault or BitLocker.
 
 ## 5. Journal prompts for developers
 **URL:** `/prompts`

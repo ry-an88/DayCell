@@ -27,16 +27,16 @@ Replace `[URL]` with the landing page link plus the channel's UTM tag, for examp
 > each day is a cell, there's a command mode, `b` for a new entry, `Shift+Enter` to commit, `/` for a command palette.
 >
 > How it saves:
-> - In Chrome/Edge it writes straight into a file you choose (File System Access API). Put that file in any folder
->   you already sync.
-> - In Safari/Firefox/iPad it keeps the journal in the browser and reminds you to download the `.md`.
+> - With Pro in Chrome/Edge, it writes straight into a file you choose (File System Access API). Put that file in
+>   any folder you already sync.
+> - Otherwise (free, Safari, Firefox, iPad) it keeps the journal in the browser and reminds you to download the `.md`.
 > - There's also a tiny Python launcher if you'd rather run it locally and write from an iPad on your Wi-Fi.
 >
 > There's no account and no server for your entries. The only network call is checking a licence key if you buy Pro.
 > The code is public: [repo URL].
 >
 > Pricing: writing is free forever (prompts, streaks, search, export). Pro is a one-time £12 (£9 this week) for
-> [the Pro list as shipped: live file saving, multiple journals, encryption, all-time insights]. No subscription.
+> more journals with a switcher, live file saving in Chrome and Edge, a year of insights with a shareable "year in cells" image, templates and accent colours. No subscription.
 >
 > Things it deliberately doesn't do: sync through a server, AI over your entries, or lock you out of reading your own
 > journal. Things it doesn't do *yet*: [be honest, e.g. images in entries].
@@ -73,7 +73,7 @@ Don't ask anyone to upvote.
 > *"if today had a commit message, what would it be?"*, a streak grid, mood and tag insights, and a command palette.
 >
 > Free forever: unlimited entries, prompts, streaks, search, export.
-> Pro, one-time £12 (£9 for launch week): [Pro features as shipped].
+> Pro, one-time £12 (£9 for launch week): more journals with a switcher, live file saving in Chrome and Edge, a year of insights with a shareable "year in cells" image, templates and accent colours.
 >
 > The code is public at [repo URL]. I'd love to hear what you'd want from a journal you'll keep for decades.
 
@@ -100,7 +100,7 @@ instead. Post from Dip's own account, as the maker, and reply to everything. Don
 > ```
 >
 > Because mood and tags are `key:: value`, Dataview can query them (e.g. a mood table by month). Point Daycell at a
-> file inside your vault (Chrome/Edge save straight into it) and both tools see the same entries.
+> file inside your vault (with Pro, Chrome/Edge save straight into it) and both tools see the same entries.
 >
 > What it adds on top: a cell-per-entry notebook view, a prompt each day, a streak grid, and mood/tag insights.
 > Free to use; there's an optional one-time Pro. No account, nothing leaves your machine. Code: [repo URL].
