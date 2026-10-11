@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daycell · a journal that's just a markdown file</title>
+<meta name="description" content="A notebook-style journal with streaks, prompts and insights. Everything lives in one plain .md file you own. No account, no cloud, no subscription.">
+<meta name="theme-color" content="#11151b">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="__SITE_URL__/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Daycell · your journal is just a markdown file">
+<meta property="og:description" content="Streaks, prompts and insights in a notebook-style journal. One plain .md file you own. No account, no cloud.">
+<meta property="og:url" content="__SITE_URL__/">
+<meta property="og:image" content="__SITE_URL__/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="site.css">
+<!--analytics-->
+</head>
+<body>
+<header class="nav wrap">
+  <a class="brand" href="./"><span class="glyph">d/</span>daycell<i>.md</i></a>
+  <nav><a href="#features">features</a><a href="#pricing">pricing</a><a href="#faq">faq</a></nav>
+  <a class="btn primary" href="app/">open the app</a>
+</header>
+
+<main>
+<section class="hero wrap">
+  <div class="hero-copy">
+    <p class="eyebrow">journal · notebook · markdown</p>
+    <h1>your journal is just a markdown file.</h1>
+    <p class="lede">Daycell is a journal that looks like a coding notebook. Every entry is a cell, every day adds to your streak, and the whole thing lives in one plain <code>.md</code> file you own.</p>
+    <div class="ctas">
+      <a class="btn primary big" href="app/">start writing, free</a>
+      <a class="btn big" href="#pricing">see pro · <span data-price>£12</span> once</a>
+    </div>
+    <p class="fine">no account · no cloud · works offline · nothing to install</p>
+  </div>
+
+  <div class="mock" aria-label="Daycell notebook with two entries and today's status">
+    <div class="mock-bar"><span class="glyph sm">d/</span><span class="tab">morning-pages.md</span><span class="grow"></span><span class="led"></span><span class="dim">saved</span></div>
+    <div class="mock-body">
+      <div class="mcell"><span class="pr">[41]:</span><div class="box">
+        <div class="hd">2026-10-10 <b>07:12</b> · fri <span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span> <span class="tag">#work</span></div>
+        <div class="tt">shipped the thing</div>
+        <p>finally pushed the release. <strong>three weeks</strong> of edge cases, gone.</p>
+        <p class="task"><span class="cb on"></span>write the changelog</p>
+      </div></div>
+      <div class="mcell sel"><span class="pr">[42]:</span><div class="box">
+        <div class="hd">2026-10-11 <b>21:40</b> · sat <span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span> <span class="tag">#family</span></div>
+        <div class="tt">long walk, no phone</div>
+        <blockquote>if today had a commit message, what would it be?</blockquote>
+        <p><code>fix: remembered to look up</code></p>
+      </div></div>
+      <div class="mcell status"><span class="pr">[~]:</span><div class="box">
+        <div class="code">daycell.<span class="fn">today</span>()</div>
+        <div class="out"><span class="k">streak</span><span class="hi">42-day streak. keep the loop running.</span></div>
+        <div class="out"><span class="k">prompt</span>“what’s running in the background of your mind?”</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="file wrap" id="file">
+  <div class="sec-head">
+    <p class="eyebrow">the file</p>
+    <h2>open it in anything. it’s yours.</h2>
+    <p>Your journal is a readable Markdown file, not a database. Open it in Notepad, Obsidian or VS Code. Back it up however you like. If Daycell disappeared tomorrow, every word would still be there.</p>
+  </div>
+  <div class="split">
+    <pre class="raw" aria-label="The journal file"><span class="h"># Morning Pages</span>
+
+<span class="h">## 2026-10-11 · 21:40 — long walk, no phone</span>
+<span class="f">mood:: great</span>
+<span class="f">tags:: #family</span>
+
+&gt; if today had a commit message, what would it be?
+
+`fix: remembered to look up`
+
+---</pre>
+    <ul class="ticks">
+      <li><b>One file per journal.</b> Entries are <code>##</code> headings, oldest first.</li>
+      <li><b>Obsidian-friendly.</b> Mood and tags use Dataview’s <code>key:: value</code> fields.</li>
+      <li><b>Hand edits are fine.</b> Change the file anywhere and Daycell reads it back.</li>
+      <li><b>Trash travels with it</b> in a <code># Trash</code> section until you empty it.</li>
+      <li><b>An open format.</b> <a href="__REPO_URL__/blob/main/docs/file-format.md">The spec is public</a>, so other tools can use it.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="features wrap" id="features">
+  <div class="sec-head">
+    <p class="eyebrow">features</p>
+    <h2>small habits, nicely tooled.</h2>
+  </div>
+  <div class="grid">
+    <div class="feat"><span class="ico">[~]</span><h3>a daily status cell</h3><p>Your streak, this week’s words, an “on this day” entry from a year ago, and today’s prompt, waiting at the bottom of the notebook.</p></div>
+    <div class="feat"><span class="ico">▦</span><h3>streaks and an activity grid</h3><p>A GitHub-style grid fills up as you write. Milestones at 3, 7, 30 and 100 days. Mood trend and top tags in insights.</p></div>
+    <div class="feat"><span class="ico">?</span><h3>prompts with a dev voice</h3><p>“If today had a commit message, what would it be?” Thirty prompts, a new one each day, one tap to start writing.</p></div>
+    <div class="feat"><span class="ico">/</span><h3>keyboard first</h3><p>A command palette, <kbd>b</kbd> for a new entry, <kbd>shift</kbd>+<kbd>enter</kbd> to commit, <kbd>j</kbd>/<kbd>k</kbd> to move. Markdown everywhere.</p></div>
+    <div class="feat"><span class="ico">⇣</span><h3>works offline</h3><p>Add it to your home screen or dock and it opens like an app, with or without a connection.</p></div>
+    <div class="feat"><span class="ico">◫</span><h3>desktop, iPad, phone</h3><p>Touch-friendly on tablets and phones, keyboard-friendly on a laptop. Light and dark themes.</p></div>
+  </div>
+</section>
+
+<section class="pricing wrap" id="pricing">
+  <div class="sec-head">
+    <p class="eyebrow">pricing</p>
+    <h2>free forever. pro once.</h2>
+    <p>Everything you need to keep a daily journal is free, with no time limit. Pro is a single payment for extras. No subscription, ever.</p>
+  </div>
+  <p class="launch" data-launch hidden>launch week: pro is <b>£9</b> instead of £12, applied automatically at checkout.</p>
+  <div class="tiers">
+    <div class="tier">
+      <p class="tname">free</p>
+      <p class="price">£0 <small>forever</small></p>
+      <ul>
+        <li>one journal, unlimited entries</li>
+        <li>daily prompts, streaks and milestones</li>
+        <li>status cell and 22-week activity grid</li>
+        <li>search, command palette, trash, themes</li>
+        <li>download and eject your .md any time</li>
+        <li>works offline, installs to your home screen</li>
+        <li>daily reminder for your calendar</li>
+      </ul>
+      <a class="btn big" href="app/">start writing</a>
+    </div>
+    <div class="tier pro">
+      <p class="tname">pro <span>one-time</span></p>
+      <p class="price"><span data-price>£12</span> <small>once</small></p>
+      <ul>
+        <li><b>more journals</b> with a switcher (work, dreams, morning pages)</li>
+        <li><b>live files:</b> save straight into a .md on your disk (Chrome, Edge)</li>
+        <li><b>a year of insights</b> and a shareable “year in cells” image</li>
+        <li><b>templates:</b> daily review, weekly retro, standup, decision log</li>
+        <li><b>accent colours</b></li>
+        <li>up to 5 devices, works offline after activation</li>
+      </ul>
+      <a class="btn primary big" href="app/">try free, upgrade inside</a>
+    </div>
+  </div>
+</section>
+
+<section class="privacy wrap">
+  <div class="sec-head">
+    <p class="eyebrow">privacy</p>
+    <h2>we never see your journal.</h2>
+  </div>
+  <ul class="ticks cols">
+    <li><b>No accounts.</b> There’s nothing to sign up for.</li>
+    <li><b>No servers holding entries.</b> Your writing stays in your file or your browser.</li>
+    <li><b>No AI reading your diary.</b> Nothing is sent anywhere to be analysed.</li>
+    <li><b>No tracking cookies.</b> At most, anonymous counts of page visits.</li>
+  </ul>
+  <p class="fine center"><a href="privacy.html">read the privacy policy</a></p>
+</section>
+
+<section class="faq wrap" id="faq">
+  <div class="sec-head">
+    <p class="eyebrow">faq</p>
+    <h2>questions</h2>
+  </div>
+  <details><summary>Where are my entries saved?</summary><p>In Chrome and Edge with Pro, straight into the .md file you pick on your computer. Everywhere else, in your browser’s storage on that device, until you download or eject the file. Nothing is stored on our side.</p></details>
+  <details><summary>Can I lose my journal?</summary><p>Browsers can clear site data, and Safari does so after 7 days without a visit unless Daycell is on your home screen. That’s why Daycell reminds you to download a copy every few days, and why the file is plain Markdown you can keep anywhere.</p></details>
+  <details><summary>Does it sync between devices?</summary><p>Not through a cloud. Move your .md between devices however you like (download and open it, or keep it in a synced folder with a live file). If you run the free desktop launcher, an iPad on the same Wi-Fi can write into the same file.</p></details>
+  <details><summary>What happens if I stop paying?</summary><p>There’s nothing to stop: Pro is one payment. If a licence is ever refunded, Pro features switch off and your journals stay exactly as they are.</p></details>
+  <details><summary>Can I use it with Obsidian?</summary><p>Yes. Put the file in your vault. Mood and tags use the same <code>key:: value</code> fields as the Dataview plugin.</p></details>
+  <details><summary>Is the code open?</summary><p>The source is public on GitHub under the Functional Source License: free to read and use personally, and every version becomes MIT-licensed two years after release.</p></details>
+  <details><summary>Refunds?</summary><p>If Pro isn’t right for you, ask within 14 days for a full refund. See the <a href="terms.html">terms</a>.</p></details>
+</section>
+
+<section class="cta wrap">
+  <h2>day 0 starts now.</h2>
+  <a class="btn primary big" href="app/">open daycell</a>
+</section>
+</main>
+
+<footer class="foot wrap">
+  <span><span class="glyph sm">d/</span> daycell</span>
+  <span class="grow"></span>
+  <a href="privacy.html">privacy</a><a href="terms.html">terms</a><a href="__REPO_URL__">source</a><a href="mailto:hello@daycell.app">hello@daycell.app</a>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

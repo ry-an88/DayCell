@@ -1,9 +1,9 @@
 # Hosting the web version on Netlify.
-# Only daycell.html is published (as index.html). The Journals folder, the launcher and
-# everything else in this folder stay off the internet.
+# tools/build.mjs publishes the landing pages (site/) at / and the app (daycell.html) at /app/.
+# The Journals folder, the launcher and everything else in this repo stay off the internet.
 
 [build]
-  command = "mkdir -p dist && cp daycell.html dist/index.html"
+  command = "node tools/build.mjs"
   publish = "dist"
 
 [functions]
@@ -15,3 +15,14 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer"
     X-Frame-Options = "DENY"
+
+# the service worker must never be cached, or app updates get stuck
+[[headers]]
+  for = "/app/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[redirects]]
+  from = "/app"
+  to = "/app/"
+  status = 301
