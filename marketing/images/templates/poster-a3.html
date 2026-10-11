@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="format" content="pdf">
+<meta name="size" content="A3">
+<title>Printable poster (A3)</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  @page { size: A3; margin: 0; }
+  html, body { width: 297mm; height: 420mm; }
+  body { font-size: 16pt; padding: 26mm 22mm; display: flex; flex-direction: column; overflow: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; background-size: 9mm 9mm; }
+  .top { display: flex; align-items: center; gap: 5mm; font-size: 24pt; }
+  h1 { font: 700 104pt/1.0 var(--sans); letter-spacing: -.035em; margin: 16mm 0 9mm; }
+  h1 code { font: 700 .9em var(--mono); color: var(--accent); }
+  .lede { font-size: 22pt; line-height: 1.45; color: var(--muted); margin: 0 0 12mm; max-width: 230mm; }
+  .cells { display: grid; gap: 7mm; font-size: 18pt; }
+  .card h2 { font: 600 24pt var(--sans); margin: 3mm 0; }
+  .card p { margin: 0; line-height: 1.5; }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: auto; font-size: 15pt; }
+  .facts div { border-top: 1mm solid var(--accent); padding-top: 4mm; }
+  .facts b { display: block; font: 700 24pt var(--mono); margin-bottom: 2mm; }
+  .facts span { color: var(--muted); line-height: 1.45; }
+  .foot { display: flex; justify-content: space-between; font: 500 14pt var(--mono); color: var(--faint); margin-top: 14mm; }
+</style></head>
+<body>
+  <div class="top"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+  <h1>Commit<br>your day.</h1>
+  <p class="lede">A journal that looks like a code notebook and saves everything to one plain <code class="mono accent">.md</code> file you own. No account. No subscription.</p>
+  <div class="cells">
+    <div class="cell"><span class="idx">[1]:</span><div class="card"><div class="meta">07:15 · okay · <span class="tag">#morning</span></div><h2>morning pages</h2><p>One thing that would make today a win: one hour of deep work.</p></div></div>
+    <div class="cell on"><span class="idx">[2]:</span><div class="card"><div class="meta">21:42 · great · <span class="tag">#wins</span></div><h2>shipped the thing</h2><p>commit message for today: <span class="mono accent">feat: finally trusted myself</span></p></div></div>
+    <div class="cell"><span class="idx">[~]:</span><div class="card dashed"><div class="mono">daycell.<span class="accent">today</span>()</div><p class="mono muted">streak: 30 days. keep the loop running.</p></div></div>
+  </div>
+  <div class="facts">
+    <div><b>£0</b><span>to write, forever. Prompts, streaks, search, export.</span></div>
+    <div><b>£12 once</b><span>for Pro. No renewal, no account.</span></div>
+    <div><b>1 file</b><span>Plain markdown. Opens in any editor, works with Obsidian.</span></div>
+  </div>
+  <div class="foot"><span>github.com/ry-an88/daycell</span><span>made in the UK</span></div>
+</body></html>

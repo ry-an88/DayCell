@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1920">
+<meta name="duration" content="15">
+<title>Video 03: subscription maths</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<link rel="stylesheet" href="scene.css">
+<style>
+  .board { display: grid; gap: 40px; }
+  .yr { font: 600 46px var(--mono); color: var(--muted); }
+  .yr b { color: var(--text); }
+  .card { padding: 42px 46px; display: grid; gap: 12px; }
+  .card .label { font: 600 30px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .num { font: 700 120px/1 var(--mono); letter-spacing: -.03em; }
+  .us { border-color: var(--accent); box-shadow: inset 10px 0 0 var(--accent); }
+  .us .num { color: var(--accent); }
+  .note { font: 400 28px/1.45 var(--sans); color: var(--faint); }
+</style>
+<script src="scene.js"></script>
+<script>
+  // years tick from 1 to 5 between 3.0s and 8.5s
+  window.onSeek = t => {
+    const y = Math.max(1, Math.min(5, 1 + Math.floor((t - 3) / 1.3)));
+    document.querySelector('.y').textContent = y;
+    // the total always matches the year shown: $49.99 per year paid so far
+    document.querySelector('.total').textContent = '$' + (49.99 * y).toFixed(2);
+  };
+</script></head>
+<body>
+  <div class="stage in out" style="--at:.2s; --out:2.6s">
+    <p class="big">Your journal shouldn't cost rent.</p>
+  </div>
+  <div class="stage in out" style="--at:2.8s; --out:11.4s">
+    <div class="board">
+      <div class="yr">year <b class="y">1</b> of writing every day</div>
+      <div class="card">
+        <div class="label">a typical journal subscription</div>
+        <div class="num total">$49.99</div>
+      </div>
+      <div class="card us in" style="--at:4s">
+        <div class="label accent">daycell pro · one-time</div>
+        <div class="num">£12</div>
+      </div>
+      <div class="sub in" style="--at:9s">And the core is free. Forever.</div>
+      <div class="note">Subscription figure: Day One's entry paid plan at its listed US$49.99/year, Oct 2026. Prices change.</div>
+    </div>
+  </div>
+  <div class="stage cta in" style="--at:11.8s">
+    <div class="brand"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+    <p class="mid">Pay once. Keep the file.</p>
+    <p class="sub">Your journal is a plain .md file on your device.</p>
+    <span class="safe">link in bio</span>
+  </div>
+</body></html>

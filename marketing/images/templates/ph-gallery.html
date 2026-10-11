@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1270x760">
+<title>Product Hunt gallery: hero</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  body { padding: 56px 0 0 64px; display: grid; grid-template-columns: 380px 1fr; gap: 44px; }
+  .top { display: flex; align-items: center; gap: 12px; font-size: 22px; margin-bottom: 40px; }
+  h1 { font: 700 46px/1.08 var(--sans); letter-spacing: -.03em; margin: 0 0 22px; }
+  h1 span { color: var(--accent); }
+  p { font-size: 20px; line-height: 1.5; color: var(--muted); margin: 0 0 26px; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; font: 500 17px var(--mono); }
+  ul li::before { content: "✓ "; color: var(--accent); }
+  .shot { border: 2px solid var(--border-strong); border-right: 0; border-bottom: 0; border-radius: 14px 0 0 0; overflow: hidden; align-self: end; height: 650px; }
+  .shot img { width: 1300px; display: block; }
+</style>
+<script>
+  // ?shot=desktop-light picks a screenshot from marketing/screenshots
+  addEventListener('DOMContentLoaded', () => {
+    const s = new URLSearchParams(location.search).get('shot') || 'desktop-dark';
+    document.querySelector('.shot img').src = `../../screenshots/${s}.png`;
+  });
+</script></head>
+<body>
+  <div>
+    <div class="top"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+    <h1>A journal that's just a <span>.md</span> file.</h1>
+    <p>Notebook-style daily writing that saves to a plain file you own.</p>
+    <ul><li>free forever to write</li><li>no account, no cloud</li><li>prompts, streaks, insights</li><li>pro: £12 once</li></ul>
+  </div>
+  <div class="shot"><img alt=""></div>
+</body></html>

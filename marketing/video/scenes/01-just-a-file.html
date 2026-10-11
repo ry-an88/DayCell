@@ -1,0 +1,58 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1920">
+<meta name="duration" content="17">
+<title>Video 01: it's just a file</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<link rel="stylesheet" href="scene.css">
+<style>
+  .s1 { --at: .2s; --out: 3.4s; }
+  .cellwrap { font-size: 40px; display: grid; gap: 34px; }
+  .card { padding: 38px 42px; }
+  .card h2 { font: 600 54px var(--sans); margin: 14px 0; min-height: 1.2em; }
+  .card p { margin: 0; font-size: 40px; line-height: 1.45; min-height: 2.9em; }
+  .file { background: var(--code); border: 2px solid var(--border); border-radius: 16px; padding: 38px 42px; font: 34px/1.7 var(--mono); color: var(--muted); }
+  .file .h { color: var(--text); } .file .k { color: var(--accent); }
+  .label { font: 600 30px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .words { display: grid; gap: 18px; align-content: center; }
+  .words .mid span { color: var(--accent); }
+</style>
+<script src="scene.js"></script></head>
+<body>
+  <div class="stage s1 in out">
+    <p class="big">Where does your journal actually live?</p>
+  </div>
+
+  <div class="stage in out" style="--at:3.8s; --out:11.2s">
+    <div class="cellwrap">
+      <div class="label">what you write</div>
+      <div class="cell on"><span class="idx">[42]:</span><div class="card">
+        <div class="meta">2026-10-08 19:30 thu · good · <span class="tag">#health</span></div>
+        <h2><span data-type="long run by the river" data-at="4.4" data-cps="18"></span></h2>
+        <p><span data-type="9 km, no headphones. Best ideas of the week came at km 6." data-at="5.8" data-cps="26"></span><span class="caret" data-until="8.4"></span></p>
+      </div></div>
+      <div class="label in" style="--at:8.4s">what's on your disk</div>
+      <div class="file in" style="--at:8.7s">
+        <div class="h">## 2026-10-08 · 19:30 — long run…</div>
+        <div><span class="k">mood::</span> good</div>
+        <div><span class="k">tags::</span> #health</div><br>
+        <div>9 km, no headphones. Best ideas</div>
+        <div>of the week came at km 6.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage words in out" style="--at:11.6s; --out:14.4s">
+    <p class="mid in" style="--at:11.6s">One plain <span>.md</span> file.</p>
+    <p class="mid in" style="--at:12.2s">Opens in VS Code.</p>
+    <p class="mid in" style="--at:12.6s">Opens in Obsidian.</p>
+    <p class="mid in" style="--at:13.0s">Opens in Notepad.</p>
+    <p class="mid in" style="--at:13.5s"><span>Opens in 2050.</span></p>
+  </div>
+
+  <div class="stage cta in" style="--at:14.8s">
+    <div class="brand"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+    <p class="sub">Free to write, forever.<br>No account. Pro is £12, once.</p>
+    <span class="safe">link in bio</span>
+  </div>
+</body></html>

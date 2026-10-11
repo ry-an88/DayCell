@@ -1,0 +1,35 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1920">
+<title>Story: launch week price</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  body { font-size: 30px; padding: 220px 88px 260px; display: flex; flex-direction: column; }
+  .top { display: flex; align-items: center; gap: 18px; font-size: 40px; }
+  .pill { font-size: 28px; align-self: flex-start; margin: auto 0 40px; }
+  h1 { font: 700 112px/1.02 var(--sans); letter-spacing: -.04em; margin: 0 0 44px; }
+  h1 span { color: var(--accent); }
+  p { font: 400 40px/1.45 var(--sans); color: var(--muted); margin: 0 0 64px; }
+  .price { display: flex; align-items: baseline; gap: 28px; font-family: var(--mono); }
+  .price b { font-size: 150px; font-weight: 700; color: var(--accent); }
+  .price s { font-size: 60px; color: var(--faint); }
+  .price span { font-size: 34px; color: var(--muted); }
+  .until { font: 500 32px var(--mono); color: var(--muted); margin: 18px 0 auto; }
+  .foot { font: 500 30px var(--mono); color: var(--faint); }
+</style>
+<script>
+  // ?until=Sun 2 Nov sets the real end date of the launch price. Only use a date you will honour.
+  addEventListener('DOMContentLoaded', () => {
+    const u = new URLSearchParams(location.search).get('until');
+    document.querySelector('.until').textContent = u ? `launch price until ${u}, then £12` : 'launch week only, then £12';
+  });
+</script></head>
+<body>
+  <div class="top"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+  <span class="pill">launch week</span>
+  <h1>Write free forever.<br><span>Own Pro for life.</span></h1>
+  <p>Daycell is a notebook-style journal that saves to one plain .md file. The core is free. Pro is a one-time unlock.</p>
+  <div class="price"><b>£9</b><s>£12</s><span>once</span></div>
+  <div class="until"></div>
+  <div class="foot">link in bio · no account needed</div>
+</body></html>

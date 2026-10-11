@@ -1,0 +1,53 @@
+/* Daycell brand tokens for marketing templates. Same palette and fonts as daycell.html. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg: #0c0f13; --grid: #171c23; --surface: #141920; --code: #0f1318;
+  --border: #232a33; --border-strong: #36404c; --text: #e3e8ee; --muted: #8b95a3; --faint: #56606d;
+  --accent: #2dd4bf; --accent-soft: rgba(45, 212, 191, .13); --amber: #fbbf24; --ok: #4ade80; --danger: #f87171;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --sans: "Inter", system-ui, "Segoe UI", sans-serif;
+}
+.light {
+  --bg: #f6f7f8; --grid: #e7eaee; --surface: #ffffff; --code: #f6f8fa;
+  --border: #e4e7eb; --border-strong: #c9ced6; --text: #1c2128; --muted: #667085; --faint: #a0a8b4;
+  --accent: #0d9488; --accent-soft: rgba(13, 148, 136, .14); --amber: #d97706;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg); color: var(--text); font-family: var(--sans);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+  /* the app's dotted notebook grid */
+  background-image: radial-gradient(var(--grid) 1.6px, transparent 1.6px);
+  background-size: 28px 28px;
+}
+.mono { font-family: var(--mono); }
+.accent { color: var(--accent); }
+.muted { color: var(--muted); }
+.faint { color: var(--faint); }
+
+/* the d/ logo tile */
+.logo { display: inline-grid; place-items: center; background: var(--text); color: var(--bg); font: 700 1em/1 var(--mono); border-radius: .22em; width: 1.7em; height: 1.7em; }
+.wordmark { font: 600 1em var(--mono); letter-spacing: -.01em; }
+.wordmark i { font-style: normal; color: var(--faint); }
+
+/* a notebook cell: [n]: gutter + card */
+.cell { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 .8em; align-items: start; }
+.cell .idx { font-family: var(--mono); color: var(--faint); padding-top: .9em; }
+.cell.on .idx { color: var(--accent); }
+.card { background: var(--surface); border: 2px solid var(--border); border-radius: .5em; padding: .9em 1.1em; }
+.cell.on .card { border-color: var(--border-strong); box-shadow: inset 6px 0 0 var(--accent); }
+.dashed { background: transparent; border-style: dashed; }
+.meta { font-family: var(--mono); color: var(--muted); font-size: .8em; }
+.tag { color: var(--accent); }
+.pill { display: inline-block; font: 600 .7em/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: .5em .7em; border-radius: .35em; background: var(--accent-soft); color: var(--accent); }
+.btn { display: inline-block; font: 600 1em/1 var(--mono); background: var(--text); color: var(--bg); padding: .7em 1em; border-radius: .4em; }
+.kbd { display: inline-block; font: 500 .8em/1 var(--mono); border: 2px solid var(--border-strong); border-radius: .3em; padding: .25em .45em; color: var(--muted); }
+.caret { display: inline-block; width: .55em; height: 1.1em; background: var(--accent); vertical-align: text-bottom; margin-left: .05em; }
+
+/* activity grid squares */
+.grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: .22em; }
+.grid i { display: block; width: 1em; height: 1em; border-radius: .2em; background: var(--grid); }
+.grid i.l1 { background: rgba(45, 212, 191, .3); } .grid i.l2 { background: rgba(45, 212, 191, .55); }
+.grid i.l3 { background: rgba(45, 212, 191, .8); } .grid i.l4 { background: var(--accent); }
