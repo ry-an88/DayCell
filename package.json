@@ -1,0 +1,14 @@
+{
+  "name": "daycell",
+  "private": true,
+  "description": "A notebook-style journal that's just a markdown file.",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check": "node tools/check.mjs",
+    "test": "node tools/build.mjs && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

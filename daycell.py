@@ -23,7 +23,11 @@ JOURNALS = ROOT / "Journals"
 JOURNALS.mkdir(exist_ok=True)
 PORT = int(next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--port=")), os.environ.get("DAYCELL_PORT", "8765")))
 LAN = "--lan" in sys.argv
-STATIC = {"/daycell.html"}  # the only file served besides the API
+STATIC = {"/daycell.html"}  # the only file served besides the API and the icons below
+# app icons and manifest, so "Add to Home Screen" on a paired iPad gets a proper icon
+WEB = ROOT / "web"
+WEB_FILES = {"/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-maskable-512.png", "/apple-touch-icon.png"}
+WEB_TYPES = {".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png"}
 COOKIE = "daycell_key"
 OLD_COOKIE = "daybook_key"  # set by pairings made before the rename
 
@@ -142,6 +146,13 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(200, {"name": path.name, "exists": path.exists(), "text": text, "version": version(path)})
         elif url.path in STATIC:
             super().do_GET()
+        elif url.path in WEB_FILES and (WEB / url.path[1:]).is_file():
+            body = (WEB / url.path[1:]).read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", WEB_TYPES[Path(url.path).suffix])
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
         else:
             self.send_json(404, {"error": "not found"})
 

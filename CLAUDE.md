@@ -6,8 +6,10 @@ file format, the three run modes, pricing rules, deploy steps, the decisions log
 ## What this is
 
 **Daycell** (renamed from the working name Daybook on 2026-10-11) is a journal app with a Jupyter/marimo-style "notebook" UI.
-All entries live in **one plain `.md` file** per journal. It's being turned into a $5 web product: no accounts,
-users own the file.
+All entries live in **one plain `.md` file** per journal. It's being turned into a web product: no accounts, users
+own the file. **Free forever, plus a one-time Pro unlock at £12 (£9 launch week)**, decided 2026-10-11. The repo is
+going public under FSL-1.1-MIT. The launch checklist is `TASKS.md`; marketing lives in `marketing/` (owned by a
+separate thread, leave it alone).
 
 ## Golden rules
 
@@ -44,7 +46,11 @@ users own the file.
 | `daycell.html` | The entire app: CSS, markup and JS in one file (~2,000 lines). The same file runs under the launcher and as the hosted web version. |
 | `daycell.py` | Local server. Serves only `/daycell.html` plus an API, and reads/writes `Journals/*.md`. Flags: `--lan`, `--no-browser`, `--port=NNNN`. |
 | `Start Daycell.bat` / `Start Daycell (iPad & tablet).bat` | Launchers (the second adds `--lan`). |
-| `netlify.toml`, `netlify/functions/license.mjs` | Web hosting: publishes only `dist/index.html` (a copy of `daycell.html`) plus the licence proxy function. |
+| `web/` | Manifest, icons and `sw.js` for the app. The launcher serves the manifest and icons (not the service worker). |
+| `site/` | Landing page, privacy, terms, `site.css`, `site.js`, self-hosted fonts, `og.png`. Placeholders `__SITE_URL__`, `__REPO_URL__`, `__LAUNCH_ENDS__` and `<!--analytics-->` are filled by the build. |
+| `tools/build.mjs` | Builds `dist/` (site at `/`, app at `/app/`), swaps Google Fonts for the self-hosted ones and fills `checkoutUrl`, `launchEnds` and `ANALYTICS` from env (`LS_CHECKOUT_URL`, `LAUNCH_ENDS`, `UMAMI_SRC`, `UMAMI_WEBSITE_ID`). |
+| `tools/check.mjs`, `tests/`, `playwright.config.mjs` | Syntax checks and Playwright smoke tests (`npm test`). CI in `.github/workflows/ci.yml`. |
+| `netlify.toml`, `netlify/functions/license.mjs` | Web hosting: runs the build, publishes `dist/` plus the licence proxy function. |
 | `.gitignore` | Excludes `Journals/`, `.daycell-key`, `dist/`, caches. |
 | `.daycell-key` | Created by `--lan` mode: the QR pairing secret. Never served, never committed. |
 
@@ -66,7 +72,8 @@ In order:
 5. **tiny markdown renderer:** `renderMd`, `inline`. All user text goes through `esc()`.
 6. **file I/O:**
    - A **target** is where the journal saves: `serverTarget(name)` (launcher API with version check and 409 merge),
-     `handleTarget(h)` (File System Access, Chrome/Edge) or `browserTarget(name)` (web, kept in browser storage).
+     `handleTarget(h)` (File System Access, Chrome/Edge) or `browserTarget(name)` (web: IndexedDB key
+     `journal:<name>` in the `daycell` db's `kv` store; falls back to the localStorage copy for pre-IndexedDB journals).
    - `writeFile()` always caches the markdown in `localStorage` (`daycell-md`), then `target.write()` runs through a
      promise chain.
    - `connect(target)`, `mergeRemote()` (matches entries across devices by `entrySig = date + ' ' + time`) and
@@ -74,28 +81,45 @@ In order:
 7. **web version:**
    - `webMode()` is `!state.server && !state.unpaired`.
    - The **mount** (`daycell-mount`) is `{ name, kind: 'handle' | 'browser', downloadedHash, lastDownload }`.
+     `setMount()` also upserts browser mounts into the **library** (`daycell-library`), the list of journals kept in
+     this browser; `switchJournal(name)` (Pro) hops between them; `forgetJournal` runs on eject.
+   - `settle()` exits edit mode and flushes the write before switching or opening another journal.
+   - `IOS`, `MAC_SAFARI`, `STANDALONE` and `safariWarning()` drive the 7-day storage banner; `askPersist()`.
    - `startNew`, `startOpen`, `openUploaded` (with the older-copy warning), `downloadMd` (adds the stamp, records it
      in `daycell-exports`), `eject` (with a 9 s undo) and `startHtml()` (the start screen).
-   - `LIVE_FILES` is false with `?storage=browser`.
-8. **licence + trial:**
-   - `LICENSE` config. `licensingOn()` needs `webMode()` **and** a non-empty `checkoutUrl`, so it's off by default.
-   - `canWrite()`, `trialDaysLeft()` (`daycell-trial`) and `getLic()` (`daycell-licence`).
-   - `activateKey`, `recheckLicence` (every 30 days; network failure never locks), `deactivateDevice`,
-     `showUnlock` and `friendlyLicenceError`.
-9. **entry actions:** `newEntry(prompt)` and `startEdit` are **gated by `canWrite()`**. Also `syncEditor`,
-   `exitEdit` (toasts and milestones), `revert`, `trash`/`restore`/`purge`/`emptyTrash` (purges are remembered in
-   `state.purged` so merges can't resurrect them) and `jumpTo`.
+   - `LIVE_FILES` is false with `?storage=browser`. `liveFiles()` = `LIVE_FILES && isPro()` (new live files are Pro;
+     an existing handle still reconnects).
+8. **free + pro:**
+   - `LICENSE` config (`price`, `launchPrice`, `launchEnds`, `launchCode`, `checkoutUrl`…). `licensingOn()` needs
+     `webMode()` **and** a non-empty `checkoutUrl`, so it's off by default (and in the launcher).
+   - `isPro()` = `!licensingOn() || licensed()`. `needPro(feature)` returns true and shows the upgrade dialog when
+     locked; use it as `if (needPro('templates')) return;`. Reasons live in `PRO_WHY`, the list in `PRO_FEATURES`.
+   - `launchOn()`, `priceNow()`, `checkoutHref()` (adds `checkout[discount_code]` in launch week).
+   - `activateKey`, `recheckLicence` (every 30 days; network failure never changes anything), `deactivateDevice`,
+     `showUnlock(feature)` and `friendlyLicenceError`. **There is no trial and writing is never gated.**
+9. **entry actions:** `newEntry(prompt, tpl)` and `startEdit`. Also `syncEditor`, `exitEdit` (toasts, milestones;
+   drops an untouched template; `e.fresh`/`e.tpl` are transient flags), `revert`, `trash`/`restore`/`purge`/
+   `emptyTrash` (purges are remembered in `state.purged` so merges can't resurrect them) and `jumpTo`.
 10. **rendering:**
     - Templates are built with `innerHTML`, including `renderCells`.
     - The start screen shows when web mode has no target, and the status cell `[~]` sits at the **bottom**.
-    - Also `cellHtml`, `renderPanel`/`renderPanelBody` (contents, insights, trash, files), `insightsHtml`,
+    - Also `cellHtml`, `renderPanel`/`renderPanelBody` (contents, insights, trash, files), `insightsHtml` (22 weeks, or
+      53 with `state.heatYear` for Pro),
       `deviceHtml` (iPad QR, which lazy-loads qrcodejs from cdnjs), `licenceHtml`, `setStatus` and `renderChrome`.
-11. **command palette:** the `COMMANDS` list.
+    - After `applyTheme`: `ACCENTS`/`accentCss()`/`applyAccent`/`chooseAccent` (Pro), `TEMPLATES`/`newFromTemplate`
+      (Pro), `downloadReminder()` (`.ics`), `saveBlob`, `drawCard()` shared by `streakCard()` (free) and `yearCard()`
+      (Pro) — share images never draw entry text, `ANALYTICS`/`loadAnalytics`/
+      `track(event)` (Umami; counts only, never entry text).
+    - **import from Day One:** `startImport()` → `#importInput` → `importDayOne(file)`; `unzipJson()` is a tiny zip
+      reader (stored or deflate via `DecompressionStream`), `fromDayOne()` maps entries, `localParts()` converts to the
+      entry's time zone.
+11. **command palette:** the `COMMANDS` list. `openPalette(q)` can prefill (the editor's "template" button uses it).
 12. **events:** handled by delegation on `#cells` (`data-act`, `data-mood`), `#panel` (`data-fact`, `data-tact`,
     `data-sfile`, `data-date`, `.row`) and a global `keydown` (command-mode keys: b, Enter, j/k, d d, /, Ctrl+K,
     Ctrl+S).
 13. **boot:** `init()` detects the launcher (`GET /api/files`). Otherwise it's the web path: reopen the mounted
-    journal or show the start screen.
+    journal (reading it from IndexedDB and writing it back, which migrates localStorage-only journals) or show the
+    start screen. `webExtras()` (web only) registers `sw.js`, loads analytics and counts a day-3 return.
 
 **Styling:**
 - Colour tokens live on `:root`. Dark mode is defined twice: under `prefers-color-scheme` (guarded by
@@ -117,18 +141,21 @@ In order:
 
 ## Testing
 
+- **Automated (do this first):** `npm ci` once, then `npm run check` (syntax) and `npm test` (builds `dist/` with a fake
+  checkout link and runs the Playwright smoke tests against `python -m http.server 5180`). In the cloud container,
+  Chromium is preinstalled for Playwright 1.56.1. Add a test to `tests/smoke.spec.mjs` for new behaviour.
 - **Syntax:**
-  - Extract the `<script>` from `daycell.html` with Python and run `node --check` on it.
-  - Run `node --check netlify/functions/license.mjs`.
+  - `npm run check` covers the app script, `web/sw.js`, the licence function and the manifest.
   - Run `python -m py_compile daycell.py`, then delete the `__pycache__/` it creates.
 - **UI (web/browser mode):**
   - Copy `daycell.html` into a scratchpad folder and add a temporary launch config:
-    `python -m http.server 5180 --directory <scratch>`.
+    `python -m http.server 5180 --directory <scratch>` (or serve `dist/` after `node tools/build.mjs`).
   - Open `http://localhost:5180/daycell.html?storage=browser`, then seed data with JS (`state.entries = [...]`,
     `renderAll()`).
   - Stub downloads (`HTMLAnchorElement.prototype.click`) so nothing lands in the user's Downloads folder.
-  - Mock `/api/license` by overriding `window.fetch`, and set `LICENSE.checkoutUrl` in the page to switch
-    licensing on.
+  - Mock `/api/license` by overriding `window.fetch`. Switch licensing on with `LS_CHECKOUT_URL=… node tools/build.mjs`
+    (or set `LICENSE.checkoutUrl` in the page). Seed `daycell-licence` `{ status: 'active', validatedAt: Date.now() }`
+    to act as a Pro user.
   - Clear that origin's `localStorage` and IndexedDB afterwards.
 - **Launcher:** copy `daycell.py` and `daycell.html` into a scratch folder with its own `Journals/`, then run
   `python <scratch>/daycell.py --no-browser --port=8797` from a temporary launch config.
@@ -141,23 +168,21 @@ In order:
   - Screenshots in the browser pane sometimes lag a step behind, so verify with JS measurements.
   - Python's `http.server` occasionally resets a connection and the page half-loads; reload.
 
-## Current state (as of 2026-10-11)
+## Current state (as of 2026-10-11, late)
 
 - **Done:**
-  - notebook UI, trash, autosave, launcher
-  - personality: status cell, prompts, insights, voice, palette
-  - responsive layout and touch support
+  - notebook UI, trash, autosave, launcher, personality, responsive layout and touch support
   - iPad LAN mode with QR pairing and conflict-safe merging
-  - web version (start screen, live file / in-browser, download, eject with undo, older-copy warning)
-  - licence and trial (off until `checkoutUrl` is set), Netlify config and licence function
-  - README
-- **Not done or not verified:**
-  - a real iPad, the QR image, the firewall prompt
-  - real Lemon Squeezy calls and a Netlify deploy
-  - the Chrome/Edge file pickers in web mode
-- **Next steps, from the user's plan:**
-  1. ~~Pick a name~~ Done: Daycell (internals renamed too, 2026-10-11).
-  2. The user sets up Lemon Squeezy (a $5 product with licence keys, activation limit 5) and pastes the checkout URL.
-  3. Deploy to Netlify with `LS_STORE_ID` and `LS_PRODUCT_ID` set.
-  4. Marketing: short vertical promo videos, launch posts, and an Instagram page (the user creates the account).
-- **Parked:** images in entries (plan in the README under "Parked ideas"), and a desktop app (Tauri) later.
+  - web version (start screen, in-browser journals in IndexedDB, live files for Pro, download, eject with undo,
+    older-copy warning, Safari storage banner, persistent storage request)
+  - **free forever + one-time Pro** (more journals, live files, year insights + share image, templates, accents)
+  - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 11 smoke tests
+  - free streak share image (no entry text) and a free Day One importer (zip or JSON)
+  - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
+- **Not done or not verified:** see `TASKS.md`. Notably: real Lemon Squeezy/Netlify, Safari/Firefox and a real iPad,
+  the Chrome/Edge file pickers.
+- **Dip's next steps** (accounts and identity): Lemon Squeezy product and `LAUNCH` code, Netlify env vars and deploy,
+  domain, support inbox, make the repo public, UKIPO search, HMRC/ICO.
+- **Parked:** images in entries (plan in the README under "Parked ideas"), passphrase encryption and a book export
+  (Pro), web push reminders, and a desktop app (Tauri).
