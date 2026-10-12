@@ -1,0 +1,17 @@
+/* shared bits for vertical (1080x1920) promo scenes */
+body { font-size: 40px; }
+.stage { position: absolute; inset: 0; padding: 260px 80px 300px; display: flex; flex-direction: column; justify-content: center; }
+/* every timed element starts hidden; give it --at (seconds) and optionally --out */
+.in { opacity: 0; animation: fadeUp .5s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--at, 0s); }
+.out { animation: fadeOut .4s ease both; animation-delay: var(--out); }
+.in.out { animation: fadeUp .5s cubic-bezier(.2,.7,.2,1) var(--at, 0s) both, fadeOut .4s ease var(--out) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(-30px); } }
+.pop { animation: pop .35s cubic-bezier(.3,1.6,.5,1) both; animation-delay: var(--at, 0s); }
+@keyframes pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+.big { font: 700 104px/1.04 var(--sans); letter-spacing: -.04em; margin: 0; }
+.mid { font: 600 64px/1.12 var(--sans); letter-spacing: -.03em; margin: 0; }
+.sub { font: 400 44px/1.4 var(--sans); color: var(--muted); margin: 0; }
+.cta { display: grid; gap: 30px; justify-items: start; align-content: center; }
+.cta .brand { display: flex; align-items: center; gap: 22px; font-size: 64px; }
+.safe { font: 500 30px var(--mono); color: var(--faint); }

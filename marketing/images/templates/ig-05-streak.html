@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1350">
+<title>Instagram 05: streak grid</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  body { font-size: 30px; padding: 96px 88px; display: flex; flex-direction: column; }
+  .toast { align-self: flex-start; font: 500 30px var(--mono); background: var(--surface); border: 2px solid var(--border-strong); border-radius: 12px; padding: 20px 26px; }
+  .toast .accent { margin-right: 12px; }
+  .grid { font-size: 33px; margin: auto 0; justify-content: start; }
+  h1 { font: 700 76px/1.08 var(--sans); letter-spacing: -.03em; margin: 0 0 24px; }
+  p { font: 400 34px/1.45 var(--sans); color: var(--muted); margin: 0; }
+  .legend { display: flex; justify-content: space-between; font: 500 22px var(--mono); color: var(--faint); margin-top: 14px; }
+</style>
+<script>
+  // a deterministic, made-up 22-week activity grid that ends in a 30-day streak
+  addEventListener('DOMContentLoaded', () => {
+    let s = 3; const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    const g = document.querySelector('.grid'), days = 22 * 7;
+    for (let i = 0; i < days; i++) {
+      const ago = days - 1 - i, el = document.createElement('i');
+      const on = ago < 30 || r() < (ago < 80 ? .6 : .35);
+      if (on) el.className = 'l' + (1 + Math.floor(r() * 4));
+      g.appendChild(el);
+    }
+  });
+</script></head>
+<body>
+  <div class="toast"><span class="accent">✓</span>achievement unlocked: 30-day streak.</div>
+  <div><div class="grid"></div><div class="legend"><span>22 weeks ago</span><span>today</span></div></div>
+  <h1>Watch the habit show up.</h1>
+  <p>Every entry fills a square. Streaks, milestones and an "on this day" look-back, all from a file on your device.</p>
+</body></html>

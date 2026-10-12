@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1350">
+<title>Instagram 03: prompt of the day</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  body { font-size: 30px; padding: 96px 88px; display: flex; flex-direction: column; }
+  .top { display: flex; justify-content: space-between; align-items: center; font: 500 26px var(--mono); color: var(--faint); }
+  .code { font: 500 34px var(--mono); margin: auto 0 36px; }
+  .code .fn { color: var(--accent); }
+  h1 { font: 600 82px/1.12 var(--mono); letter-spacing: -.02em; margin: 0 0 56px; }
+  h1::before { content: "“"; color: var(--faint); } h1::after { content: "”"; color: var(--faint); }
+  .ans { font: 400 34px/1.5 var(--sans); color: var(--muted); border-left: 6px solid var(--accent); padding-left: 28px; margin-bottom: auto; }
+  .foot { display: flex; align-items: center; gap: 16px; font-size: 30px; }
+  .foot .muted { margin-left: auto; font: 500 24px var(--mono); }
+</style>
+<script>
+  // ?n=0..9 picks the prompt (these are lines from the app's own PROMPTS list)
+  const PROMPTS = [
+    'if today had a commit message, what would it be?',
+    'what did you debug in your life today?',
+    'what’s one thing you’d refactor about today?',
+    'what’s running in the background of your mind?',
+    'write the changelog for this week.',
+    'what’s a small win worth committing?',
+    'what are you avoiding, and why?',
+    'what gave you energy today, and what drained it?',
+  ];
+  const n = Number(new URLSearchParams(location.search).get('n') || 0) % PROMPTS.length;
+  addEventListener('DOMContentLoaded', () => {
+    document.querySelector('h1').textContent = PROMPTS[n];
+    document.querySelector('.num').textContent = String(n + 1).padStart(2, '0');
+  });
+</script></head>
+<body>
+  <div class="top"><span>prompt.of_the_day</span><span>#<span class="num">01</span></span></div>
+  <div class="code">daycell.<span class="fn">prompt</span>()</div>
+  <h1></h1>
+  <div class="ans">Answer it in the comments, or in your own journal. One line counts.</div>
+  <div class="foot"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span><span class="muted">save for later ↓</span></div>
+</body></html>

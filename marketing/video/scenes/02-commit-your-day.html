@@ -1,0 +1,59 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1920">
+<meta name="duration" content="16">
+<title>Video 02: commit your day</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<link rel="stylesheet" href="scene.css">
+<style>
+  .term { font: 500 44px/1.5 var(--mono); display: grid; gap: 34px; }
+  .term .fn { color: var(--accent); }
+  .q { font: 600 70px/1.15 var(--mono); letter-spacing: -.02em; }
+  .ans { background: var(--surface); border: 2px solid var(--border-strong); border-radius: 16px; padding: 34px 38px; font: 500 46px var(--mono); box-shadow: inset 8px 0 0 var(--accent); min-height: 140px; }
+  .keys { display: flex; gap: 14px; align-items: center; font-size: 40px; color: var(--muted); }
+  .kbd { font-size: 34px; }
+  .toast { font: 500 40px var(--mono); background: var(--surface); border: 2px solid var(--border-strong); border-radius: 14px; padding: 26px 30px; justify-self: start; }
+  .gridwrap { display: grid; gap: 28px; }
+  .grid { font-size: 38px; }
+  .streak { font: 700 120px var(--mono); color: var(--accent); }
+  .streak small { font: 500 40px var(--mono); color: var(--muted); margin-left: 16px; }
+</style>
+<script src="scene.js"></script>
+<script>
+  addEventListener('DOMContentLoaded', () => {
+    let s = 5; const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    const g = document.querySelector('.grid'), days = 16 * 7;
+    for (let i = 0; i < days; i++) {
+      const ago = days - 1 - i, el = document.createElement('i');
+      if (ago === 0) { el.className = 'l4 today pop'; el.style.setProperty('--at', '10.6s'); }
+      else if (ago < 29 || r() < .45) el.className = 'l' + (1 + Math.floor(r() * 4));
+      g.appendChild(el);
+    }
+  });
+</script></head>
+<body>
+  <div class="stage in out" style="--at:.2s; --out:8.6s">
+    <div class="term">
+      <div>daycell.<span class="fn">prompt</span>()</div>
+      <div class="q in" style="--at:.9s">“if today had a commit message, what would it be?”</div>
+      <div class="ans in" style="--at:2.6s"><span data-type="feat: finally trusted myself" data-at="3.2" data-cps="12"></span><span class="caret" data-until="6.4"></span></div>
+      <div class="keys in" style="--at:6.2s"><span class="kbd">shift</span>+<span class="kbd">enter</span><span>to commit</span></div>
+      <div class="toast pop" style="--at:7.0s"><span class="accent">✓ </span>committed. your future self says thanks.</div>
+    </div>
+  </div>
+
+  <div class="stage in out" style="--at:9s; --out:13.2s">
+    <div class="gridwrap">
+      <div class="streak"><span data-count="29,30,10.5,10.8,0,"></span><small>day streak</small></div>
+      <div class="grid"></div>
+      <div class="toast pop" style="--at:11.2s"><span class="accent">✓ </span>achievement unlocked: 30-day streak.</div>
+    </div>
+  </div>
+
+  <div class="stage cta in" style="--at:13.5s">
+    <div class="brand"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
+    <p class="mid">Commit your day.</p>
+    <p class="sub">A journal that feels like a code notebook. Free to write, forever.</p>
+    <span class="safe">link in bio</span>
+  </div>
+</body></html>
