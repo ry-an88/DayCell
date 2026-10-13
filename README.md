@@ -383,6 +383,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-13 | **Redesign:** warm neutrals, off-white light mode, a one-job accent, solid borders except the `[~]` cell, a small motion set, a notebook start screen | Remove the generic look and the glare in light mode while keeping the notebook foundations (approved from a clickable preview) |
 | 2026-10-13 | `daycell.today()` gets a ticker line and a tiny robot, each with an off button | Personality without clutter; the lines are bundled, so it stays offline and private |
 | 2026-10-13 | **Maker section as a street poster** ("Because why not.", rules I keep, a "say hello" form) that deliberately doesn't match the site, and keeps its light paper in dark mode | Dip wanted the "who I am" part to feel like a window into another world. Picked over a broadsheet and a paperback (mockups in the project files). Anton + Archivo are allowed inside the poster only; the rest of the site stays Inter + JetBrains Mono |
+| 2026-10-13 | The maker is named **Dip Raiyan** everywhere (privacy page, poster, footer, `meta author` and schema.org JSON-LD) and the window bar no longer says "vicarious" | Google's AI answer called Dip "an alias" writing under the "vicarious" umbrella, because the privacy page said only "an independent developer" and the bar label read like a brand |
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
 
 ---
