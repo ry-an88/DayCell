@@ -2,7 +2,8 @@
 // Only these files are published; the launcher, journals and everything else stay off the internet.
 //
 // Optional settings, read from the environment (set them in Netlify → Site configuration → Environment variables):
-//   LS_CHECKOUT_URL   Lemon Squeezy checkout link for Daycell Pro. Without it, the hosted app has no paywall.
+//   CHECKOUT_URL      the Polar checkout link for Daycell Pro. Without it, the hosted app has no paywall.
+//   PORTAL_URL        optional: where buyers find a lost key (your Polar customer portal). Defaults to emailing support.
 //   LAUNCH_ENDS       last day of launch week, YYYY-MM-DD. Until then the £9 launch price shows and is applied.
 //   UMAMI_SRC         Umami script URL, e.g. https://cloud.umami.is/script.js   } both needed to turn on
 //   UMAMI_WEBSITE_ID  the website ID Umami gives you                            } cookie-free analytics
@@ -11,6 +12,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync } f
 import { join } from 'node:path';
 
 const env = process.env;
+const CHECKOUT_URL = env.CHECKOUT_URL || '';
 const SITE_URL = (env.SITE_URL || env.URL || 'https://daycell.app').replace(/\/$/, '');
 const REPO_URL = 'https://github.com/ry-an88/daycell';
 const js = v => JSON.stringify(v || '').slice(1, -1).replace(/'/g, "\\'");
@@ -34,7 +36,8 @@ let app = readFileSync('daycell.html', 'utf8');
 app = app.replace(/<link rel="preconnect" href="https:\/\/fonts\.googleapis\.com">\n<link rel="preconnect" href="https:\/\/fonts\.gstatic\.com" crossorigin>\n<link href="https:\/\/fonts\.googleapis\.com[^"]*" rel="stylesheet">/,
   '<link rel="stylesheet" href="../fonts/fonts.css">');
 if (app.includes('fonts.googleapis.com')) throw new Error('daycell.html: Google Fonts link not replaced');
-app = replaceOnce(app, "checkoutUrl: '',", `checkoutUrl: '${js(env.LS_CHECKOUT_URL)}',`, 'daycell.html');
+app = replaceOnce(app, "checkoutUrl: '',", `checkoutUrl: '${js(CHECKOUT_URL)}',`, 'daycell.html');
+if (env.PORTAL_URL) app = replaceOnce(app, /recoverUrl: '[^']*',/.exec(app)[0], `recoverUrl: '${js(env.PORTAL_URL)}',`, 'daycell.html');
 app = replaceOnce(app, "launchEnds: '',", `launchEnds: '${date(env.LAUNCH_ENDS)}',`, 'daycell.html');
 app = replaceOnce(app, "const ANALYTICS = { src: '', websiteId: '' };", `const ANALYTICS = { src: '${js(env.UMAMI_SRC)}', websiteId: '${js(env.UMAMI_WEBSITE_ID)}' };`, 'daycell.html');
 writeFileSync('dist/app/index.html', app);
@@ -50,4 +53,4 @@ for (const f of readdirSync('dist').filter(f => f.endsWith('.html'))) {
 const sitejs = 'dist/site.js';
 writeFileSync(sitejs, readFileSync(sitejs, 'utf8').replace('__LAUNCH_ENDS__', date(env.LAUNCH_ENDS)));
 
-console.log(`built dist/ for ${SITE_URL}${env.LS_CHECKOUT_URL ? ' (paywall on)' : ' (no checkout link: everything unlocked)'}`);
+console.log(`built dist/ for ${SITE_URL}${CHECKOUT_URL ? ' (paywall on)' : ' (no checkout link: everything unlocked)'}`);

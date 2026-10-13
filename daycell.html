@@ -1190,9 +1190,9 @@ const LICENSE = {
   price: '£12',
   launchPrice: '£9',
   launchEnds: '',      // last day of launch week (LAUNCH_ENDS at build time), e.g. '2026-11-16'; £9 shows until 23:59 UK time that day
-  launchCode: 'LAUNCH', // Lemon Squeezy discount code applied at checkout during launch week
-  checkoutUrl: '',  // filled in at build time from LS_CHECKOUT_URL (tools/build.mjs); empty means no paywall, everything unlocked
-  recoverUrl: 'https://app.lemonsqueezy.com/my-orders',
+  launchCode: 'LAUNCH', // discount code added to the checkout link during launch week (it must exist in Polar as £3 off)
+  checkoutUrl: '',  // filled in at build time from CHECKOUT_URL (tools/build.mjs); empty means no paywall, everything unlocked
+  recoverUrl: 'mailto:hello@daycell.app?subject=I%20lost%20my%20Daycell%20Pro%20key', // build time: PORTAL_URL (the customer portal) replaces this
   endpoint: '/api/license',  // the small server function in netlify/functions/license.mjs
   recheckDays: 30,
 };
@@ -1229,7 +1229,7 @@ const launchOn = () => !!LICENSE.launchEnds && Date.now() < launchEndsAt(LICENSE
 const priceNow = () => launchOn() ? LICENSE.launchPrice : LICENSE.price;
 function checkoutHref() {
   if (!launchOn() || !LICENSE.launchCode) return LICENSE.checkoutUrl;
-  return LICENSE.checkoutUrl + (LICENSE.checkoutUrl.includes('?') ? '&' : '?') + 'checkout%5Bdiscount_code%5D=' + encodeURIComponent(LICENSE.launchCode);
+  return LICENSE.checkoutUrl + (LICENSE.checkoutUrl.includes('?') ? '&' : '?') + 'discount_code=' + encodeURIComponent(LICENSE.launchCode);
 }
 // true when the feature is locked (and the upgrade dialog is now showing)
 function needPro(feature) {

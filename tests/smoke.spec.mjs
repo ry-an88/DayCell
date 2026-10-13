@@ -271,3 +271,12 @@ test('free: the streak image downloads and the status cell keeps its spacing', a
   const [a, b] = [await label.boundingBox(), await link.boundingBox()];
   expect(b.x - (a.x + a.width)).toBeGreaterThanOrEqual(6);
 });
+
+test('checkout link carries the launch discount only during launch week', async ({ page }) => {
+  await page.goto(APP);
+  const href = launchEnds => page.evaluate(d => { LICENSE.launchEnds = d; return checkoutHref(); }, launchEnds);
+  const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+  expect(await href(day(2))).toBe('https://example.com/checkout?discount_code=LAUNCH');
+  expect(await href(day(-3))).toBe('https://example.com/checkout');
+  expect(await href('')).toBe('https://example.com/checkout');
+});
