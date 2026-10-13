@@ -8,7 +8,7 @@ file format, the three run modes, pricing rules, deploy steps, the decisions log
 **Daycell** (renamed from the working name Daybook on 2026-10-11) is a journal app with a Jupyter/marimo-style "notebook" UI.
 All entries live in **one plain `.md` file** per journal. It's being turned into a web product: no accounts, users
 own the file. **Free, with every feature** (decided 2026-10-13; the earlier free + £12 Pro model and Polar are gone). The repo is
-going public under FSL-1.1-MIT. The launch checklist is `TASKS.md`; marketing lives in `marketing/` (owned by a
+going public with all rights reserved (`LICENSE`; FSL-1.1-MIT was dropped on 2026-10-13). The launch checklist is `TASKS.md`; marketing lives in `marketing/` (owned by a
 separate thread, leave it alone).
 
 ## Golden rules
@@ -175,7 +175,7 @@ In order:
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
   - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 14 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
-  - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
+  - licence: all rights reserved (`LICENSE`); history checked for secrets; file format spec in `docs/`
 - **Not done or not verified:** see `TASKS.md`. Notably: Safari/Firefox and a real iPad,
   the Chrome/Edge file pickers.
 - **Dip's next steps** (accounts and identity): delete the Polar/checkout env vars in Netlify, a "made by Dip" section,

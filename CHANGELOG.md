@@ -2,6 +2,10 @@
 
 ## 2026-10-13 · free, a redesign and a livelier today cell
 
+**Licence**
+- The code is now all rights reserved (`LICENSE`). The FSL-1.1-MIT `LICENSE.md` is removed, and the landing page,
+  terms and package metadata say so.
+
 **Free, every feature**
 - Daycell Pro is gone: several journals, live files, a year of insights and its image, templates and accents are free
   for everyone. No upgrade dialog, no licence checks.

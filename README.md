@@ -64,7 +64,7 @@ Requires Python 3 (already installed on this PC). No other installs.
 | `tests/` | Browser smoke tests (Playwright). `npm test` builds and runs them. |
 | `netlify.toml` | Hosting config for the web version. |
 | `docs/file-format.md` | The journal file format as a short open spec. |
-| `LICENSE.md` | FSL-1.1-MIT: public source, no competing products, MIT after two years. |
+| `LICENSE` | Copyright © 2026 Dip Raiyan. All rights reserved. The code is public to read, not to reuse. |
 | `TASKS.md` | The launch task list. |
 | `.gitignore` | Keeps `Journals/` and the iPad pairing secret out of git. |
 | `CLAUDE.md` | Working notes for Claude sessions: code map, safe-testing rules, preferences and current state. |
@@ -310,7 +310,7 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 - **Hosting** publishes only `dist/` (the site and the app). `Journals/` is never uploaded.
 - **Storage keys** in the browser always use the fixed prefix `daycell-` (the `STORE_KEY` constant), and in-browser
   journals are stored in IndexedDB as `journal:<name>`. Renaming the app can't make anyone's saved journal disappear.
-- **The source is public** under FSL-1.1-MIT. Git history was checked for secrets and journal content on 2026-10-11.
+- **The source is public to read**, with all rights reserved (see `LICENSE`). Git history was checked for secrets and journal content on 2026-10-11.
 
 ---
 
@@ -384,6 +384,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-13 | `daycell.today()` gets a ticker line and a tiny robot, each with an off button | Personality without clutter; the lines are bundled, so it stays offline and private |
 | 2026-10-13 | **Maker section as a street poster** ("Because why not.", rules I keep, a "say hello" form) that deliberately doesn't match the site, and keeps its light paper in dark mode | Dip wanted the "who I am" part to feel like a window into another world. Picked over a broadsheet and a paperback (mockups in the project files). Anton + Archivo are allowed inside the poster only; the rest of the site stays Inter + JetBrains Mono |
 | 2026-10-13 | The maker is named **Dip Raiyan** everywhere (privacy page, poster, footer, `meta author` and schema.org JSON-LD) and the window bar no longer says "vicarious" | Google's AI answer called Dip "an alias" writing under the "vicarious" umbrella, because the privacy page said only "an independent developer" and the bar label read like a brand |
+| 2026-10-13 | **Licence: all rights reserved**, replacing FSL-1.1-MIT before the repo goes public | A licence can be loosened later but not tightened; it stops someone cloning Daycell and running it with their own ads, and people can still read the code to check their journal never leaves their device |
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
 
 ---
