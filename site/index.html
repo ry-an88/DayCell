@@ -23,7 +23,7 @@
 <body>
 <header class="nav wrap">
   <a class="brand" href="./"><span class="glyph">d/</span>daycell<i>.md</i></a>
-  <nav><a href="#features">features</a><a href="#pricing">pricing</a><a href="#faq">faq</a></nav>
+  <nav><a href="#features">features</a><a href="#pricing">price</a><a href="#faq">faq</a></nav>
   <a class="btn primary" href="app/">open the app</a>
 </header>
 
@@ -35,7 +35,7 @@
     <p class="lede">Daycell is a journal that looks like a coding notebook. Every entry is a cell, every day adds to your streak, and the whole thing lives in one plain <code>.md</code> file you own.</p>
     <div class="ctas">
       <a class="btn primary big" href="app/">start writing, free</a>
-      <a class="btn big" href="#pricing">see pro · <span data-price>£12</span> once</a>
+      <a class="btn big" href="#file">see the file format</a>
     </div>
     <p class="fine">no account · no cloud · works offline · nothing to install</p>
   </div>
@@ -109,40 +109,28 @@
 
 <section class="pricing wrap" id="pricing">
   <div class="sec-head">
-    <p class="eyebrow">pricing</p>
-    <h2>free forever. pro once.</h2>
-    <p>Everything you need to keep a daily journal is free, with no time limit. Pro is a single payment for extras. No subscription, ever.</p>
+    <p class="eyebrow">price</p>
+    <h2>free. all of it.</h2>
+    <p>Every feature is free, with no time limit, no account and no upgrade screen. No subscription, ever.</p>
   </div>
-  <p class="launch" data-launch hidden>launch week: pro is <b>£9</b> instead of £12, applied automatically at checkout.</p>
-  <div class="tiers">
+  <div class="tiers one">
     <div class="tier">
-      <p class="tname">free</p>
+      <p class="tname">daycell</p>
       <p class="price">£0 <small>forever</small></p>
-      <ul>
-        <li>one journal, unlimited entries</li>
+      <ul class="two">
+        <li>as many journals as you like, with a switcher</li>
         <li>daily prompts, streaks and milestones</li>
-        <li>status cell and 22-week activity grid</li>
-        <li>search, command palette, trash, themes</li>
+        <li>a status cell, plus a full-year activity grid</li>
+        <li><b>live files:</b> save straight into a .md on your disk (Chrome, Edge)</li>
+        <li>templates: daily review, weekly retro, standup, decision log</li>
+        <li>search, command palette, trash, themes and accent colours</li>
         <li>download and eject your .md any time</li>
         <li>works offline, installs to your home screen</li>
         <li>daily reminder for your calendar</li>
-        <li>a shareable streak image (squares only, no entry text)</li>
+        <li>shareable streak and year images (squares only, no entry text)</li>
         <li>import from Day One</li>
       </ul>
-      <a class="btn big" href="app/">start writing</a>
-    </div>
-    <div class="tier pro">
-      <p class="tname">pro <span>one-time</span></p>
-      <p class="price"><span data-price>£12</span> <small>once</small></p>
-      <ul>
-        <li><b>more journals</b> with a switcher (work, dreams, morning pages)</li>
-        <li><b>live files:</b> save straight into a .md on your disk (Chrome, Edge)</li>
-        <li><b>a year of insights</b> and a shareable “year in cells” image</li>
-        <li><b>templates:</b> daily review, weekly retro, standup, decision log</li>
-        <li><b>accent colours</b></li>
-        <li>up to 5 devices, works offline after activation</li>
-      </ul>
-      <a class="btn primary big" href="app/">try free, upgrade inside</a>
+      <a class="btn primary big" href="app/">start writing</a>
     </div>
   </div>
 </section>
@@ -166,14 +154,13 @@
     <p class="eyebrow">faq</p>
     <h2>questions</h2>
   </div>
-  <details><summary>Where are my entries saved?</summary><p>In Chrome and Edge with Pro, straight into the .md file you pick on your computer. Everywhere else, in your browser’s storage on that device, until you download or eject the file. Nothing is stored on our side.</p></details>
+  <details><summary>Where are my entries saved?</summary><p>In Chrome and Edge, straight into the .md file you pick on your computer. Everywhere else, in your browser’s storage on that device, until you download or eject the file. Nothing is stored on our side.</p></details>
   <details><summary>Can I lose my journal?</summary><p>Browsers can clear site data, and Safari does so after 7 days without a visit unless Daycell is on your home screen. That’s why Daycell reminds you to download a copy every few days, and why the file is plain Markdown you can keep anywhere.</p></details>
   <details><summary>Does it sync between devices?</summary><p>Not through a cloud. Move your .md between devices however you like (download and open it, or keep it in a synced folder with a live file). If you run the free desktop launcher, an iPad on the same Wi-Fi can write into the same file.</p></details>
-  <details><summary>What happens if I stop paying?</summary><p>There’s nothing to stop: Pro is one payment. If a licence is ever refunded, Pro features switch off and your journals stay exactly as they are.</p></details>
+  <details><summary>Is it really free?</summary><p>Yes. Every feature is free and there is nothing to buy. Daycell runs in your browser and stores nothing on our side, so it costs very little to keep running.</p></details>
   <details><summary>I use Day One. Can I bring my entries?</summary><p>Yes, for free. In Day One, export your journal as JSON, then open Daycell and choose “import from Day One” with the .zip. Text, dates, times and tags come across; photos stay in Day One, with a note where each one was.</p></details>
   <details><summary>Can I use it with Obsidian?</summary><p>Yes. Put the file in your vault. Mood and tags use the same <code>key:: value</code> fields as the Dataview plugin.</p></details>
   <details><summary>Is the code open?</summary><p>The source is public on GitHub under the Functional Source License: free to read, run and change for anything except a competing product, and every version becomes MIT-licensed two years after release.</p></details>
-  <details><summary>Refunds?</summary><p>If Pro isn’t right for you, ask within 14 days for a full refund. See the <a href="terms.html">terms</a>.</p></details>
 </section>
 
 <section class="cta wrap">
@@ -187,6 +174,5 @@
   <span class="grow"></span>
   <a href="privacy.html">privacy</a><a href="terms.html">terms</a><a href="__REPO_URL__">source</a><a href="mailto:hello@daycell.app">hello@daycell.app</a>
 </footer>
-<script src="site.js"></script>
 </body>
 </html>
