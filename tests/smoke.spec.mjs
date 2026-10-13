@@ -261,3 +261,39 @@ test('today cell: the ticker and the robot turn off, stay off, and nothing is fe
   await expect(page.locator('#bot.hop')).toHaveCount(1, { timeout: 2000 });
   expect(outside).toEqual([]);
 });
+
+test('landing page: the maker poster and its "say hello" form', async ({ page }) => {
+  let posted = '';
+  await page.route('**/', route => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    posted = route.request().postData() || '';
+    return route.fulfill({ status: 200, body: 'ok' });
+  });
+  await page.goto('/#maker');
+  const form = page.locator('form[name="hello"]');
+  await expect(page.locator('#maker .p-huge')).toBeVisible();
+  await expect(form).toHaveAttribute('data-netlify', 'true');
+  await expect(form.locator('input[name="bot-field"]')).toBeHidden();
+  await form.locator('input[name="name"]').fill('Ada');
+  await form.locator('input[name="email"]').fill('ada@example.com');
+  await form.locator('textarea[name="message"]').fill('hello from a test');
+  await form.locator('button[type="submit"]').click();
+  await expect(form.locator('.f-note')).toHaveText('Sent. I’ll write back.');
+  expect(new URLSearchParams(posted).get('form-name')).toBe('hello');
+  expect(new URLSearchParams(posted).get('message')).toBe('hello from a test');
+  await expect(form.locator('input[name="name"]')).toHaveValue('');
+});
+
+test('landing page: on a phone the maker window is at most 80% of the screen and scrolls inside', async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto('/');
+  const m = await page.evaluate(() => {
+    const w = document.querySelector('.win'), p = document.querySelector('.poster');
+    return { win: w.getBoundingClientRect().height, vh: innerHeight, scrolls: p.scrollHeight > p.clientHeight, wide: document.documentElement.scrollWidth > innerWidth };
+  });
+  expect(m.win).toBeLessThanOrEqual(m.vh * 0.8 + 1);
+  expect(m.scrolls).toBe(true);
+  expect(m.wide).toBe(false);
+  await ctx.close();
+});

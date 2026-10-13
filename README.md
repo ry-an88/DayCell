@@ -241,13 +241,20 @@ year image, templates and accent colours included. There is no paywall, licence 
 
 | Path | From | What |
 |---|---|---|
-| `/` | `site/index.html` | landing page: hero, the file format, features, price (free), privacy, FAQ |
+| `/` | `site/index.html` | landing page: hero, the file format, features, price (free), privacy, the maker poster with a "say hello" form, FAQ |
 | `/privacy.html`, `/terms.html` | `site/` | privacy policy and terms (refunds within 14 days) |
 | `/app/` | `daycell.html` + `web/` | the app, its manifest, icons and service worker |
-| `/fonts/` | `site/fonts/` | Inter and JetBrains Mono, self-hosted so visitors never contact Google |
+| `/fonts/` | `site/fonts/` | Inter and JetBrains Mono (plus Anton and Archivo for the maker poster only), self-hosted so visitors never contact Google |
 | `/og.png` | `site/og.png` | share image for links |
 
 The support address on the site is `hello@daycell.app` (replace it if the inbox is different).
+
+**The maker section** (`#maker`) is a window into a different design world on purpose: a street poster inside
+Daycell's own frame, with its own paper, ink, square corners and type (Anton + Archivo), and it stays light in dark
+mode. Its "say hello" form uses **Netlify Forms** (form name `hello`, a hidden spam trap, sent in the background with
+`fetch`; without JavaScript it posts normally). To receive messages: Netlify → **Forms → enable form detection**, then
+redeploy, then **Forms → hello → Form notifications → Email notification** to your inbox. The free tier takes 100
+messages a month.
 
 ---
 
@@ -375,6 +382,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-13 | **Everything free.** No Pro, no licence keys; the Polar setup is dropped | Dip's call: grow first and use Daycell to show Dip's work. A free journal with no catch is the easiest thing to share |
 | 2026-10-13 | **Redesign:** warm neutrals, off-white light mode, a one-job accent, solid borders except the `[~]` cell, a small motion set, a notebook start screen | Remove the generic look and the glare in light mode while keeping the notebook foundations (approved from a clickable preview) |
 | 2026-10-13 | `daycell.today()` gets a ticker line and a tiny robot, each with an off button | Personality without clutter; the lines are bundled, so it stays offline and private |
+| 2026-10-13 | **Maker section as a street poster** ("Because why not.", rules I keep, a "say hello" form) that deliberately doesn't match the site, and keeps its light paper in dark mode | Dip wanted the "who I am" part to feel like a window into another world. Picked over a broadsheet and a paperback (mockups in the project files). Anton + Archivo are allowed inside the poster only; the rest of the site stays Inter + JetBrains Mono |
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
 
 ---
@@ -434,15 +442,14 @@ The live list is [`TASKS.md`](TASKS.md). In short:
 
 1. **Dip:** delete the Polar and checkout variables in Netlify, domain, support inbox, make the repo public, trademark search, HMRC/ICO checks, a real iPad test.
 2. **Marketing:** lives in `marketing/` (a separate thread).
-3. **Next features:** a "made by Dip" section on the landing page, more ticker lines and robot moves, passphrase
+3. **Next features:** more ticker lines and robot moves, passphrase
    encryption, export to a styled book, images in entries, web push reminders, and the Tauri desktop app.
 
 ### Parked ideas
 
-**Made by Dip** (discussed 2026-10-13, waiting on Dip's details). A section near the bottom of the landing page:
-photo or avatar, two or three lines in Dip's voice, what Dip does, links, and a "let's chat" form (name, email, topic,
-message) for paid work, using Netlify Forms (free tier: 100 messages a month), a hidden spam trap and a privacy-page
-line. In the app, only a small "made by Dip" link on the start screen and in the file panel.
+**Made by Dip, still open** (2026-10-13). The poster section is built. Still to add once Dip shares them: a photo
+or sketch, more links (LinkedIn, Instagram), and possibly a small "made by Dip" link in the app's file panel. The
+broadsheet direction ("The Vicarious") was liked too and is kept as a reference for a later page.
 
 **Money without a paywall** (discussed 2026-10-13). A "support Daycell" tip link (Ko-fi or GitHub Sponsors); a
 sponsor slot on the website and README. Later, at a few thousand daily writers, possibly one clearly labelled

@@ -16,8 +16,8 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
 - [x] ~~Polar~~ dropped on 2026-10-13: Daycell is free, nothing to sell.
 - [ ] **Netlify:** after the free redesign is merged, delete these environment variables if they're set:
       `CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS`, `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL`.
-- [ ] **Made by Dip:** answer Claude's questions for the landing page section (what you do, paid work you want,
-      photo, links, where "Let's chat" messages go).
+- [ ] **Made by Dip form:** in Netlify, Forms → enable form detection, redeploy, then add an email notification for
+      the `hello` form. Send Claude any links (LinkedIn, Instagram) or a photo for the poster.
 - [ ] **Domain:** buy one (daycell.app was the favourite; check it's free) and connect it in Netlify.
 - [ ] **Support email:** create an inbox (for example `hello@<your domain>`). The site uses `hello@daycell.app`;
       tell Claude if yours is different.
@@ -56,7 +56,7 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
       that respects reduced motion, notebook-style start screen.
 - [x] Today cell: a ticker line (bundled quotes, facts, tips; nothing fetched) and a tiny robot, each with an on/off
       button that's remembered (`/ticker`, `/bot`, file panel).
-- [ ] "Made by Dip" section on the landing page with a "Let's chat" form (waiting on Dip's answers).
+- [x] "Made by Dip" section on the landing page: a street poster with a "say hello" form (Netlify Forms).
 
 ### 4. Website
 - [x] Landing page at `/` with the app at `/app/`.

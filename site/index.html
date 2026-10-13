@@ -21,9 +21,9 @@
 <!--analytics-->
 </head>
 <body>
-<header class="nav wrap">
+<header class="nav wrap" id="top">
   <a class="brand" href="./"><span class="glyph">d/</span>daycell<i>.md</i></a>
-  <nav><a href="#features">features</a><a href="#pricing">price</a><a href="#faq">faq</a></nav>
+  <nav><a href="#features">features</a><a href="#pricing">price</a><a href="#maker">maker</a><a href="#faq">faq</a></nav>
   <a class="btn primary" href="app/">open the app</a>
 </header>
 
@@ -149,6 +149,33 @@
   <p class="fine center"><a href="privacy.html">read the privacy policy</a></p>
 </section>
 
+<!-- The maker: Daycell's chrome around a window into a different design world (a street poster), on purpose.
+     The poster keeps its own paper, ink and type in dark mode too. -->
+<section class="maker wrap" id="maker">
+  <p class="win-cap"><span class="pr">[me]</span><b>who makes this</b><span>· a different page, on purpose</span></p>
+  <div class="win">
+    <div class="win-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">vicarious · posted on a wall</span></div>
+    <div class="poster">
+      <p class="p-top"><span>Dip · United Kingdom</span><span class="mid">A hobby, posted in public</span><span>No. 001</span></p>
+      <h2 class="p-huge">Because <span>why not.</span></h2>
+      <div class="p-slap"><p>A man of culture who happens to work in data.</p><small>I built Daycell because my journals were all over the place, and to make writing every day a habit.</small></div>
+      <div class="p-col p-who"><h3>Who</h3><p>Data professional: visualisation, machine learning, AI, data science.</p><p>Reads literature. Follows politics. Writes it down every day.</p></div>
+      <div class="p-col p-rules"><h3>Rules I keep</h3><ol><li>Be honest.</li><li>Keep it simple.</li><li>Write it down. Keep the mind light.</li><li>Live and build, vicariously.</li></ol></div>
+      <div class="p-col p-else"><h3>Elsewhere</h3><p><a href="mailto:hello@daycell.app">hello@daycell.app</a></p><p><a href="__REPO_URL__">the code, on GitHub</a></p><p class="soft">More about me later.</p></div>
+      <form class="p-form" name="hello" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="hello">
+        <p class="hp" hidden><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <h3 class="p-say">Say hello.</h3>
+        <label class="f-name"><span>Name</span><input name="name" autocomplete="name" required></label>
+        <label class="f-mail"><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+        <label class="f-msg"><span>Message</span><textarea name="message" rows="3" required></textarea></label>
+        <div class="f-go"><button type="submit">Send it →</button><p class="f-note" role="status">No newsletter. I reply myself.</p></div>
+      </form>
+    </div>
+  </div>
+  <p class="win-foot"><a href="#top">← back to the notebook</a></p>
+</section>
+
 <section class="faq wrap" id="faq">
   <div class="sec-head">
     <p class="eyebrow">faq</p>
@@ -174,5 +201,31 @@
   <span class="grow"></span>
   <a href="privacy.html">privacy</a><a href="terms.html">terms</a><a href="__REPO_URL__">source</a><a href="mailto:hello@daycell.app">hello@daycell.app</a>
 </footer>
+<script>
+// On phones the poster scrolls inside its window; drop the bottom fade once the end is reached.
+(() => {
+  const poster = document.querySelector('.poster'), win = poster.closest('.win');
+  const edge = () => win.classList.toggle('end', poster.scrollTop + poster.clientHeight >= poster.scrollHeight - 4);
+  poster.addEventListener('scroll', edge, { passive: true });
+  addEventListener('resize', edge); edge();
+})();
+// "Say hello" posts to Netlify Forms in the background, so the page stays put. Without JS the form still posts normally.
+(() => {
+  const form = document.querySelector('form[name="hello"]');
+  const note = form.querySelector('.f-note'), btn = form.querySelector('button');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    btn.disabled = true; note.textContent = 'Sending…';
+    try {
+      const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)).toString() });
+      if (!r.ok) throw new Error(r.status);
+      form.reset(); form.classList.add('sent'); note.textContent = 'Sent. I’ll write back.';
+    } catch {
+      note.innerHTML = 'That didn’t send. Email <a href="mailto:hello@daycell.app">hello@daycell.app</a> instead.';
+    }
+    btn.disabled = false;
+  });
+})();
+</script>
 </body>
 </html>

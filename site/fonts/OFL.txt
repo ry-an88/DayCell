@@ -1,7 +1,9 @@
 Inter: Copyright (c) 2016 The Inter Project Authors (https://github.com/rsms/inter)
 JetBrains Mono: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+Anton: Copyright 2020 The Anton Project Authors (https://github.com/googlefonts/AntonFont)
+Archivo: Copyright 2019 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
 
-Both fonts are licensed under the SIL Open Font License, Version 1.1, reproduced below.
+All four fonts are licensed under the SIL Open Font License, Version 1.1, reproduced below.
 
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 -----------------------------------------------------------

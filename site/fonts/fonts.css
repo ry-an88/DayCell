@@ -1,5 +1,5 @@
 /* Self-hosted so visitors' browsers never contact Google. Latin subset, variable weight.
-   Inter and JetBrains Mono are both under the SIL Open Font License 1.1 (see OFL.txt). */
+   Inter, JetBrains Mono, Anton and Archivo are all under the SIL Open Font License 1.1 (see OFL.txt). */
 @font-face {
   font-family: 'Inter'; font-style: normal; font-weight: 400 600; font-display: swap;
   src: url(inter-latin.woff2) format('woff2');
@@ -7,4 +7,13 @@
 @font-face {
   font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 600; font-display: swap;
   src: url(jetbrains-mono-latin.woff2) format('woff2');
+}
+/* Anton and Archivo are only used by the maker poster on the landing page (a different page, on purpose). */
+@font-face {
+  font-family: 'Anton'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url(anton-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Archivo'; font-style: normal; font-weight: 400 900; font-display: swap;
+  src: url(archivo-latin.woff2) format('woff2');
 }
