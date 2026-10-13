@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "check": "node tools/check.mjs",
-    "test": "node tools/build.mjs && playwright test"
+    "test:unit": "node --test tests/license.unit.mjs",
+    "test": "npm run test:unit && node tools/build.mjs && playwright test"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"

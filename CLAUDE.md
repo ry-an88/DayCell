@@ -23,7 +23,7 @@ separate thread, leave it alone).
   `preview_stop`.
 - **Never bind the launcher to the network during tests** (`--lan` with `0.0.0.0`). It pops a Windows Firewall
   dialog on the user's screen. Test LAN logic as described in [Testing](#testing).
-- **The user does the outward-facing account work:** Lemon Squeezy, Netlify, domain, Instagram. Posting or
+- **The user does the outward-facing account work:** Polar (payments), Netlify, domain, Instagram. Posting or
   publishing anything needs their explicit go-ahead each time.
 - **Keep `README.md` updated** when behaviour, decisions or setup steps change. The user asked for all important
   info to be recorded there, including the decisions log and parked ideas.
@@ -48,9 +48,9 @@ separate thread, leave it alone).
 | `Start Daycell.bat` / `Start Daycell (iPad & tablet).bat` | Launchers (the second adds `--lan`). |
 | `web/` | Manifest, icons and `sw.js` for the app. The launcher serves the manifest and icons (not the service worker). |
 | `site/` | Landing page, privacy, terms, `site.css`, `site.js`, self-hosted fonts, `og.png`. Placeholders `__SITE_URL__`, `__REPO_URL__`, `__LAUNCH_ENDS__` and `<!--analytics-->` are filled by the build. |
-| `tools/build.mjs` | Builds `dist/` (site at `/`, app at `/app/`), swaps Google Fonts for the self-hosted ones and fills `checkoutUrl`, `launchEnds` and `ANALYTICS` from env (`LS_CHECKOUT_URL`, `LAUNCH_ENDS`, `UMAMI_SRC`, `UMAMI_WEBSITE_ID`). |
+| `tools/build.mjs` | Builds `dist/` (site at `/`, app at `/app/`), swaps Google Fonts for the self-hosted ones and fills `checkoutUrl`, `launchEnds` and `ANALYTICS` from env (`CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS`, `UMAMI_SRC`, `UMAMI_WEBSITE_ID`). |
 | `tools/check.mjs`, `tests/`, `playwright.config.mjs` | Syntax checks and Playwright smoke tests (`npm test`). CI in `.github/workflows/ci.yml`. |
-| `netlify.toml`, `netlify/functions/license.mjs` | Web hosting: runs the build, publishes `dist/` plus the licence proxy function. |
+| `netlify.toml`, `netlify/functions/license.mjs` | Web hosting: runs the build, publishes `dist/` plus the licence function (forwards to Polar; env `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL`). |
 | `.gitignore` | Excludes `Journals/`, `.daycell-key`, `dist/`, caches. |
 | `.daycell-key` | Created by `--lan` mode: the QR pairing secret. Never served, never committed. |
 
@@ -141,7 +141,7 @@ In order:
 
 ## Testing
 
-- **Automated (do this first):** `npm ci` once, then `npm run check` (syntax) and `npm test` (builds `dist/` with a fake
+- **Automated (do this first):** `npm ci` once, then `npm run check` (syntax) and `npm test` (first the licence function unit tests, `npm run test:unit`, then builds `dist/` with a fake
   checkout link and runs the Playwright smoke tests against `python -m http.server 5180`). In the cloud container,
   Chromium is preinstalled for Playwright 1.56.1. Add a test to `tests/smoke.spec.mjs` for new behaviour.
 - **Syntax:**
@@ -153,7 +153,7 @@ In order:
   - Open `http://localhost:5180/daycell.html?storage=browser`, then seed data with JS (`state.entries = [...]`,
     `renderAll()`).
   - Stub downloads (`HTMLAnchorElement.prototype.click`) so nothing lands in the user's Downloads folder.
-  - Mock `/api/license` by overriding `window.fetch`. Switch licensing on with `LS_CHECKOUT_URL=… node tools/build.mjs`
+  - Mock `/api/license` by overriding `window.fetch`. Switch licensing on with `CHECKOUT_URL=… node tools/build.mjs`
     (or set `LICENSE.checkoutUrl` in the page). Seed `daycell-licence` `{ status: 'active', validatedAt: Date.now() }`
     to act as a Pro user.
   - Clear that origin's `localStorage` and IndexedDB afterwards.
@@ -180,9 +180,9 @@ In order:
   - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 11 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
   - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
-- **Not done or not verified:** see `TASKS.md`. Notably: real Lemon Squeezy/Netlify, Safari/Firefox and a real iPad,
+- **Not done or not verified:** see `TASKS.md`. Notably: a real Polar purchase (Lemon Squeezy rejected the store, so payments moved to Polar on 2026-10-13), Safari/Firefox and a real iPad,
   the Chrome/Edge file pickers.
-- **Dip's next steps** (accounts and identity): Lemon Squeezy product and `LAUNCH` code, Netlify env vars and deploy,
+- **Dip's next steps** (accounts and identity): Polar product and `LAUNCH` code, Netlify env vars and deploy,
   domain, support inbox, make the repo public, UKIPO search, HMRC/ICO.
 - **Parked:** images in entries (plan in the README under "Parked ideas"), passphrase encryption and a book export
   (Pro), web push reminders, and a desktop app (Tauri).

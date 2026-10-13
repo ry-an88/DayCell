@@ -13,13 +13,16 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
 
 ## For Dip (needs your accounts, money or identity)
 
-- [ ] **Lemon Squeezy:** create the product **"Daycell Pro"**, a single payment of **£12**, with licence keys on and
-      an activation limit of **5**. Add a discount code **`LAUNCH`** for **£3 off**, limited to launch week. Note the checkout link,
-      store ID and product ID for the next step.
-- [ ] **Netlify:** import the GitHub repo and set these environment variables, then deploy and do one test-mode
-      purchase: `LS_STORE_ID`, `LS_PRODUCT_ID`, `LS_CHECKOUT_URL` (the checkout link; this switches the paywall on),
-      and `LAUNCH_ENDS` (last day of the £9 week, `YYYY-MM-DD`) when you launch. Full table in the README under
-      "Deploying the web version".
+- [x] ~~Lemon Squeezy~~ declined the store application on 2026-10-13. Payments moved to Polar (code done, see below).
+- [ ] **Polar:** create an account and organization, submit it for approval (Finance → Account: business description,
+      ID check, Stripe payout account), create the product **"Daycell Pro"** (**£12**, one-time) with a licence-key
+      benefit (activation limit **5**), a discount code **`LAUNCH`** (£3 off, ends on the last day of launch week) and a
+      checkout link. Note the checkout link and the organization ID. Click-by-click steps are in
+      `launch/next-steps.md` in the project files.
+- [ ] **Netlify:** import the GitHub repo and set these environment variables, then deploy and do one sandbox
+      purchase: `POLAR_ORG_ID`, `CHECKOUT_URL` (the checkout link; this switches the paywall on), `POLAR_BENEFIT_ID`
+      (recommended), and `LAUNCH_ENDS` (last day of the £9 week, `YYYY-MM-DD`) when you launch. Full table in the
+      README under "Deploying the web version".
 - [ ] **Domain:** buy one (daycell.app was the favourite; check it's free) and connect it in Netlify.
 - [ ] **Support email:** create an inbox (for example `hello@<your domain>`). The site uses `hello@daycell.app`;
       tell Claude if yours is different.
@@ -59,6 +62,7 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
   - [x] insights beyond 22 weeks (a full year) and the shareable **Year in cells** image
   - [x] accent colours
   - [x] entry templates
+- [x] Move the licence function and checkout link from Lemon Squeezy to Polar (2026-10-13); unit tests for the function.
 - [x] Price shown as £12, with the £9 launch-week line driven by `LICENSE.launchEnds`.
 - [x] Upgrade prompts only at natural moments (a second journal, a Pro feature), never mid-entry.
 

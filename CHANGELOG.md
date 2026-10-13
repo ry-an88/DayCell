@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-13 · payments move to Polar
+
+- Lemon Squeezy declined the store application, so Pro is now sold through Polar (also a merchant of record).
+- The licence function talks to Polar's licence-key API; the app's own licence calls are unchanged.
+- Environment variables: `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL` (testing), `CHECKOUT_URL` and `PORTAL_URL`
+  replace `LS_STORE_ID`, `LS_PRODUCT_ID` and `LS_CHECKOUT_URL`.
+- The launch discount is added to the checkout link as `?discount_code=LAUNCH`.
+- Privacy policy and terms name Polar. New unit tests for the licence function, and a test for the launch link.
+
 ## 2026-10-11 · launch preparation
 
 **Pricing model**

@@ -63,7 +63,7 @@ Requires Python 3 (already installed on this PC). No other installs.
 | `tools/make-images.py` | Redraws the icons and the share image (needs Pillow and the JetBrains Mono font files). |
 | `tests/` | Browser smoke tests (Playwright). `npm test` builds and runs them. |
 | `netlify.toml` | Hosting config for the web version. |
-| `netlify/functions/license.mjs` | Tiny server function that checks licence keys with Lemon Squeezy. |
+| `netlify/functions/license.mjs` | Tiny server function that checks licence keys with Polar. |
 | `docs/file-format.md` | The journal file format as a short open spec. |
 | `LICENSE.md` | FSL-1.1-MIT: public source, no competing products, MIT after two years. |
 | `TASKS.md` | The launch task list. |
@@ -210,7 +210,7 @@ The hosted site has **no accounts**. On first visit it shows a start screen with
 ## Pricing: free forever + Pro
 
 **Model (decided 2026-10-11):** everything you need to keep a daily journal is **free forever**. **Daycell Pro** is a
-**one-time £12** unlock (**£9 in launch week**), sold through **Lemon Squeezy**, which handles VAT/sales tax as
+**one-time £12** unlock (**£9 in launch week**), sold through **Polar** (switched from Lemon Squeezy on 2026-10-13, see the decisions log), which handles VAT/sales tax as
 merchant of record and emails the licence key automatically. No subscription, and writing is never locked.
 
 | Free | Pro (one-time) |
@@ -226,26 +226,29 @@ merchant of record and emails the licence key automatically. No subscription, an
 - **Upgrade prompts only appear when someone reaches for a Pro feature** (a second journal, the year view, a
   template, an accent colour). Never in the middle of writing, and the status cell doesn't nag.
 - **Activation:** the key is checked once per device, and works offline after that.
-- **Monthly re-check:** about every 30 days when online. Offline or server trouble never changes anything. If Lemon
-  Squeezy says the key is refunded or disabled, Pro features switch off; journals are untouched.
-- **Device limit:** set in Lemon Squeezy (recommended: **5 devices**). Users free one with **remove this device**.
-- **Lost keys:** the dialog links to Lemon Squeezy's order lookup ("lost your key?").
+- **Monthly re-check:** about every 30 days when online. Offline or server trouble never changes anything. If Polar
+  says the key is refunded or disabled, Pro features switch off; journals are untouched.
+- **Device limit:** set on the licence-key benefit in Polar (recommended: **5 activations**). Users free one with **remove this device**.
+- **Lost keys:** the dialog links to the Polar customer portal when `PORTAL_URL` is set, otherwise to an email to support.
 - **Launch week:** set `LAUNCH_ENDS` (a date). Until the end of that day the app and site show £9, and the checkout
-  link carries the discount code `LAUNCH` (`checkout[discount_code]`), which must exist in Lemon Squeezy as £3 off.
+  link carries the discount code `LAUNCH` (`?discount_code=LAUNCH`, Polar's parameter), which must exist in Polar as a £3 discount ending that day.
 - **The launcher never shows a paywall.** Everything is unlocked there.
-- **Licensing is off until a checkout link is set.** With no `LS_CHECKOUT_URL`, the hosted app has everything
+- **Licensing is off until a checkout link is set.** With no `CHECKOUT_URL`, the hosted app has everything
   unlocked.
 
-**Setting up Lemon Squeezy (Dip does this; it needs identity and bank details):**
-1. Create a Lemon Squeezy account and store.
-2. Create a product **Daycell Pro**, **£12**, single payment.
-3. Turn on **license keys** and set the activation limit (5 recommended).
-4. Add a discount code **`LAUNCH`**, £3 off, for launch week.
-5. Note the **checkout link**, **store ID** and **product ID** for the deploy step.
+**Setting up Polar (Dip does this; it needs identity and bank details):**
+1. Create a Polar account and an organization, then submit it for approval under **Finance → Account** (describe the
+   business, verify identity, connect a Stripe payout account).
+2. Create a product **Daycell Pro**, **£12** (GBP), one-time, with a **license keys** benefit (activation limit 5).
+3. Add a discount code **`LAUNCH`**, £3 off, ending on the last day of launch week.
+4. Create a **checkout link** for the product, and note the **organization ID** (and the benefit ID if you can find it).
+5. Test everything first in Polar's **sandbox** (`sandbox.polar.sh`, a separate account with its own IDs), then repeat
+   with the live values.
 
-**Why there's a server function:** Lemon Squeezy's licence API blocks calls made directly from web pages, so
-`netlify/functions/license.mjs` forwards them. It also:
-- rejects keys that belong to someone else's Lemon Squeezy product (checked against your store and product IDs)
+**Why there's a server function:** the app talks to one same-origin endpoint, `/api/license`, so the provider can be
+swapped without touching the app (it was Lemon Squeezy until 2026-10-13). `netlify/functions/license.mjs` forwards the
+calls to Polar's customer-portal licence API. It also:
+- rejects keys from another licence-key benefit in your organization (when `POLAR_BENEFIT_ID` is set)
 - strips the buyer's name and email before anything reaches the browser
 - only allows `activate`, `validate` and `deactivate`
 
@@ -277,8 +280,11 @@ Netlify (free tier is enough):
 
    | Variable | Needed? | What |
    |---|---|---|
-   | `LS_STORE_ID`, `LS_PRODUCT_ID` | yes, for licences | used by the licence function to reject other products' keys |
-   | `LS_CHECKOUT_URL` | to switch the paywall on | the Lemon Squeezy checkout link for Daycell Pro |
+   | `POLAR_ORG_ID` | yes, for licences | your Polar organization ID; the licence function refuses to run without it |
+   | `POLAR_BENEFIT_ID` | recommended | the Daycell Pro licence-key benefit; keys from other benefits are refused |
+   | `POLAR_API_URL` | testing only | `https://sandbox-api.polar.sh` while using a Polar sandbox account |
+   | `CHECKOUT_URL` | to switch the paywall on | the Polar checkout link for Daycell Pro |
+   | `PORTAL_URL` | optional | your Polar customer-portal address, for the "lost your key?" link |
    | `LAUNCH_ENDS` | launch week only | last day of the £9 price, `YYYY-MM-DD` |
    | `UMAMI_SRC`, `UMAMI_WEBSITE_ID` | optional | cookie-free analytics (Umami Cloud has a free tier) |
    | `SITE_URL` | optional | the public address for share links (Netlify's own `URL` is used otherwise) |
@@ -377,6 +383,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 | 2026-10-07 | Web version: **no accounts** | The server never stores journals, so accounts would add cost and risk for no benefit |
 | 2026-10-07 | Web version: open/eject model; live file on Chrome/Edge, in-browser copy elsewhere | Clear ownership story; nothing lost if the tab closes |
 | 2026-10-07 | $5 one-time licence key via Lemon Squeezy, 2-day trial | Simple for a small price; Lemon Squeezy handles tax and key emails |
+| 2026-10-13 | Payments move from Lemon Squeezy to **Polar** | Lemon Squeezy declined the store application. Polar is also a merchant of record (VAT handled), has licence keys with an activation limit, lists the UK for payouts and prices in GBP. The app-facing licence API did not change |
 | 2026-10-07 | Never lock reading/eject behind the paywall | Trust, reviews, and the "your file" promise |
 | 2026-10-07 | Accept that a client-side licence can be bypassed | At $5 it's an honesty system; anti-piracy effort isn't worth it |
 | 2026-10-11 | Name: **Daycell**, internals included (files, storage keys, stamp, default journal `daycell.md`) | No journaling app clash found; old `daybook` data is migrated automatically |
@@ -421,7 +428,7 @@ lookups were blocked from Claude's environment, so availability of daycell.com /
 - **Web version (the earlier $5 trial build, 2026-10-07):** start screen, creating and naming a journal, autosave surviving a reload, download (with the
   stamp), eject and undo, opening an older copy (warning shown), the paywall after the trial, wrong and right keys,
   refunded key locking writing, offline never locking.
-- **Licence function** (with faked Lemon Squeezy replies): activation, foreign-product rejection, personal data
+- **Licence function** (with faked Polar replies, `npm run test:unit`): activation, foreign-product rejection, personal data
   stripped, bad requests refused.
 
 **Tested on 2026-10-11 (automated, `npm test`, Chromium):** landing page and legal pages; free writing surviving a
@@ -434,8 +441,8 @@ hand with a scratch journal (reads, writes, serves the manifest, no service work
 - **A real iPad:** the Safari camera/QR scan and the home-screen flow end to end.
 - **The QR image** (the test setup couldn't load the library).
 - **The Windows firewall prompt** (deliberately not triggered).
-- **Real Lemon Squeezy calls** and a **real Netlify deploy** (they need your accounts), including the
-  `checkout[discount_code]` launch link.
+- **Real Polar calls** (the function is only tested against faked replies built from Polar's docs, so the first
+  sandbox purchase is the real test) and the `?discount_code=` launch link.
 - **Safari and Firefox** for the new storage, service worker and banners (the tests run in Chromium).
 - **Chrome/Edge live-file pickers in the web version** (file dialogs can't be driven in the test browser; the same
   code path already worked in the earlier version).
@@ -446,7 +453,7 @@ hand with a scratch journal (reads, writes, serves the manifest, no service work
 
 The live list is [`TASKS.md`](TASKS.md). In short:
 
-1. **Dip:** Lemon Squeezy product (£12, licence keys, limit 5, `LAUNCH` code), Netlify deploy with the environment
+1. **Dip:** Polar product (£12, licence keys, limit 5, `LAUNCH` code), Netlify deploy with the environment
    variables above, domain, support inbox, make the repo public, trademark search, HMRC/ICO checks, a real iPad test.
 2. **Marketing:** lives in `marketing/` (a separate thread).
 3. **Next features:** passphrase encryption (Pro), export to a styled book (Pro), images in entries, web push

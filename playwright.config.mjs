@@ -9,7 +9,7 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:5180', acceptDownloads: true },
   webServer: {
     command: 'node tools/build.mjs && python3 -m http.server 5180 --bind 127.0.0.1 --directory dist',
-    env: { LS_CHECKOUT_URL: 'https://example.com/checkout', SITE_URL: 'https://daycell.test' },
+    env: { CHECKOUT_URL: 'https://example.com/checkout', SITE_URL: 'https://daycell.test' },
     url: 'http://localhost:5180/',
     reuseExistingServer: false,
     stdout: 'ignore',
