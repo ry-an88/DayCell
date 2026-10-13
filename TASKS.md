@@ -4,7 +4,7 @@ The working list for getting Daycell from "built" to "launched". It comes from t
 [launch plan](https://claude.ai/artifact/RaWy4AmwyFsXEQcrafb7rZ) and the decisions Dip made on 2026-10-11, updated on 2026-10-13:
 
 - **Free, every feature** (2026-10-13). The one-time Pro unlock, Polar and the licence function are gone.
-- **The code goes public** (licence: FSL-1.1-MIT, see `LICENSE.md`).
+- **The code goes public** to read, with all rights reserved (see `LICENSE`).
 
 Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `[ ]` to do.
 
