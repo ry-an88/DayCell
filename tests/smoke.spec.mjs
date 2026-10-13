@@ -31,6 +31,11 @@ test('landing page links to the app and the legal pages', async ({ page }) => {
   await expect(page.locator('h1')).toHaveText('your journal is just a markdown file.');
   expect(await page.content()).not.toContain('__SITE_URL__');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://daycell.test/og.png');
+  // the maker is named the same way everywhere, so search engines don't read 'Dip' as an alias
+  await expect(page.locator('meta[name="author"]')).toHaveAttribute('content', 'Dip Raiyan');
+  const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+  expect(ld.author.name).toBe('Dip Raiyan');
+  expect(ld.url).toBe('https://daycell.test/');
   for (const p of ['privacy.html', 'terms.html', 'app/', 'og.png', 'fonts/fonts.css']) {
     expect((await page.request.get(p)).status(), p).toBe(200);
   }
