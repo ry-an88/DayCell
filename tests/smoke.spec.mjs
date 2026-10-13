@@ -20,9 +20,6 @@ async function openPanel(page, name) {
   const b = page.locator(`.rail [data-panel="${name}"]`);
   if (!(await b.getAttribute('class')).includes('active')) await b.click();
 }
-const goPro = page => page.addInitScript(() => {
-  localStorage.setItem('daycell-licence', JSON.stringify({ key: 'test', instanceId: 'i', device: 'test', status: 'active', validatedAt: Date.now() }));
-});
 const idbGet = (page, key) => page.evaluate(k => new Promise(res => {
   const r = indexedDB.open('daycell', 1);
   r.onupgradeneeded = () => r.result.createObjectStore('kv');
@@ -42,7 +39,6 @@ test('landing page links to the app and the legal pages', async ({ page }) => {
 test('free: write an entry and it survives a reload', async ({ page }) => {
   await page.goto(APP);
   await expect(page.locator('.start')).toBeVisible();
-  await expect(page.locator('.start-price')).toContainText('free forever');
   await newJournal(page, 'morning');
   await write(page, 'first light', 'a quiet start.');
   await page.reload();
@@ -50,44 +46,7 @@ test('free: write an entry and it survives a reload', async ({ page }) => {
   expect(await idbGet(page, 'journal:morning.md')).toContain('— first light');
 });
 
-test('free: pro features show the upgrade dialog instead', async ({ page }) => {
-  await page.goto(APP);
-  await newJournal(page, 'solo');
-  await write(page, 'something', 'so insights have data.');
-  const dialog = page.locator('#unlock');
-  const close = () => page.click('#uCancel');
-
-  await openPanel(page, 'files');
-  await page.click('[data-fact="startNew"]');
-  await expect(dialog).toBeVisible();
-  await expect(page.locator('#uText')).toContainText('free keeps one journal');
-  await expect(page.locator('#uBuy')).toHaveAttribute('href', 'https://example.com/checkout');
-  await expect(page.locator('#uBuy')).toContainText('£12');
-  await close();
-
-  await page.click('[data-fact="accent"][data-accent="violet"]');
-  await expect(dialog).toBeVisible();
-  await close();
-  expect(await page.evaluate(() => document.documentElement.dataset.accent)).toBeUndefined();
-
-  await openPanel(page, 'insights');
-  await page.click('[data-fact="heatYear"]');
-  await expect(dialog).toBeVisible();
-  await close();
-
-  await page.keyboard.press('/');
-  await page.fill('#palInput', 'retro');
-  await page.keyboard.press('Enter');
-  await expect(dialog).toBeVisible();
-  await close();
-  await expect(page.locator('.cell.editing')).toHaveCount(0);
-
-  // writing itself is never locked
-  await write(page, 'still free', 'writing is never locked.');
-});
-
-test('pro: several journals with a switcher, templates and accents', async ({ page }) => {
-  await goPro(page);
+test('everything is free: several journals with a switcher, templates and accents', async ({ page }) => {
   await page.goto(APP);
   await newJournal(page, 'work');
   await write(page, 'standup notes', 'shipped it.');
@@ -120,7 +79,6 @@ test('pro: several journals with a switcher, templates and accents', async ({ pa
 
   await openPanel(page, 'files');
   await page.click('[data-fact="accent"][data-accent="violet"]');
-  await expect(page.locator('#unlock')).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.dataset.accent)).toBe('violet');
 
   // ejecting one journal leaves the others a click away on the start screen
@@ -132,8 +90,7 @@ test('pro: several journals with a switcher, templates and accents', async ({ pa
   await expect(page.locator('.title', { hasText: 'flying again' })).toBeVisible();
 });
 
-test('pro: year view and the year-in-cells image', async ({ page }) => {
-  await goPro(page);
+test('year view and the year-in-cells image', async ({ page }) => {
   await page.goto(APP);
   await newJournal(page, 'year');
   await write(page, 'one', 'a few words today.');
@@ -258,7 +215,6 @@ test('free: the streak image downloads and the status cell keeps its spacing', a
   const dl = page.waitForEvent('download');
   await page.click('[data-act="streakCard"]');
   expect((await dl).suggestedFilename()).toMatch(/^daycell-streak-\d{4}-\d{2}-\d{2}\.png$/);
-  await expect(page.locator('#unlock')).toBeHidden();
 
   // an entry from 30 days ago shows as "30 days ago" next to its link, with a gap between them
   await page.evaluate(() => {
@@ -272,11 +228,36 @@ test('free: the streak image downloads and the status cell keeps its spacing', a
   expect(b.x - (a.x + a.width)).toBeGreaterThanOrEqual(6);
 });
 
-test('checkout link carries the launch discount only during launch week', async ({ page }) => {
+test('there is no paywall left anywhere', async ({ page }) => {
   await page.goto(APP);
-  const href = launchEnds => page.evaluate(d => { LICENSE.launchEnds = d; return checkoutHref(); }, launchEnds);
-  const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
-  expect(await href(day(2))).toBe('https://example.com/checkout?discount_code=LAUNCH');
-  expect(await href(day(-3))).toBe('https://example.com/checkout');
-  expect(await href('')).toBe('https://example.com/checkout');
+  await expect(page.locator('#unlock')).toHaveCount(0);
+  await newJournal(page, 'first');
+  await openPanel(page, 'files');
+  await expect(page.locator('#panel')).not.toContainText('· pro');
+  await page.keyboard.press('/');
+  await page.fill('#palInput', 'pro');
+  await expect(page.locator('#palList')).not.toContainText('licence');
+});
+
+test('today cell: the ticker and the robot turn off, stay off, and nothing is fetched', async ({ page }) => {
+  const outside = [];
+  page.on('request', r => { if (!r.url().startsWith('http://localhost:5180/')) outside.push(r.url()); });
+  await page.goto(APP);
+  await newJournal(page, 'today');
+  await expect(page.locator('#bot')).toBeVisible();
+  await expect(page.locator('#ticker')).toContainText('#', { timeout: 5000 });
+  await page.click('[data-act="toggleTicker"]');
+  await page.click('[data-act="toggleBot"]');
+  await expect(page.locator('#tickWrap')).toHaveClass(/off/);
+  await expect(page.locator('#bot')).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('.cell.status')).toBeVisible();
+  await expect(page.locator('#tickWrap')).toHaveClass(/off/);
+  await expect(page.locator('#bot')).toHaveCount(0);
+  await page.click('[data-act="toggleBot"]');
+  await expect(page.locator('#bot')).toBeVisible();
+  // committing an entry makes the robot hop
+  await write(page, 'hello robot', 'a small hop.');
+  await expect(page.locator('#bot.hop')).toHaveCount(1, { timeout: 2000 });
+  expect(outside).toEqual([]);
 });

@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-10-13 · free, a redesign and a livelier today cell
+
+**Free, every feature**
+- Daycell Pro is gone: several journals, live files, a year of insights and its image, templates and accents are free
+  for everyone. No upgrade dialog, no licence checks.
+- The licence function, its unit tests and the checkout settings are removed. Netlify no longer needs
+  `CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS` or the `POLAR_*` variables.
+- Landing page, privacy policy and terms say "free" and no longer mention payments or refunds.
+
+**Redesign**
+- Light mode is readable and easy on the eyes: an off-white page instead of glare, darker text and accent (WCAG AA
+  or better throughout).
+- Calmer dark mode, variable Inter and JetBrains Mono, consistent radii, solid borders, quieter tags and buttons,
+  tabular numbers, visible keyboard focus.
+- Small, quick motion: new cells rise in, a commit sweeps the cell, the panel and dialogs ease in, the theme switch
+  crossfades. All of it is off with "reduce motion".
+- The start screen is a notebook too: `daycell.start()` with numbered options.
+
+**Today cell**
+- A ticker line types out a short quote, fact or tip (bundled in the app; nothing is fetched), with an "on this day"
+  line first. Click for the next one; it pauses while you hover or write.
+- A tiny robot reacts: it hops when you commit, cheers on milestones, covers its eyes when you trash an entry, gets
+  dizzy from too many prompt shuffles, follows your pointer and falls asleep when you're idle. Poke it.
+- Each has its own on/off button on the cell, remembered per browser (also `/ticker`, `/bot` and the file panel).
+
+**Tests**
+- New smoke tests: no paywall anywhere, and the ticker and robot turn off, stay off and make no network requests.
+
 ## 2026-10-13 · payments move to Polar
 
 - Lemon Squeezy declined the store application, so Pro is now sold through Polar (also a merchant of record).

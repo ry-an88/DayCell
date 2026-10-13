@@ -1,4 +1,4 @@
-// Syntax checks that need no browser: the app's inline script, the service worker and the licence function.
+// Syntax checks that need no browser: the app's inline script and the service worker.
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -13,6 +13,6 @@ scripts.forEach((js, i) => {
   writeFileSync(f, js);
   execFileSync(process.execPath, ['--check', f], { stdio: 'inherit' });
 });
-for (const f of ['web/sw.js', 'netlify/functions/license.mjs']) execFileSync(process.execPath, ['--check', f], { stdio: 'inherit' });
+for (const f of ['web/sw.js']) execFileSync(process.execPath, ['--check', f], { stdio: 'inherit' });
 JSON.parse(readFileSync('web/manifest.webmanifest', 'utf8'));
 console.log('syntax ok');

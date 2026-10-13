@@ -90,7 +90,7 @@ def og():
     d.text((px + 86, 422), "daycell.today()", font=mono(21), fill=MUTED)
     d.text((px + 86, 458), "42-day streak.", font=mono_b(22), fill=ACCENT)
     d.text((px + 86, 492), "no account. no cloud.", font=mono(21), fill=TEXT)
-    d.text((72, 572), "free forever · pro £12 once", font=mono(22), fill=FAINT)
+    d.text((72, 572), "free · every feature · no account", font=mono(22), fill=FAINT)
     return img
 
 

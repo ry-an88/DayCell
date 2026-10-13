@@ -7,7 +7,7 @@ file format, the three run modes, pricing rules, deploy steps, the decisions log
 
 **Daycell** (renamed from the working name Daybook on 2026-10-11) is a journal app with a Jupyter/marimo-style "notebook" UI.
 All entries live in **one plain `.md` file** per journal. It's being turned into a web product: no accounts, users
-own the file. **Free forever, plus a one-time Pro unlock at £12 (£9 launch week)**, decided 2026-10-11. The repo is
+own the file. **Free, with every feature** (decided 2026-10-13; the earlier free + £12 Pro model and Polar are gone). The repo is
 going public under FSL-1.1-MIT. The launch checklist is `TASKS.md`; marketing lives in `marketing/` (owned by a
 separate thread, leave it alone).
 
@@ -23,7 +23,7 @@ separate thread, leave it alone).
   `preview_stop`.
 - **Never bind the launcher to the network during tests** (`--lan` with `0.0.0.0`). It pops a Windows Firewall
   dialog on the user's screen. Test LAN logic as described in [Testing](#testing).
-- **The user does the outward-facing account work:** Polar (payments), Netlify, domain, Instagram. Posting or
+- **The user does the outward-facing account work:** Netlify, domain, Instagram. Posting or
   publishing anything needs their explicit go-ahead each time.
 - **Keep `README.md` updated** when behaviour, decisions or setup steps change. The user asked for all important
   info to be recorded there, including the decisions log and parked ideas.
@@ -47,10 +47,10 @@ separate thread, leave it alone).
 | `daycell.py` | Local server. Serves only `/daycell.html` plus an API, and reads/writes `Journals/*.md`. Flags: `--lan`, `--no-browser`, `--port=NNNN`. |
 | `Start Daycell.bat` / `Start Daycell (iPad & tablet).bat` | Launchers (the second adds `--lan`). |
 | `web/` | Manifest, icons and `sw.js` for the app. The launcher serves the manifest and icons (not the service worker). |
-| `site/` | Landing page, privacy, terms, `site.css`, `site.js`, self-hosted fonts, `og.png`. Placeholders `__SITE_URL__`, `__REPO_URL__`, `__LAUNCH_ENDS__` and `<!--analytics-->` are filled by the build. |
-| `tools/build.mjs` | Builds `dist/` (site at `/`, app at `/app/`), swaps Google Fonts for the self-hosted ones and fills `checkoutUrl`, `launchEnds` and `ANALYTICS` from env (`CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS`, `UMAMI_SRC`, `UMAMI_WEBSITE_ID`). |
+| `site/` | Landing page, privacy, terms, `site.css`, self-hosted fonts, `og.png`. Placeholders `__SITE_URL__`, `__REPO_URL__` and `<!--analytics-->` are filled by the build. |
+| `tools/build.mjs` | Builds `dist/` (site at `/`, app at `/app/`), swaps Google Fonts for the self-hosted ones and fills `ANALYTICS` from env (`UMAMI_SRC`, `UMAMI_WEBSITE_ID`). |
 | `tools/check.mjs`, `tests/`, `playwright.config.mjs` | Syntax checks and Playwright smoke tests (`npm test`). CI in `.github/workflows/ci.yml`. |
-| `netlify.toml`, `netlify/functions/license.mjs` | Web hosting: runs the build, publishes `dist/` plus the licence function (forwards to Polar; env `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL`). |
+| `netlify.toml` | Web hosting: runs the build and publishes `dist/`. There is no server function any more. |
 | `.gitignore` | Excludes `Journals/`, `.daycell-key`, `dist/`, caches. |
 | `.daycell-key` | Created by `--lan` mode: the QR pairing secret. Never served, never committed. |
 
@@ -82,33 +82,32 @@ In order:
    - `webMode()` is `!state.server && !state.unpaired`.
    - The **mount** (`daycell-mount`) is `{ name, kind: 'handle' | 'browser', downloadedHash, lastDownload }`.
      `setMount()` also upserts browser mounts into the **library** (`daycell-library`), the list of journals kept in
-     this browser; `switchJournal(name)` (Pro) hops between them; `forgetJournal` runs on eject.
+     this browser; `switchJournal(name)` hops between them; `forgetJournal` runs on eject.
    - `settle()` exits edit mode and flushes the write before switching or opening another journal.
    - `IOS`, `MAC_SAFARI`, `STANDALONE` and `safariWarning()` drive the 7-day storage banner; `askPersist()`.
    - `startNew`, `startOpen`, `openUploaded` (with the older-copy warning), `downloadMd` (adds the stamp, records it
      in `daycell-exports`), `eject` (with a 9 s undo) and `startHtml()` (the start screen).
-   - `LIVE_FILES` is false with `?storage=browser`. `liveFiles()` = `LIVE_FILES && isPro()` (new live files are Pro;
-     an existing handle still reconnects).
-8. **free + pro:**
-   - `LICENSE` config (`price`, `launchPrice`, `launchEnds`, `launchCode`, `checkoutUrl`…). `licensingOn()` needs
-     `webMode()` **and** a non-empty `checkoutUrl`, so it's off by default (and in the launcher).
-   - `isPro()` = `!licensingOn() || licensed()`. `needPro(feature)` returns true and shows the upgrade dialog when
-     locked; use it as `if (needPro('templates')) return;`. Reasons live in `PRO_WHY`, the list in `PRO_FEATURES`.
-   - `launchOn()`, `priceNow()`, `checkoutHref()` (adds `checkout[discount_code]` in launch week).
-   - `activateKey`, `recheckLicence` (every 30 days; network failure never changes anything), `deactivateDevice`,
-     `showUnlock(feature)` and `friendlyLicenceError`. **There is no trial and writing is never gated.**
+   - `LIVE_FILES` is false with `?storage=browser` and in browsers without the File System Access API.
+8. **free:** there is no paywall (removed 2026-10-13); every feature works in every mode. Don't reintroduce
+   `needPro`/`isPro`; if money comes back, read the README's parked ideas first.
 9. **entry actions:** `newEntry(prompt, tpl)` and `startEdit`. Also `syncEditor`, `exitEdit` (toasts, milestones;
    drops an untouched template; `e.fresh`/`e.tpl` are transient flags), `revert`, `trash`/`restore`/`purge`/
    `emptyTrash` (purges are remembered in `state.purged` so merges can't resurrect them) and `jumpTo`.
 10. **rendering:**
     - Templates are built with `innerHTML`, including `renderCells`.
-    - The start screen shows when web mode has no target, and the status cell `[~]` sits at the **bottom**.
+    - The start screen (`daycell.start()` plus `[1]`–`[3]` option cells) shows when web mode has no target, and the
+      status cell `[~]` sits at the **bottom**.
+    - **today cell: ticker line + robot** (its own section just before rendering): `TICKER` (bundled lines) and
+      `ON_THIS_DAY` (`MM-DD` keys), `nextLine()` types a line out and holds it 12 s (paused while editing or hovered);
+      `BOT_SVG`, `bot(move, ms, then)` plays a CSS class on `#bot` 30 ms later (so it survives a re-render),
+      `botCommit`, `botCheer`, `pokeBot`, `sleepBot`/`wakeBot`, `botIdle()`. `toggleTicker`/`toggleBot` store
+      `daycell-ticker`/`daycell-bot` = `off`. `state.flashId` marks a just-committed cell for the one-off sweep.
     - Also `cellHtml`, `renderPanel`/`renderPanelBody` (contents, insights, trash, files), `insightsHtml` (22 weeks, or
-      53 with `state.heatYear` for Pro),
-      `deviceHtml` (iPad QR, which lazy-loads qrcodejs from cdnjs), `licenceHtml`, `setStatus` and `renderChrome`.
-    - After `applyTheme`: `ACCENTS`/`accentCss()`/`applyAccent`/`chooseAccent` (Pro), `TEMPLATES`/`newFromTemplate`
-      (Pro), `downloadReminder()` (`.ics`), `saveBlob`, `drawCard()` shared by `streakCard()` (free) and `yearCard()`
-      (Pro) — share images never draw entry text, `ANALYTICS`/`loadAnalytics`/
+      53 with `state.heatYear`),
+      `deviceHtml` (iPad QR, which lazy-loads qrcodejs from cdnjs), `setStatus` and `renderChrome`.
+    - After `applyTheme`: `ACCENTS`/`accentCss()`/`applyAccent`/`chooseAccent`, `TEMPLATES`/`newFromTemplate`,
+      `downloadReminder()` (`.ics`), `saveBlob`, `drawCard()` shared by `streakCard()` and `yearCard()`
+      — share images never draw entry text, `ANALYTICS`/`loadAnalytics`/
       `track(event)` (Umami; counts only, never entry text).
     - **import from Day One:** `startImport()` → `#importInput` → `importDayOne(file)`; `unzipJson()` is a tiny zip
       reader (stored or deflate via `DecompressionStream`), `fromDayOne()` maps entries, `localParts()` converts to the
@@ -141,11 +140,10 @@ In order:
 
 ## Testing
 
-- **Automated (do this first):** `npm ci` once, then `npm run check` (syntax) and `npm test` (first the licence function unit tests, `npm run test:unit`, then builds `dist/` with a fake
-  checkout link and runs the Playwright smoke tests against `python -m http.server 5180`). In the cloud container,
+- **Automated (do this first):** `npm ci` once, then `npm run check` (syntax) and `npm test` (builds `dist/` and runs the Playwright smoke tests against `python -m http.server 5180`). In the cloud container,
   Chromium is preinstalled for Playwright 1.56.1. Add a test to `tests/smoke.spec.mjs` for new behaviour.
 - **Syntax:**
-  - `npm run check` covers the app script, `web/sw.js`, the licence function and the manifest.
+  - `npm run check` covers the app script, `web/sw.js` and the manifest.
   - Run `python -m py_compile daycell.py`, then delete the `__pycache__/` it creates.
 - **UI (web/browser mode):**
   - Copy `daycell.html` into a scratchpad folder and add a temporary launch config:
@@ -153,36 +151,34 @@ In order:
   - Open `http://localhost:5180/daycell.html?storage=browser`, then seed data with JS (`state.entries = [...]`,
     `renderAll()`).
   - Stub downloads (`HTMLAnchorElement.prototype.click`) so nothing lands in the user's Downloads folder.
-  - Mock `/api/license` by overriding `window.fetch`. Switch licensing on with `CHECKOUT_URL=… node tools/build.mjs`
-    (or set `LICENSE.checkoutUrl` in the page). Seed `daycell-licence` `{ status: 'active', validatedAt: Date.now() }`
-    to act as a Pro user.
   - Clear that origin's `localStorage` and IndexedDB afterwards.
 - **Launcher:** copy `daycell.py` and `daycell.html` into a scratch folder with its own `Journals/`, then run
   `python <scratch>/daycell.py --no-browser --port=8797` from a temporary launch config.
 - **LAN/pairing logic:** import `daycell` in Python with `sys.argv = ['daycell.py', '--lan']`, override
   `Handler.is_local` (e.g. treat requests with an `X-Remote` header as remote), add the test host to
   `ALLOWED_HOSTS` and bind to `127.0.0.1`. That way there's no firewall prompt.
-- **Licence function:** import it in Node, stub `globalThis.fetch` and call it with a `Request`.
 - **Screen sizes:** use `resize_window` (the `mobile` preset also turns on touch emulation), then reset to `desktop`.
 - **Known quirks:**
   - Screenshots in the browser pane sometimes lag a step behind, so verify with JS measurements.
   - Python's `http.server` occasionally resets a connection and the page half-loads; reload.
 
-## Current state (as of 2026-10-11, late)
+## Current state (as of 2026-10-13)
 
 - **Done:**
   - notebook UI, trash, autosave, launcher, personality, responsive layout and touch support
   - iPad LAN mode with QR pairing and conflict-safe merging
-  - web version (start screen, in-browser journals in IndexedDB, live files for Pro, download, eject with undo,
+  - web version (start screen, in-browser journals in IndexedDB, live files, download, eject with undo,
     older-copy warning, Safari storage banner, persistent storage request)
-  - **free forever + one-time Pro** (more journals, live files, year insights + share image, templates, accents)
+  - **everything free** (2026-10-13): several journals, live files, year insights + image, templates, accents
+  - redesign (2026-10-13): warm neutrals, off-white light mode, notebook start screen, motion, plus a ticker line and
+    a tiny robot in the today cell, each with an off button
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
-  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 11 smoke tests
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 12 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
   - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
-- **Not done or not verified:** see `TASKS.md`. Notably: a real Polar purchase (Lemon Squeezy rejected the store, so payments moved to Polar on 2026-10-13), Safari/Firefox and a real iPad,
+- **Not done or not verified:** see `TASKS.md`. Notably: Safari/Firefox and a real iPad,
   the Chrome/Edge file pickers.
-- **Dip's next steps** (accounts and identity): Polar product and `LAUNCH` code, Netlify env vars and deploy,
+- **Dip's next steps** (accounts and identity): delete the Polar/checkout env vars in Netlify, a "made by Dip" section,
   domain, support inbox, make the repo public, UKIPO search, HMRC/ICO.
-- **Parked:** images in entries (plan in the README under "Parked ideas"), passphrase encryption and a book export
-  (Pro), web push reminders, and a desktop app (Tauri).
+- **Parked:** images in entries (plan in the README under "Parked ideas"), passphrase encryption and a book export,
+  ads/sponsor ideas, web push reminders, and a desktop app (Tauri).

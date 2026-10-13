@@ -117,10 +117,11 @@ h2 { font: 600 clamp(26px, 3.4vw, 34px)/1.15 var(--mono); letter-spacing: -.03em
 .feat h3 { font: 600 15px var(--mono); letter-spacing: -.01em; }
 .feat p { color: var(--muted); font-size: 15px; }
 
-.launch { margin: 0 0 18px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: color-mix(in srgb, var(--amber) 9%, var(--surface)); border-radius: 8px; font: 13px var(--mono); }
 .tiers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 860px; }
 .tier { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px; display: grid; gap: 16px; align-content: start; }
-.tier.pro { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tiers.one { grid-template-columns: minmax(0, 1fr); }
+.tier ul.two { columns: 2 260px; column-gap: 32px; display: block; }
+.tier ul.two li { break-inside: avoid; margin-bottom: 8px; }
 .tname { font: 600 13px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .tname span { font-weight: 400; color: var(--accent); text-transform: none; letter-spacing: 0; margin-left: 6px; }
 .price { font: 600 40px/1 var(--mono); letter-spacing: -.03em; }

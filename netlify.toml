@@ -6,9 +6,6 @@
   command = "node tools/build.mjs"
   publish = "dist"
 
-[functions]
-  directory = "netlify/functions"
-
 [[headers]]
   for = "/*"
   [headers.values]
