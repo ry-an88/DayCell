@@ -32,7 +32,7 @@ separate thread, leave it alone).
 
 - Based in the UK (timestamps are BST/GMT). Works on Windows 11 with Git Bash, PowerShell and Python 3.10. Node is
   available.
-- **Design taste:** techy, minimal, notebook-like. **No cursive or decorative fonts** (Inter + JetBrains Mono only),
+- **Design taste:** techy, minimal, notebook-like. **No cursive or decorative fonts** (Inter + JetBrains Mono only; the one exception is the landing page's maker poster, which uses Anton + Archivo on purpose),
   and it should not look like a paper journal.
 - Likes things built and tested rather than just discussed, but sometimes parks ideas ("we'll look back at it later").
   Record parked ideas in the README.
@@ -173,7 +173,7 @@ In order:
   - redesign (2026-10-13): warm neutrals, off-white light mode, notebook start screen, motion, plus a ticker line and
     a tiny robot in the today cell, each with an off button
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
-  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 12 smoke tests
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 14 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
   - licence FSL-1.1-MIT; history checked for secrets; file format spec in `docs/`
 - **Not done or not verified:** see `TASKS.md`. Notably: Safari/Firefox and a real iPad,
