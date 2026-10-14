@@ -18,15 +18,13 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
       `CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS`, `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL`.
 - [ ] **Made by Dip form:** in Netlify, Forms → enable form detection, redeploy, then add an email notification for
       the `hello` form. Send Claude any links (LinkedIn, Instagram) or a photo for the poster.
-- [ ] **Domain:** buy one (daycell.app was the favourite; check it's free) and connect it in Netlify.
-- [ ] **Support email:** create an inbox (for example `hello@<your domain>`). The site uses `hello@daycell.app`;
-      tell Claude if yours is different.
+- [x] **Domain:** daycell.app, connected in Netlify (deploys from `main`).
+- [x] **Support email:** `hello@daycell.app` forwards to Dip through Cloudflare Email Routing.
 - [ ] **Read the privacy and terms pages** (`site/privacy.html`, `site/terms.html`). They're written plainly but aren't legal advice.
 - [ ] **Analytics (optional but recommended):** make a free Umami Cloud account, add the site, and set
       `UMAMI_SRC` and `UMAMI_WEBSITE_ID` in Netlify. Nothing else to edit.
 - [ ] **Make the repo public:** GitHub → Settings → General → Danger zone → Change visibility. History was checked on
       2026-10-11: no keys, tokens or journal entries in it.
-- [ ] **Check the licence name line** in `LICENSE.md` (it says "ry-an88"). Put your legal name there if you prefer.
 - [ ] **Trademark:** search "Daycell" on the UKIPO register (classes 9 and 42) before spending on marketing.
 - [ ] **HMRC:** only relevant if paid work through the site passes the £1,000 trading allowance in a tax year.
 - [ ] **ICO:** take the data protection fee self-assessment (ico.org.uk). Daycell stores no user data, so you may be

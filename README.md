@@ -3,11 +3,13 @@
 A journal app that looks like a coding notebook and stores everything in **one plain markdown file you own**.
 No account, no cloud. Each entry is a "cell"; your journal is a `.md` file you can open in any text editor.
 
-> **Renamed from "Daybook" to Daycell on 2026-10-11.** An established app called "Daybook: AI Journal & Diary"
-> already exists on iOS and Android. See [Naming](#naming).
->
-> **Launch work in progress:** see [`TASKS.md`](TASKS.md) for what's done and what's left (including the steps only
-> Dip can do), and [`CHANGELOG.md`](CHANGELOG.md) for what changed.
+- **Use it:** [daycell.app](https://daycell.app). It's free, with every feature, and runs in your browser.
+- **Made by** Dip Raiyan, an independent developer in the UK. Say hello at
+  [hello@daycell.app](mailto:hello@daycell.app).
+- **Licence:** the source is public so you can read it and check how your journal is handled. It is not open
+  source: all rights reserved (see [`LICENSE`](LICENSE)).
+- **Status:** working and deployed, still being launched. [`TASKS.md`](TASKS.md) has what's left and
+  [`CHANGELOG.md`](CHANGELOG.md) has what changed.
 
 ---
 
@@ -35,6 +37,11 @@ No account, no cloud. Each entry is a "cell"; your journal is a `.md` file you c
 
 ## Quick start
 
+**In a browser:** open [daycell.app](https://daycell.app) and click through to the app (`/app/`). Start a new journal
+or open a `.md` you already have. Nothing to install, and your entries never leave your device.
+
+**The local launcher** (the maker's own Windows setup, from a copy of this folder):
+
 **On this PC:** double-click **`Start Daycell.bat`**. It opens the app in your browser and saves every entry to
 `Journals/daycell.md`. Keep the black launcher window open while you write; close it to stop.
 
@@ -43,7 +50,8 @@ Then in the app click the **folder icon** (left rail) and scan the QR code with 
 must be on the same Wi-Fi and the PC must be on. The first time, Windows may ask about the firewall: allow
 **private networks only**.
 
-Requires Python 3 (already installed on this PC). No other installs.
+The launcher needs Python 3 and nothing else. The `.bat` files are for Windows; elsewhere, run `python daycell.py`
+(add `--lan` for tablet access).
 
 ---
 
@@ -66,6 +74,10 @@ Requires Python 3 (already installed on this PC). No other installs.
 | `docs/file-format.md` | The journal file format as a short open spec. |
 | `LICENSE` | Copyright © 2026 Dip Raiyan. All rights reserved. The code is public to read, not to reuse. |
 | `TASKS.md` | The launch task list. |
+| `CHANGELOG.md` | What changed, newest first. |
+| `marketing/` | Launch strategy, copy, brand assets and screenshots. |
+| `package.json`, `playwright.config.mjs` | Node scripts (`build`, `check`, `test`) and the test setup. |
+| `.github/workflows/ci.yml` | CI: syntax checks and the smoke tests on every push and pull request. |
 | `.gitignore` | Keeps `Journals/` and the iPad pairing secret out of git. |
 | `CLAUDE.md` | Working notes for Claude sessions: code map, safe-testing rules, preferences and current state. |
 | `.daycell-key` | Created automatically in iPad mode. The secret in the QR code. Delete it to un-pair all devices. |
@@ -229,8 +241,7 @@ year image, templates and accent colours included. There is no paywall, licence 
   made; the Polar sandbox product can be left as it is.
 - The licence function (`netlify/functions/license.mjs`), its tests and the `CHECKOUT_URL`, `PORTAL_URL`,
   `LAUNCH_ENDS` build settings were removed.
-- **Netlify:** delete `CHECKOUT_URL`, `POLAR_ORG_ID`, `POLAR_BENEFIT_ID`, `POLAR_API_URL`, `PORTAL_URL` and
-  `LAUNCH_ENDS` from the site's environment variables, then redeploy. Nothing reads them any more.
+- **Netlify:** the old payment variables are unused and can be deleted (see [Deploying](#deploying-the-web-version)).
 - **Ads:** not inside the app (see the decisions log and parked ideas).
 
 ---
@@ -242,12 +253,13 @@ year image, templates and accent colours included. There is no paywall, licence 
 | Path | From | What |
 |---|---|---|
 | `/` | `site/index.html` | landing page: hero, the file format, features, price (free), privacy, the maker poster with a "say hello" form, FAQ |
-| `/privacy.html`, `/terms.html` | `site/` | privacy policy and terms (refunds within 14 days) |
+| `/privacy.html`, `/terms.html` | `site/` | privacy policy and terms (free to use, no payments) |
 | `/app/` | `daycell.html` + `web/` | the app, its manifest, icons and service worker |
 | `/fonts/` | `site/fonts/` | Inter and JetBrains Mono (plus Anton and Archivo for the maker poster only), self-hosted so visitors never contact Google |
 | `/og.png` | `site/og.png` | share image for links |
 
-The support address on the site is `hello@daycell.app` (replace it if the inbox is different).
+The contact address on the site is `hello@daycell.app`. It forwards to Dip's inbox through Cloudflare Email
+Routing, so there's no separate mailbox to check.
 
 **The maker section** (`#maker`) is a window into a different design world on purpose: a street poster inside
 Daycell's own frame, with its own paper, ink, square corners and type (Anton + Archivo), and it stays light in dark
@@ -260,7 +272,8 @@ messages a month.
 
 ## Deploying the web version
 
-Netlify (free tier is enough):
+The live site, [daycell.app](https://daycell.app), is on Netlify and deploys from `main`: every merge to `main` goes
+live. The free tier is enough. To set it up from scratch:
 
 1. In Netlify: **Add new site → Import from GitHub**, then pick the repo. `netlify.toml` runs `node tools/build.mjs`
    and publishes `dist/`.
@@ -273,6 +286,9 @@ Netlify (free tier is enough):
 
 3. Deploy, then connect your domain. Changing a variable needs a redeploy (Deploys → Trigger deploy).
 
+There are no payment or licence variables any more. If `CHECKOUT_URL`, `PORTAL_URL`, `LAUNCH_ENDS` or any `POLAR_*`
+variable is still set in Netlify, it can be deleted: nothing reads it.
+
 The site must be served over **HTTPS** (Netlify does this). Live files and the service worker require it.
 
 **Analytics** only count events, never journal text: `journal-new`, `journal-open`, `first-entry`, `return-day3`,
@@ -282,13 +298,16 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 
 ## Tests
 
-- `npm ci` once, then `npm test`: builds the site and runs the Playwright smoke tests in
-  `tests/` (landing page, writing and reloading, no paywall anywhere, journal switching, templates, accents, year image,
-  the ticker and robot switching off and staying off with nothing fetched,
-  reminder file, eject, the move from localStorage to IndexedDB, opening offline, Day One import from a zip and a
-  JSON, the streak image, and the status cell's spacing).
-- `npm run check`: syntax checks with no browser.
-- GitHub Actions (`.github/workflows/ci.yml`) runs both on every push and pull request.
+- `npm ci` once, then `npm test`: builds `dist/` and runs the 14 Playwright smoke tests in `tests/smoke.spec.mjs`
+  (Chromium). They cover the landing page and legal pages, writing and reloading, no paywall anywhere, journal
+  switching, templates and accents, the year view and image, the reminder file, eject, the move from localStorage to
+  IndexedDB, opening offline, Day One import (zip and JSON), the streak image and the status cell's spacing, the
+  ticker and robot switching off and staying off with nothing fetched, and the maker poster with its form (including
+  its size on a phone).
+- First run on a new machine: `npx playwright install chromium`.
+- `npm run check`: syntax checks with no browser (app script, service worker, manifest). For the launcher,
+  `python -m py_compile daycell.py`.
+- GitHub Actions (`.github/workflows/ci.yml`) runs all of these on every push and pull request.
 
 ---
 
@@ -342,11 +361,10 @@ Candidates were checked against app stores and journaling-app lists (web search 
 **Already taken or crowded:** Daybook, Day One, Day Log, Daylio, DayPlus, Inkwell (several apps).
 
 **Checked on 2026-10-11 (web search only):** no app or software product called Daycell turned up. The only
-trademark found is **DAYCELL COSMETICS Co., Ltd.** (Korean cosmetics, a different class from software). Domain
-lookups were blocked from Claude's environment, so availability of daycell.com / daycell.app is unconfirmed.
+trademark found is **DAYCELL COSMETICS Co., Ltd.** (Korean cosmetics, a different class from software). The
+domain **daycell.app** is now in use.
 
-**Before launch:** check the domain, and search the UK trademark register (UKIPO) and the US one
-(USPTO). Reddit couldn't be searched from here; it can be checked by hand or through Claude in Chrome.
+**Before launch:** search the UK trademark register (UKIPO) and the US one (USPTO). Reddit couldn't be searched from here; it can be checked by hand or through Claude in Chrome.
 
 ---
 
@@ -428,6 +446,9 @@ dialog; no paywall text left in the panel or palette; the ticker and robot switc
 commit makes the robot hop; no request leaves the site. Screenshots checked at desktop and phone width in light and
 dark.
 
+**Tested on 2026-10-13 (landing page):** the maker poster renders, its "say hello" form posts to Netlify Forms, and on
+a phone the poster window stays within 80% of the screen and scrolls inside.
+
 **Not tested yet:**
 - **A real iPad:** the Safari camera/QR scan and the home-screen flow end to end.
 - **The QR image** (the test setup couldn't load the library).
@@ -442,7 +463,8 @@ dark.
 
 The live list is [`TASKS.md`](TASKS.md). In short:
 
-1. **Dip:** delete the Polar and checkout variables in Netlify, domain, support inbox, make the repo public, trademark search, HMRC/ICO checks, a real iPad test.
+1. **Dip:** delete the old payment variables in Netlify, turn on the form notification for `hello`, make the repo
+   public, trademark search, HMRC/ICO checks, a real iPad test. (The domain and `hello@daycell.app` are done.)
 2. **Marketing:** lives in `marketing/` (a separate thread).
 3. **Next features:** more ticker lines and robot moves, passphrase
    encryption, export to a styled book, images in entries, web push reminders, and the Tauri desktop app.
