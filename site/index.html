@@ -10,8 +10,11 @@
 <link rel="canonical" href="__SITE_URL__/">
 <meta name="author" content="Dip Raiyan">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Daycell","url":"__SITE_URL__/","applicationCategory":"LifestyleApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},
- "author":{"@type":"Person","name":"Dip Raiyan","alternateName":"Dip","jobTitle":"Data professional","homeLocation":{"@type":"Country","name":"United Kingdom"},"url":"__SITE_URL__/#maker","sameAs":["__REPO_URL__"]}}
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebApplication","@id":"__SITE_URL__/#app","name":"Daycell","alternateName":"daycell.app","url":"__SITE_URL__/","description":"A free web journal by Dip Raiyan that keeps every entry in one plain markdown file. It runs in the browser; it is not an App Store or Google Play app.","applicationCategory":"LifestyleApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"author":{"@id":"__SITE_URL__/#maker"},"creator":{"@id":"__SITE_URL__/#maker"},"publisher":{"@id":"__SITE_URL__/#maker"},"sameAs":["__REPO_URL__"]},
+ {"@type":"WebSite","@id":"__SITE_URL__/#site","name":"Daycell","url":"__SITE_URL__/","publisher":{"@id":"__SITE_URL__/#maker"}},
+ {"@type":"Person","@id":"__SITE_URL__/#maker","name":"Dip Raiyan","alternateName":"Dip","jobTitle":"Data professional","homeLocation":{"@type":"Country","name":"United Kingdom"},"url":"__SITE_URL__/#maker","email":"hello@daycell.app","sameAs":["https://github.com/ry-an88"]}
+]}
 </script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Daycell · your journal is just a markdown file">
@@ -186,6 +189,7 @@
     <p class="eyebrow">faq</p>
     <h2>questions</h2>
   </div>
+  <details><summary>Who makes Daycell?</summary><p>Dip Raiyan, an independent developer in the United Kingdom (see <a href="#maker">the maker</a>). Daycell lives at daycell.app and runs in your browser. It isn’t on the App Store or Google Play, so an app with a similar name there is someone else’s and isn’t connected to this one.</p></details>
   <details><summary>Where are my entries saved?</summary><p>In Chrome and Edge, straight into the .md file you pick on your computer. Everywhere else, in your browser’s storage on that device, until you download or eject the file. Nothing is stored on our side.</p></details>
   <details><summary>Can I lose my journal?</summary><p>Browsers can clear site data, and Safari does so after 7 days without a visit unless Daycell is on your home screen. That’s why Daycell reminds you to download a copy every few days, and why the file is plain Markdown you can keep anywhere.</p></details>
   <details><summary>Does it sync between devices?</summary><p>Not through a cloud. Move your .md between devices however you like (download and open it, or keep it in a synced folder with a live file). If you run the free desktop launcher, an iPad on the same Wi-Fi can write into the same file.</p></details>

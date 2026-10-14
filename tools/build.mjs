@@ -37,7 +37,7 @@ writeFileSync('dist/app/index.html', app);
 // the landing pages
 const analytics = env.UMAMI_SRC && env.UMAMI_WEBSITE_ID
   ? `<script defer src="${env.UMAMI_SRC}" data-website-id="${env.UMAMI_WEBSITE_ID}"></script>` : '';
-for (const f of readdirSync('dist').filter(f => f.endsWith('.html'))) {
+for (const f of readdirSync('dist').filter(f => /\.(html|txt|xml)$/.test(f))) {
   const p = join('dist', f);
   writeFileSync(p, readFileSync(p, 'utf8')
     .replaceAll('__SITE_URL__', SITE_URL).replaceAll('__REPO_URL__', REPO_URL).replace('<!--analytics-->', analytics));

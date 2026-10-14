@@ -20,6 +20,9 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
       the `hello` form. Send Claude any links (LinkedIn, Instagram) or a photo for the poster.
 - [x] **Domain:** daycell.app, connected in Netlify (deploys from `main`).
 - [x] **Support email:** `hello@daycell.app` forwards to Dip through Cloudflare Email Routing.
+- [ ] **Google Search Console:** add daycell.app as a Domain property (verify with the TXT record it gives you, in
+      Cloudflare DNS), submit `https://daycell.app/sitemap.xml`, then use URL inspection → Request indexing on the
+      home page. Also send feedback on the wrong AI Mode answer (thumbs down → "not accurate").
 - [ ] **Read the privacy and terms pages** (`site/privacy.html`, `site/terms.html`). They're written plainly but aren't legal advice.
 - [ ] **Analytics (optional but recommended):** make a free Umami Cloud account, add the site, and set
       `UMAMI_SRC` and `UMAMI_WEBSITE_ID` in Netlify. Nothing else to edit.
