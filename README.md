@@ -257,6 +257,7 @@ year image, templates and accent colours included. There is no paywall, licence 
 | `/app/` | `daycell.html` + `web/` | the app, its manifest, icons and service worker |
 | `/fonts/` | `site/fonts/` | Inter and JetBrains Mono (plus Anton and Archivo for the maker poster only), self-hosted so visitors never contact Google |
 | `/og.png` | `site/og.png` | share image for links |
+| `/robots.txt`, `/sitemap.xml` | `site/` | tell search engines every page exists, at the real address (`__SITE_URL__` is filled by the build) |
 
 The contact address on the site is `hello@daycell.app`. It forwards to Dip's inbox through Cloudflare Email
 Routing, so there's no separate mailbox to check.
@@ -364,6 +365,12 @@ Candidates were checked against app stores and journaling-app lists (web search 
 trademark found is **DAYCELL COSMETICS Co., Ltd.** (Korean cosmetics, a different class from software). The
 domain **daycell.app** is now in use.
 
+**Reported on 2026-10-14:** Google's AI Mode, asked "who made daycell.app", described a different app called
+Daycell (a year-at-a-glance tracker on iOS and Android, by Ramazan Çapaci) and credited it with our domain. Web
+search from here could not find that listing, so it is unconfirmed; Google cited the App Store for it. Our site now
+says plainly that Daycell is a web app and isn't on the app stores. If the other app is real, it's a different
+category (year planner, not a markdown journal), but it shares the name: worth including in the trademark search.
+
 **Before launch:** search the UK trademark register (UKIPO) and the US one (USPTO). Reddit couldn't be searched from here; it can be checked by hand or through Claude in Chrome.
 
 ---
@@ -404,6 +411,7 @@ domain **daycell.app** is now in use.
 | 2026-10-13 | The maker is named **Dip Raiyan** everywhere (privacy page, poster, footer, `meta author` and schema.org JSON-LD) and the window bar no longer says "vicarious" | Google's AI answer called Dip "an alias" writing under the "vicarious" umbrella, because the privacy page said only "an independent developer" and the bar label read like a brand |
 | 2026-10-13 | **Licence: all rights reserved**, replacing FSL-1.1-MIT before the repo goes public | A licence can be loosened later but not tightened; it stops someone cloning Daycell and running it with their own ads, and people can still read the code to check their journal never leaves their device |
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
+| 2026-10-14 | `robots.txt` + `sitemap.xml`, schema.org as one linked graph (app, site, Person with `@id`), the app page gets `meta author`, and a "Who makes Daycell?" FAQ saying it isn't on the app stores | Google's AI answer credited daycell.app to the maker of a different Daycell app; the site had no sitemap, so Google had little of its own to go on |
 
 ---
 

@@ -34,11 +34,16 @@ test('landing page links to the app and the legal pages', async ({ page }) => {
   // the maker is named the same way everywhere, so search engines don't read 'Dip' as an alias
   await expect(page.locator('meta[name="author"]')).toHaveAttribute('content', 'Dip Raiyan');
   const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
-  expect(ld.author.name).toBe('Dip Raiyan');
-  expect(ld.url).toBe('https://daycell.test/');
+  const node = t => ld['@graph'].find(n => n['@type'] === t);
+  expect(node('Person').name).toBe('Dip Raiyan');
+  expect(node('WebApplication').url).toBe('https://daycell.test/');
+  expect(node('WebApplication').author['@id']).toBe(node('Person')['@id']);
   for (const p of ['privacy.html', 'terms.html', 'app/', 'og.png', 'fonts/fonts.css']) {
     expect((await page.request.get(p)).status(), p).toBe(200);
   }
+  // search engines can find every page, at the real address
+  expect(await (await page.request.get('robots.txt')).text()).toContain('Sitemap: https://daycell.test/sitemap.xml');
+  expect(await (await page.request.get('sitemap.xml')).text()).toContain('<loc>https://daycell.test/app/</loc>');
 });
 
 test('free: write an entry and it survives a reload', async ({ page }) => {
