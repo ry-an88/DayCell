@@ -412,6 +412,7 @@ category (year planner, not a markdown journal), but it shares the name: worth i
 | 2026-10-13 | **Licence: all rights reserved**, replacing FSL-1.1-MIT before the repo goes public | A licence can be loosened later but not tightened; it stops someone cloning Daycell and running it with their own ads, and people can still read the code to check their journal never leaves their device |
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
 | 2026-10-14 | `robots.txt` + `sitemap.xml`, schema.org as one linked graph (app, site, Person with `@id`), the app page gets `meta author`, and a "Who makes Daycell?" FAQ saying it isn't on the app stores | Google's AI answer credited daycell.app to the maker of a different Daycell app; the site had no sitemap, so Google had little of its own to go on |
+| 2026-10-16 | **Landing page uses the app's warm palette** and gets more breathing room: stronger secondary and faint text (7:1 and 4.5:1+), looser mono headings, longer line height, hairlines between sections, soft lift on cards | Easier to read; the site now matches the app. The maker window pins the old palette in `site.css` so it looks exactly as before |
 
 ---
 
