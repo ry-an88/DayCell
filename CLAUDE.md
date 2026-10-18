@@ -173,7 +173,7 @@ In order:
   - redesign (2026-10-13): warm neutrals, off-white light mode, notebook start screen, motion, plus a ticker line and
     a tiny robot in the today cell, each with an off button
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
-  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 16 smoke tests
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 17 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
   - licence: all rights reserved (`LICENSE`); history checked for secrets; file format spec in `docs/`
 - **Not done or not verified:** see `TASKS.md`. Notably: Safari/Firefox and a real iPad,

@@ -209,7 +209,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .moodseg button:hover { background: var(--grid); color: var(--text); }
 .moodseg button.on { background: var(--accent-soft); color: var(--accent); }
 .moodseg .lbl { padding: 5px 10px; font: 11px var(--mono); color: var(--faint); border-right: 1px solid var(--border); }
-.f-body { width: 100%; min-height: 150px; resize: none; overflow: hidden; outline: none; border: 1px solid var(--border); border-radius: var(--r-s); background: var(--code); padding: 12px 14px; font: 13px/1.75 var(--mono); tab-size: 2; }
+.f-body { width: 100%; min-height: 150px; max-height: min(400px, 45vh); resize: none; overflow-y: auto; scrollbar-width: thin; outline: none; border: 1px solid var(--border); border-radius: var(--r-s); background: var(--code); padding: 12px 14px; font: 13px/1.75 var(--mono); tab-size: 2; }
 .f-body:focus { border-color: var(--border-strong); }
 .f-tags { border: 0; outline: none; background: transparent; font: 12px var(--mono); color: var(--accent); padding: 2px 0; }
 .ed-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 10px; font: 11px var(--mono); color: var(--faint); }
@@ -458,7 +458,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
   .f-date { width: 8.4em; min-width: 0; } .f-time { width: 6.2em; min-width: 0; }
   .ed { gap: 8px; padding-bottom: 10px; }
   .f-title { padding: 0; }
-  .f-body { min-height: 96px; padding: 9px 11px; }
+  .f-body { min-height: 96px; max-height: max(96px, 24vh); max-height: max(96px, 24dvh); padding: 9px 11px; }
   /* tags and the commit row share one line */
   .ed { grid-template-columns: minmax(0, 1fr) auto; }
   .ed > * { grid-column: 1 / -1; }
@@ -2039,7 +2039,8 @@ function renderChrome() {
 
 function renderAll() { renderCells(); renderPanel(); renderChrome(); }
 
-function grow(t) { if (!t) return; t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; }
+// the box grows with the text up to its CSS max-height, then scrolls inside (keep its scroll position while measuring)
+function grow(t) { if (!t) return; const y = t.scrollTop; t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; t.scrollTop = y; }
 function countWords() {
   const c = state.editingId && cellEl(state.editingId);
   if (!c) return;

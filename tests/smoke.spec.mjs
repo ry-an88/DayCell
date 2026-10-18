@@ -336,3 +336,15 @@ test('editor: on a phone with the keyboard up, the whole new entry fits above it
   expect(m.wide).toBe(false);
   await ctx.close();
 });
+
+test('editor: a long entry stops growing at a max height and scrolls inside the box', async ({ page }) => {
+  await page.goto(APP);
+  await newJournal(page, 'long');
+  await page.click('.add-cell');
+  const body = page.locator('.cell.editing .f-body');
+  await body.fill(Array.from({ length: 80 }, (_, i) => `line ${i + 1}`).join('\n'));
+  const m = await body.evaluate(t => ({ h: t.getBoundingClientRect().height, max: parseFloat(getComputedStyle(t).maxHeight), scrolls: t.scrollHeight > t.clientHeight, oy: getComputedStyle(t).overflowY }));
+  expect(m.h).toBeLessThanOrEqual(m.max + 1);
+  expect(m.scrolls).toBe(true);
+  expect(m.oy).toBe('auto');
+});
