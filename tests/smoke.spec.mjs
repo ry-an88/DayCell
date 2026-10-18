@@ -307,3 +307,32 @@ test('landing page: on a phone the maker window is at most 80% of the screen and
   expect(m.wide).toBe(false);
   await ctx.close();
 });
+
+test('editor: the prompt row closes and stays closed for that entry', async ({ page }) => {
+  await page.goto(APP);
+  await newJournal(page, 'prompts');
+  await page.click('.add-cell');
+  await expect(page.locator('.cell.editing .prompt-line')).toBeVisible();
+  await page.click('.cell.editing .pclose');
+  await expect(page.locator('.cell.editing .prompt-line')).toHaveCount(0);
+  await page.click('.cell.editing .moodseg [data-mood="good"]');  // re-renders the cell
+  await expect(page.locator('.cell.editing .prompt-line')).toHaveCount(0);
+});
+
+test('editor: on a phone with the keyboard up, the whole new entry fits above it', async ({ browser }) => {
+  // the keyboard shrinks the page to ~470px (interactive-widget=resizes-content)
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 470 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto(APP);
+  await newJournal(page, 'phone');
+  await page.click('.add-cell');
+  await expect(page.locator('.cell.editing .f-title')).toBeFocused();
+  const m = await page.evaluate(() => {
+    const c = document.querySelector('.cell.editing').getBoundingClientRect(), nb = document.querySelector('#nb').getBoundingClientRect();
+    return { top: c.top - nb.top, bottom: nb.bottom - c.bottom, wide: document.documentElement.scrollWidth > innerWidth };
+  });
+  expect(m.top).toBeGreaterThanOrEqual(0);
+  expect(m.bottom).toBeGreaterThanOrEqual(0);
+  expect(m.wide).toBe(false);
+  await ctx.close();
+});

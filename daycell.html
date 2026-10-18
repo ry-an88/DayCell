@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -254,10 +254,14 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .out .btn { height: 24px; padding: 0 9px; font-size: 11px; }
 .out .btn.primary { background: transparent; color: var(--text); border-color: var(--border-strong); }
 .out .btn.primary:hover { background: var(--accent); border-color: var(--accent); color: var(--chrome); }
-.prompt-line { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--r-s); font: 12px var(--mono); color: var(--muted); }
-.prompt-line b { color: var(--accent); font-weight: 500; }
-.prompt-line .ptext { flex: 1; color: var(--text); }
+.prompt-line { display: flex; align-items: center; gap: 8px; padding: 5px 5px 5px 10px; border: 1px solid var(--border); border-radius: var(--r-s); font: 12px var(--mono); color: var(--muted); }
+.prompt-line b { color: var(--accent); font-weight: 500; margin-right: 6px; white-space: nowrap; }
+.prompt-line .ptext { flex: 1; min-width: 0; color: var(--text); line-height: 1.5; }
+.prompt-line .pacts { display: flex; align-items: center; gap: 6px; }
 .prompt-line .btn { height: 24px; padding: 0 9px; font-size: 11px; }
+/* the close button sits on its own, boxed, so it reads as "dismiss" at a glance */
+.prompt-line .pclose { width: 26px; height: 26px; border: 1px solid var(--border-strong); color: var(--text); }
+.prompt-line .pclose:hover:not(:disabled) { background: var(--grid); border-color: var(--text); }
 
 /* ---------- insights panel ---------- */
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 8px 4px; }
@@ -447,6 +451,23 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
   .ticker { white-space: normal; line-height: 1.6; padding: 4px 12px 0; }
   .start { margin-top: 4vh; }
   .head { padding-left: 12px; } .md, .ed { padding-left: 12px; padding-right: 12px; }
+  /* compact editor, so it fits in the half of the screen above the keyboard */
+  .cell.editing { scroll-margin-top: 8px; }
+  .cell.editing .head { gap: 4px; min-height: 0; padding-top: 6px; flex-wrap: nowrap; }
+  .cell.editing .head .edlbl { display: none; }
+  .f-date { width: 8.4em; min-width: 0; } .f-time { width: 6.2em; min-width: 0; }
+  .ed { gap: 8px; padding-bottom: 10px; }
+  .f-title { padding: 0; }
+  .f-body { min-height: 96px; padding: 9px 11px; }
+  /* tags and the commit row share one line */
+  .ed { grid-template-columns: minmax(0, 1fr) auto; }
+  .ed > * { grid-column: 1 / -1; }
+  .ed > .f-tags { grid-column: 1; min-width: 0; }
+  .ed > .ed-foot { grid-column: 2; border-top: 0; padding-top: 0; flex-wrap: nowrap; }
+  .ed-foot .wc { display: none; }
+  .prompt-line { flex-wrap: wrap; align-items: flex-start; row-gap: 4px; }
+  .prompt-line .ptext { padding-top: 3px; }
+  .prompt-line .pacts { order: 2; flex-basis: 100%; }
   .out, .code-line { padding-left: 12px; padding-right: 12px; }
   .cell.status .code-line { padding-right: 84px; }
   .out .k { display: block; min-width: 0; margin-top: 6px; line-height: 1.4; }
@@ -469,6 +490,14 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
   .toggles .ib { width: 34px; height: 34px; }
   .heat { grid-template-rows: repeat(7, 10px); }
   .heat i { width: 10px; height: 10px; }
+  .prompt-line .pclose { width: 32px; height: 32px; }
+  .prompt-line .pacts .ib { width: 32px; height: 32px; }
+  .prompt-line .btn { height: 30px; }
+}
+/* phone with the keyboard up: the status bar makes way for the editor */
+@media (max-width: 600px) and (hover: none) and (pointer: coarse) {
+  .shell:has(.cell.editing :is(input, textarea):focus) { grid-template-rows: 44px minmax(0, 1fr); }
+  .shell:has(.cell.editing :is(input, textarea):focus) .statusbar { display: none; }
 }
 </style>
 </head>
@@ -685,6 +714,7 @@ function streakLine(s) {
 
 const MOODS = ['rough', 'meh', 'okay', 'good', 'great'];
 const COARSE = matchMedia('(hover: none) and (pointer: coarse)');
+const PHONE = matchMedia('(max-width: 600px)');
 const NARROW = matchMedia('(max-width: 900px)');
 const DEFAULT_PREAMBLE = '# Journal';
 const FS = 'showOpenFilePicker' in window;
@@ -1310,9 +1340,23 @@ function startEdit(id) {
     const f = e.title ? cell.querySelector('.f-body') : cell.querySelector('.f-title');
     f.focus();
     if (f.setSelectionRange) f.setSelectionRange(f.value.length, f.value.length);
-    cell.scrollIntoView({ block: 'nearest' });
+    if (!pinEditor()) cell.scrollIntoView({ block: 'nearest' });
   }
 }
+
+// phone: the page shrinks to the space above the keyboard (interactive-widget=resizes-content in the
+// viewport meta), so keep the editor pinned to the top of the notebook and it sits right above the keys
+function pinEditor() {
+  if (!COARSE.matches || !PHONE.matches || !state.editingId) return false;
+  const c = cellEl(state.editingId), f = document.activeElement;
+  if (!c || !f || !c.contains(f)) return false;
+  // a long entry being typed into: keep its end (the caret) in view instead
+  if (f.tagName === 'TEXTAREA' && c.offsetHeight > $('#nb').clientHeight) f.scrollIntoView({ block: 'end' });
+  else c.scrollIntoView({ block: 'start' });
+  return true;
+}
+let pinTimer;
+window.addEventListener('resize', () => { clearTimeout(pinTimer); pinTimer = setTimeout(pinEditor, 60); });
 
 function syncEditor() {
   const e = byId(state.editingId), c = state.editingId && cellEl(state.editingId);
@@ -1337,7 +1381,7 @@ function exitEdit(render = true) {
     e.title = e.title.trim();
     // a template nobody filled in isn't an entry
     const untouchedTemplate = e.tpl && snap && e.title === snap.title.trim() && e.body.trim() === snap.body.trim();
-    delete e.fresh; delete e.tpl;
+    delete e.fresh; delete e.tpl; delete e.noPrompt;
     if (!hasContent(e) || untouchedTemplate) {
       state.entries = state.entries.filter(x => x !== e);
       if (state.selectedId === e.id) state.selectedId = null;
@@ -1444,7 +1488,7 @@ function shufflePrompt() {
   state.promptOffset = (state.promptOffset || 0) + 1;
   if (++BOT.shuffles >= 5) { BOT.shuffles = 0; bot('dizzy', 1500); } else bot('blink', 160);
   const p = todaysPrompt(state.promptOffset);
-  document.querySelectorAll('.ptext').forEach(x => { x.textContent = p; });
+  document.querySelectorAll('.prompt-line .pq').forEach(x => { x.textContent = p; });
   const q = document.querySelector('.cell.status .q');
   if (q) q.textContent = `“${p}”`;
 }
@@ -1752,12 +1796,12 @@ function cellHtml(e, n) {
     inner = `
       <div class="head">
         <input type="date" class="f-date" value="${e.date}"><input type="time" class="f-time" value="${e.time}">
-        <span style="color:var(--amber)">● editing</span>
+        <span class="edlbl" style="color:var(--amber)">● editing</span>
         <div class="actions">${trashBtn}</div>
       </div>
       <div class="ed">
         <input class="f-title" placeholder="untitled" value="${esc(e.title)}" autocomplete="off">
-        ${!e.body.trim() ? `<div class="prompt-line"><b>prompt ›</b><span class="ptext">${esc(todaysPrompt(state.promptOffset || 0))}</span><button class="btn" data-act="usePrompt">use</button><button class="ib" data-act="shufflePrompt" title="another prompt">${I('shuffle', 13)}</button><button class="btn ghost" data-act="templates" title="start from a template">template</button></div>` : ''}
+        ${!e.body.trim() && !e.noPrompt ? `<div class="prompt-line"><span class="ptext"><b>prompt ›</b><span class="pq">${esc(todaysPrompt(state.promptOffset || 0))}</span></span><span class="pacts"><button class="btn" data-act="usePrompt">use</button><button class="ib" data-act="shufflePrompt" title="another prompt">${I('shuffle', 13)}</button><button class="btn ghost" data-act="templates" title="start from a template">template</button></span><button class="ib pclose" data-act="closePrompt" title="hide the prompt" aria-label="hide the prompt">${I('x', 14)}</button></div>` : ''}
         <div class="moodseg"><span class="lbl">mood</span>${MOODS.map(m => `<button data-mood="${m}" class="${e.mood === m ? 'on' : ''}">${m}</button>`).join('')}</div>
         <textarea class="f-body" placeholder="write in markdown — **bold**, - lists, - [ ] tasks, \`code\`, > quotes" spellcheck="true">${esc(e.body)}</textarea>
         <input class="f-tags" placeholder="#add #tags" value="${esc(e.tags.map(t => '#' + t).join(' '))}" autocomplete="off">
@@ -2383,6 +2427,11 @@ $('#cells').addEventListener('click', ev => {
         t.focus(); t.setSelectionRange(t.value.length, t.value.length);
         t.dispatchEvent(new Event('input', { bubbles: true }));
       },
+      closePrompt: () => {
+        const e = byId(state.editingId), c = cellEl(state.editingId);
+        if (e) e.noPrompt = true;
+        if (c) c.querySelector('.prompt-line')?.remove();
+      },
       jump: () => jumpTo(act.dataset.id),
       toggleTicker, toggleBot, poke: pokeBot, nextLine,
       streakCard, importDayOne: startImport,
@@ -2405,6 +2454,8 @@ $('#cells').addEventListener('click', ev => {
 // the ticker waits while you read it
 $('#cells').addEventListener('mouseover', ev => { TK.hover = !!ev.target.closest('#ticker'); });
 $('#cells').addEventListener('mouseleave', () => { TK.hover = false; });
+// closing the prompt shouldn't take focus away from the editor (on a phone that would drop the keyboard)
+$('#cells').addEventListener('mousedown', ev => { if (ev.target.closest('.pclose')) ev.preventDefault(); });
 $('#cells').addEventListener('dblclick', ev => {
   const cell = ev.target.closest('.cell[data-id]');
   if (cell && !cell.classList.contains('editing') && ev.target.closest('.md')) startEdit(cell.dataset.id);
