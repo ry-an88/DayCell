@@ -1,7 +1,7 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="size" content="1080x1920">
-<title>Story: launch week price</title>
+<title>Story: launch</title>
 <link rel="stylesheet" href="../../brand/brand.css">
 <style>
   body { font-size: 30px; padding: 220px 88px 260px; display: flex; flex-direction: column; }
@@ -17,19 +17,13 @@
   .until { font: 500 32px var(--mono); color: var(--muted); margin: 18px 0 auto; }
   .foot { font: 500 30px var(--mono); color: var(--faint); }
 </style>
-<script>
-  // ?until=Mon 16 Nov sets the real end date of the launch price. Only use a date you will honour.
-  addEventListener('DOMContentLoaded', () => {
-    const u = new URLSearchParams(location.search).get('until');
-    document.querySelector('.until').textContent = u ? `launch price until ${u}, then £12` : 'launch week only, then £12';
-  });
-</script></head>
+</head>
 <body>
   <div class="top"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
-  <span class="pill">launch week</span>
-  <h1>Write free forever.<br><span>Own Pro for life.</span></h1>
-  <p>Daycell is a notebook-style journal that saves to one plain .md file. The core is free. Pro is a one-time unlock.</p>
-  <div class="price"><b>£9</b><s>£12</s><span>once</span></div>
-  <div class="until"></div>
-  <div class="foot">link in bio · no account needed</div>
+  <span class="pill">now live</span>
+  <h1>your journal is just a <span>.md</span> file.</h1>
+  <p>A journal that looks like a coding notebook. Every entry is a cell, every day adds to your streak.</p>
+  <div class="price"><b>£0</b><span>every feature · no catch</span></div>
+  <div class="until">no account · no cloud · works offline</div>
+  <div class="foot">daycell.app</div>
 </body></html>

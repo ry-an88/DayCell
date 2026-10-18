@@ -49,5 +49,6 @@ makes text type itself.
 
 - Fill every `[bracket]` with real details. Don't claim features that haven't shipped (sync,
   encryption, AI).
-- Use a real end date for the £9 launch price and honour it to the minute.
+- Daycell is free with every feature (decided 2026-10-13). Older drafts in `copy/` still mention Pro and £12 in
+  places; the Instagram and video captions in `copy/social.md` are up to date.
 - Re-check the Day One price on its pricing page the week you post the comparison, and update the date.

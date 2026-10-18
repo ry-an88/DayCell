@@ -80,7 +80,7 @@ await page.evaluate(() => {
   d.style.cssText = 'position:fixed;inset:0;z-index:99;background:var(--bg);display:grid;align-content:center;gap:16px;padding:0 32px;opacity:0;transition:opacity .4s';
   d.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font:600 26px var(--mono)"><span style="display:grid;place-items:center;width:44px;height:44px;border-radius:9px;background:var(--text);color:var(--bg)">d/</span><span>daycell<span style="color:var(--faint)">.md</span></span></div>
     <div style="font:700 34px/1.1 var(--sans);letter-spacing:-.03em">Commit your day.</div>
-    <div style="font:400 19px/1.45 var(--sans);color:var(--muted)">One plain .md file you own.<br>Free to write, forever. Pro is £12, once.</div>`;
+    <div style="font:400 19px/1.45 var(--sans);color:var(--muted)">One plain .md file you own.<br>Free, with every feature. daycell.app</div>`;
   document.body.appendChild(d);
   requestAnimationFrame(() => d.style.opacity = 1);
 });
