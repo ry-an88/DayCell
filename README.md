@@ -145,7 +145,8 @@ Text of the old entry.
   - two small buttons in the cell's corner turn the ticker and the robot off (also `/ticker`, `/bot` and the file
     panel). The choice is remembered on that device (`daycell-ticker`, `daycell-bot`).
 - **Daily prompts:** 30 prompts in a dev-flavoured voice ("if today had a commit message, what would it be?").
-  You can shuffle them or use one in a new entry.
+  You can shuffle them or use one in a new entry. The prompt row in a new entry has a close button (×) that hides it
+  for that entry.
 - **Insights panel:**
   - streak and longest streak, entry and word totals
   - a GitHub-style activity grid of the last 22 weeks; click a square to jump to that day
@@ -155,7 +156,10 @@ Text of the old entry.
   `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/ticker`, `/bot`, and the templates (`/review`,
   `/gratitude`, `/retro`, `/standup`, `/decision`).
 - **Works on any screen:** desktop, iPad and phone, with touch-friendly controls. Text fields are 16px so iOS
-  doesn't zoom in, and the layout respects the iPhone/iPad home bar.
+  doesn't zoom in, and the layout respects the iPhone/iPad home bar. On a phone the editor is compact (date, time and
+  trash on one line, the prompt on two, tags beside commit) and, when the keyboard opens, the page shrinks to the
+  space above it (`interactive-widget=resizes-content`, Android Chrome) and the editor is pinned to the top, so the
+  whole new entry sits above the keys. The status bar hides while typing on a phone.
 
 **Keyboard shortcuts:**
 
@@ -299,12 +303,12 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 
 ## Tests
 
-- `npm ci` once, then `npm test`: builds `dist/` and runs the 14 Playwright smoke tests in `tests/smoke.spec.mjs`
+- `npm ci` once, then `npm test`: builds `dist/` and runs the 16 Playwright smoke tests in `tests/smoke.spec.mjs`
   (Chromium). They cover the landing page and legal pages, writing and reloading, no paywall anywhere, journal
   switching, templates and accents, the year view and image, the reminder file, eject, the move from localStorage to
   IndexedDB, opening offline, Day One import (zip and JSON), the streak image and the status cell's spacing, the
   ticker and robot switching off and staying off with nothing fetched, and the maker poster with its form (including
-  its size on a phone).
+  its size on a phone), closing the prompt row, and a new entry fitting above a phone keyboard.
 - First run on a new machine: `npx playwright install chromium`.
 - `npm run check`: syntax checks with no browser (app script, service worker, manifest). For the launcher,
   `python -m py_compile daycell.py`.
@@ -413,6 +417,7 @@ category (year planner, not a markdown journal), but it shares the name: worth i
 | 2026-10-13 | No news in the ticker, no ad networks in the app | Both need a third-party request on every open, which breaks offline use and the "nothing leaves your device" promise |
 | 2026-10-14 | `robots.txt` + `sitemap.xml`, schema.org as one linked graph (app, site, Person with `@id`), the app page gets `meta author`, and a "Who makes Daycell?" FAQ saying it isn't on the app stores | Google's AI answer credited daycell.app to the maker of a different Daycell app; the site had no sitemap, so Google had little of its own to go on |
 | 2026-10-16 | **Landing page uses the app's warm palette** and gets more breathing room: stronger secondary and faint text (7:1 and 4.5:1+), looser mono headings, longer line height, hairlines between sections, soft lift on cards | Easier to read; the site now matches the app. The maker window pins the old palette in `site.css` so it looks exactly as before |
+| 2026-10-18 | **Compact phone editor + closable prompt row**: × closes the prompt for that entry; on phones the editor is tighter and the page resizes to the space above the keyboard with the editor pinned to the top | Dip: the prompt row isn't always wanted, and on a phone half the new entry was hidden behind the keyboard |
 
 ---
 
@@ -457,6 +462,10 @@ dark.
 
 **Tested on 2026-10-13 (landing page):** the maker poster renders, its "say hello" form posts to Netlify Forms, and on
 a phone the poster window stays within 80% of the screen and scrolls inside.
+
+**Tested on 2026-10-18 (compact phone editor, automated and by screenshot, Chromium phone emulation):** the prompt
+row's close button hides it and it stays hidden after a re-render; at 393×470 (a phone with the keyboard up) the
+whole new entry fits in view. Not yet checked on a real Android phone or iPhone (iOS ignores `interactive-widget`).
 
 **Not tested yet:**
 - **A real iPad:** the Safari camera/QR scan and the home-screen flow end to end.
