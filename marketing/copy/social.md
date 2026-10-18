@@ -39,10 +39,8 @@ It nudges you to write without nagging:
 [attach: screenshots/insights-dark.png]
 
 5/
-Pricing, decided in the open:
-Writing is free. Forever. Prompts, streaks, search, export included.
-Pro is £12, once. £9 this week, until [Mon 16 Nov, 23:59 UK].
-No renewal.
+Price: free. Every feature, no paywall, no subscription.
+Several journals, a year of insights, templates, all included.
 
 6/
 The code is public, so you don't have to take my word on privacy: [repo URL]
@@ -61,14 +59,14 @@ One a day is plenty; 3 a week is fine. Each has a suggested asset.
 |---|---|---|
 | 1 | Building a journal app where the database is a single markdown file. Here's an entry and here's the file it writes. | `images/out/ig-04-file.png` |
 | 2 | The prompts are written like a dev's inner monologue. Today's: "what's running in the background of your mind?" | `images/out/ig-03-prompt-n-3.png` |
-| 3 | Decision: no 2-day trial. Writing stays free forever, Pro is a one-time unlock. A habit takes weeks; locking people out on day 3 is the opposite of what a journal should do. | none, text only |
+| 3 | Decision: Daycell is free, with every feature. No trial, no paywall, no upgrade screen. A journal habit takes weeks to form, and nothing should get in its way. | none, text only |
 | 4 | Every entry fills a square. 30 days in a row gets you a very dry "achievement unlocked". | `video/out/02-commit-your-day.mp4` |
 | 5 | The whole app is one 2,000-line HTML file. No framework, no build step. It opens instantly and I can read all of it. | `screenshots/desktop-light.png` |
-| 6 | Did the subscription maths on journaling apps. $49.99 a year adds up to $249.95 over five. (Day One's entry plan, Oct 2026.) Daycell Pro: £12, once. | `video/out/03-subscription-math.mp4` |
+| 6 | Did the subscription maths on journaling apps. $49.99 a year adds up to $249.95 over five. (Day One's entry plan, Oct 2026.) Daycell: £0, every feature. | `video/out/03-subscription-math.mp4` |
 | 7 | Why a file? Apps get acquired, repriced and shut down. A file just opens. | `images/out/ig-01-hook.png` |
 | 8 | Two devices writing one file without a server: each save sends the version it last saw; if the other device saved first, it merges and retries. | text, or a short screen recording |
 | 9 | Phone layout is done. 16px inputs so iOS doesn't zoom, actions always visible on touch. | `screenshots/phone-dark.png` |
-| 10 | Launching [Tue 10 Nov]. Writing is free forever; Pro is £9 that week, then £12. | `images/out/story-launch.png` |
+| 10 | Launching [date]. Free, every feature, no account. | `images/out/story-launch.png` |
 
 ---
 
@@ -78,7 +76,7 @@ One a day is plenty; 3 a week is fine. Each has a suggested asset.
 > Apps get acquired, repriced and shut down. A file just opens.
 >
 > Daycell keeps your whole journal in one plain markdown file on your device. No account, no cloud.
-> Free to write, forever.
+> Free, with every feature.
 >
 > Link in bio.
 > #journaling #journalingapp #markdown #productivity #plaintext
@@ -98,12 +96,12 @@ One a day is plenty; 3 a week is fine. Each has a suggested asset.
 ### Single: price (ig-02-price)
 > Do the subscription maths once.
 >
-> Daycell: writing is free forever. Pro is £12, once. No renewal.
+> Daycell: free, with every feature. No subscription, no paywall.
 > (Comparison uses Day One's listed entry plan price, Oct 2026. Prices change.)
 > #journalingapp #nosubscription
 
 ### Story: launch (story-launch)
-Use the link sticker to the landing page. Only post the £9 story during launch week.
+Use the link sticker to daycell.app.
 
 ---
 

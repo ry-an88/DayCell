@@ -17,16 +17,16 @@
 <script>
   // ?shot=desktop-light picks a screenshot from marketing/screenshots
   addEventListener('DOMContentLoaded', () => {
-    const s = new URLSearchParams(location.search).get('shot') || 'desktop-dark';
+    const s = new URLSearchParams(location.search).get('shot') || 'desktop-light';
     document.querySelector('.shot img').src = `../../screenshots/${s}.png`;
   });
 </script></head>
-<body>
+<body class="light">
   <div>
     <div class="top"><span class="logo">d/</span><span class="wordmark">daycell<i>.md</i></span></div>
     <h1>A journal that's just a <span>.md</span> file.</h1>
     <p>Notebook-style daily writing that saves to a plain file you own.</p>
-    <ul><li>free forever to write</li><li>no account, no cloud</li><li>prompts, streaks, insights</li><li>pro: £12 once</li></ul>
+    <ul><li>free, every feature</li><li>no account, no cloud</li><li>prompts, streaks, insights</li><li>works offline</li></ul>
   </div>
   <div class="shot"><img alt=""></div>
 </body></html>

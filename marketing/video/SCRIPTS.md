@@ -9,7 +9,7 @@ speech. Hook on screen in the first second; product visible by second three; one
 |---|---|---|---|
 | `01-just-a-file.mp4` | 17s | "Where does your journal actually live?" → an entry types itself → the same entry as markdown on disk → "Opens in 2050." | `scenes/01-just-a-file.html` |
 | `02-commit-your-day.mp4` | 16s | The commit-message prompt, an answer typed, Shift+Enter, "committed. your future self says thanks.", the 30th square fills. | `scenes/02-commit-your-day.html` |
-| `03-subscription-math.mp4` | 15s | A subscription total ticks up year by year ($49.99 → $249.95) next to a fixed £12. | `scenes/03-subscription-math.html` |
+| `03-subscription-math.mp4` | 15s | A subscription total ticks up year by year ($49.99 → $249.95) next to Daycell's £0. | `scenes/03-subscription-math.html` |
 | `04-app-demo-dark.mp4` | 16s | The **real app** on a phone layout: new entry from a prompt, mood, body, tag, commit, insights. | `tools/app-demo.mjs --theme=dark` |
 | `04-app-demo-light.mp4` | 16s | Same, light theme. | `tools/app-demo.mjs --theme=light` |
 
@@ -43,8 +43,8 @@ Each line is: **on-screen hook** · what we see · end card. Scripts 5–9 can b
     Here's what it looks like." · real screen.
 13. **iPad on the sofa** · hand writes an entry on the iPad, the laptop on the desk shows it arrive (launcher LAN
     mode) · "One file. Two devices. No cloud."
-14. **Launch week only: "£9 until Monday"** · `images/out/story-launch.png` as a 6-second still with a slow zoom ·
-    real end date only.
+14. **Launch day: "now live"** · `images/out/story-launch.png` as a 6-second still with a slow zoom ·
+    "daycell.app".
 
 ## Hooks bank (first 1–2 seconds)
 

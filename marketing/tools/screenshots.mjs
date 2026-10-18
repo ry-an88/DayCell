@@ -39,7 +39,7 @@ for (const s of shots) {
   // mark the demo journal as downloaded so the status dot is green, and show the whole newest entry
   await page.evaluate(() => {
     const m = getMount(); m.downloadedHash = hash(serialize()); setMount(m); renderChrome();
-    const nb = document.querySelector('#nb'); nb.scrollTop = nb.scrollHeight - nb.clientHeight - 260;
+    const nb = document.querySelector('#nb'); nb.scrollTop = nb.scrollHeight - nb.clientHeight - (innerWidth < 600 ? 560 : 260);
   });
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(outDir, `${s.name}.png`) });
