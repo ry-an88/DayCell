@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1080">
+<title>Instagram profile picture</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  /* ?v=dark|light|teal . Instagram crops to a circle, so everything sits inside the middle ~70% */
+  body { display: grid; place-items: center; padding: 0; background-image: none; }
+  .tile { display: grid; place-items: center; width: 520px; height: 520px; border-radius: 112px; font: 700 300px/1 var(--mono); letter-spacing: -.06em; background: var(--text); color: var(--bg); padding-bottom: 14px; }
+  body.teal { background: #3fc8b2; background-image: none; }
+  body.teal .tile { background: #0d0e0e; color: #3fc8b2; }
+</style></head>
+<body id="b"><div class="tile">d/</div>
+<script>
+  const v = new URLSearchParams(location.search).get('v') || 'dark';
+  document.body.className = v === 'light' ? 'light' : v === 'teal' ? 'teal' : '';
+</script></body></html>

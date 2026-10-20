@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1920">
+<title>Instagram highlight cover</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  /* ?t=start|file|prompts|streak|free . Highlights show a small circle, so one big mono glyph, centred */
+  body { display: grid; place-items: center; background-image: none; }
+  .g { display: grid; place-items: center; width: 520px; height: 520px; border-radius: 50%; border: 6px solid var(--border-strong); background: var(--surface); font: 600 230px/1 var(--mono); color: var(--accent); letter-spacing: -.06em; padding-bottom: 12px; }
+</style></head>
+<body><div class="g" id="g"></div>
+<script>
+  const m = { start: '▶', file: '.md', prompts: '?', streak: '▦', free: '£0' };
+  const t = new URLSearchParams(location.search).get('t') || 'start';
+  const g = document.getElementById('g'); g.textContent = m[t];
+  if (t === 'file' || t === 'free') g.style.fontSize = '190px';
+</script></body></html>
