@@ -97,6 +97,127 @@ Post one a day or every other day, 26 Oct to 7 Nov (see timeline). Format, asset
 Every post: 3–5 hashtags (`#journaling #journalingapp #markdown #plaintext #productivity`), one clear line of text,
 and "link in bio" only where it's relevant. Reels are what reach new people; carousels get saved and shared.
 
+### 3b. The five videos: exactly what to post
+
+All five are 1080×1920, under 20 seconds, so they work as Instagram Reels, TikToks and YouTube Shorts. The files are in
+`marketing/video/out/` and copied to the project folder `instagram/videos/`. Post each one as a **Reel** (not a feed
+video), and paste the caption exactly as written. Captions and hashtags below are final; swap nothing but the
+`[bracketed]` bits.
+
+For every Reel:
+- **Audio:** pick a quiet, instrumental track from Instagram's own music library (it's licensed there). Turn the
+  volume of the track down to about 15–20% so the on-screen text carries it. There's no voiceover.
+- **Cover:** pick a frame with the hook text visible (usually the first second), then crop it so the text sits in the
+  middle 4:5 area, because the profile grid shows a centred 4:5 crop.
+- **Captions:** switch on auto-captions only if the Reel has speech. These don't, so leave them off.
+- **Share to feed:** on. **Also share to Facebook:** your choice. **Alt text:** use the line given below.
+- **Tag/location:** none. Don't tag competitors.
+- **First comment (pin it):** the link line in each post below, so the caption stays clean. Instagram doesn't make
+  caption links clickable, so the real link is in your bio and in the pinned comment as a text prompt.
+- **Time:** weekday evening about 18:00–20:00 UK, or lunchtime about 12:00. That's a common default, not a measured
+  one for your audience. After two weeks, check Insights → Followers → Most active times and move to those.
+
+| # | File | Length | On-screen hook | Post when |
+|---|---|---|---|---|
+| 1 | `01-just-a-file.mp4` | 17s | "Where does your journal actually live?" | Mon 26 Oct (or your first posting day) |
+| 2 | `02-commit-your-day.mp4` | 16s | "If today had a commit message…" | Mon 2 Nov |
+| 3 | `04-app-demo-dark.mp4` | 16s | the real app on a phone | Fri 6 Nov |
+| 4 | `03-subscription-math.mp4` | 15s | "Your journal shouldn't cost rent." | Mon 9 Nov |
+| 5 | `04-app-demo-light.mp4` | 16s | same app, light mode | Fri 13 Nov (launch week + 3) |
+
+(If your first post is later than 26 Oct, keep the order and the gaps and slide every date.)
+
+#### Reel 1: `01-just-a-file.mp4`
+**Caption**
+```
+where does your journal actually live?
+
+mine's a .md file. one plain text file on my device. no account, no cloud, no company in the middle.
+
+open it in anything, back it up anywhere, keep it for decades.
+
+daycell is free, with every feature. link in bio.
+
+#journaling #markdown #plaintext #obsidian #productivity
+```
+**Alt text:** An entry types itself in a notebook-style journal, then the same entry appears as a plain markdown file.
+**Pinned comment:** `try it in your browser, no sign-up: daycell.app`
+
+#### Reel 2: `02-commit-your-day.mp4`
+**Caption**
+```
+if today had a commit message, what would it be?
+
+mine: feat: finally trusted myself
+
+answer in the comments. one line counts. 📓
+
+#commityourday #journaling #devlife #dailyjournal #journalprompts
+```
+**Alt text:** A journal prompt asks "if today had a commit message, what would it be?", an answer is typed, and today's square fills in the streak grid.
+**Pinned comment:** `daycell.app is free, with every feature. link in bio.`
+This Reel is the seed for the `#commityourday` habit, so it matters most for replies. Answer every comment.
+
+#### Reel 3: `04-app-demo-dark.mp4` (the real app)
+**Caption**
+```
+writing today's entry in a journal that looks like a code notebook.
+
+each day is a cell. shift+enter to commit. your whole journal stays in one markdown file you own.
+
+free, every feature, no account.
+
+#journaling #journalingapp #codinglife #productivity #markdown
+```
+**Alt text:** Screen recording of Daycell on a phone: a new entry is written from a prompt, a mood and a tag are added, it is committed, and the insights panel opens.
+**Pinned comment:** `try it free in your browser: daycell.app`
+
+#### Reel 4: `03-subscription-math.mp4`
+**Caption**
+```
+do the subscription maths once.
+
+$49.99 a year is $249.95 over five. (Day One's entry plan, as listed in October 2026. prices change.)
+
+daycell: £0. every feature. no subscription, no paywall.
+
+#journalingapp #nosubscription #journaling #productivity #plaintext
+```
+**Alt text:** A running total of a journaling subscription counts up year by year to $249.95, next to Daycell's price of £0.
+**Pinned comment:** `daycell.app. free, with every feature.`
+**Before you post:** re-check Day One's price on their pricing page that week. If it changed, tell me and I'll
+re-render the video and fix the caption. Don't post a price comparison you haven't checked.
+
+#### Reel 5: `04-app-demo-light.mp4`
+**Caption**
+```
+same app, light mode. which one are you? ☀️🌙
+
+(it follows your device by default, and you can switch in the app.)
+
+#journaling #journalingapp #lightmode #darkmode #productivity
+```
+**Alt text:** The same Daycell journal entry flow as before, shown in the light theme.
+**Pinned comment:** `daycell.app`
+Add a Story poll the same day ("dark or light?") to get replies.
+
+#### Posting the same videos elsewhere
+- **TikTok and YouTube Shorts:** upload the original `.mp4` from `video/out/` (not a screen-recording of Instagram, which
+  adds a watermark). Use the same caption and 3–4 hashtags. On YouTube, add `#Shorts` and put `daycell.app` first in
+  the description.
+- **X and Bluesky:** attach the video to the launch-thread post that matches it (see `copy/social.md`).
+
+#### Also post (not videos, same batch)
+Captions for these are in `copy/social.md`: the carousel "a file just opens" (`ig-01` → `ig-04` → `ig-02`), the
+streak single (`ig-05-streak.png`), a prompt card (`ig-03-prompt-n-3.png`) and the launch story
+(`story-launch.png`, with a link sticker to daycell.app).
+
+#### Don'ts
+- Don't post a Reel without checking it plays with the sound off and the text is readable on a phone.
+- Don't use a trending sound that isn't in Instagram's library for business accounts; it can be muted or flagged.
+- Don't reply to comments with a link to a competitor, or argue about price. Say what Daycell does and move on.
+- Don't write that you have users, reviews or press. You can say "free, every feature, no account", because it's true.
+
 ## 4. Campaign strategy
 
 **Goal (be modest):** a small, real audience that sends people to daycell.app and feeds the `#commityourday` habit
