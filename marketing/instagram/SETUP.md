@@ -207,10 +207,100 @@ Add a Story poll the same day ("dark or light?") to get replies.
   the description.
 - **X and Bluesky:** attach the video to the launch-thread post that matches it (see `copy/social.md`).
 
-#### Also post (not videos, same batch)
-Captions for these are in `copy/social.md`: the carousel "a file just opens" (`ig-01` → `ig-04` → `ig-02`), the
-streak single (`ig-05-streak.png`), a prompt card (`ig-03-prompt-n-3.png`) and the launch story
-(`story-launch.png`, with a link sticker to daycell.app).
+### 3c. The image posts: exactly what to post
+
+Same rules as the Reels: paste the caption as written, add the alt text, pin the comment. Posts #2, #3, #5, #7 and #9
+in the table in section 3 are these. Normal capitalisation here (the Reel captions are lowercase; a mixed grid is fine).
+
+#### Post 2: carousel "A file just opens" (Wed 28 Oct)
+**Slides, in order:** `ig-01-hook.png` → `ig-04-file.png` → `ig-02-price.png`
+**Caption**
+```
+Apps get acquired, repriced and shut down. A file just opens.
+
+Daycell keeps your whole journal in one plain markdown file on your device. No account, no cloud. Free, with every feature.
+
+(Price on the last slide: Day One's listed entry plan, October 2026. Prices change.)
+
+Link in bio.
+
+#journaling #journalingapp #markdown #productivity #plaintext
+```
+**Alt text:** Three slides: "Apps get acquired, repriced and shut down. A file just opens.", a journal entry shown as a plain markdown file, and a subscription price compared with Daycell's £0.
+**Pinned comment:** `try it in your browser, no sign-up: daycell.app`
+**Before you post:** re-check Day One's price (the last slide quotes it).
+
+#### Post 3: prompt card (Fri 30 Oct) — `ig-03-prompt-n-3.png`
+**Caption**
+```
+Today's prompt: what's running in the background of your mind?
+
+Answer in the comments, or in your own journal. One line counts. 📓
+
+Daycell has a prompt a day built in, free. Link in bio.
+
+#journalprompts #dailyjournal #reflection #journaling #mindfulness
+```
+**Alt text:** A card reading "what's running in the background of your mind?" in the Daycell notebook style.
+**Pinned comment:** `one line is plenty. what's yours?`
+Reply to every answer. A reply to a comment is worth more here than the post itself.
+
+#### Post 5: streak single (Wed 4 Nov) — `ig-05-streak.png`
+**Caption**
+```
+Watch the habit show up. Every entry fills a square.
+
+Streaks, milestones and an "on this day" look-back, all from a plain file on your device. Free, no account.
+
+Link in bio.
+
+#journalinghabit #habittracker #dailyjournal #journaling #productivity
+```
+**Alt text:** A grid of squares filling in day by day, one square for every journal entry written.
+**Pinned comment:** `how long is your longest streak? mine's...` (fill in your real number, or leave the line out)
+
+#### Post 7: the tour carousel (Sun 8 Nov) — **not made yet, ask me to build it**
+It uses the real app screenshots. Caption to use once it exists:
+```
+How Daycell works, in 6 screens.
+
+Each day is a cell. Write, tag it, commit it with shift+enter. Your whole journal stays in one markdown file you own.
+
+Free, every feature, no account. Link in bio.
+
+#journalingapp #journaling #markdown #productivity #plaintext
+```
+**Alt text:** Six screenshots of the Daycell app: writing an entry, choosing a mood, the activity grid, insights, the markdown file and the light theme.
+
+#### Post 9 and Story: launch (Tue 10 Nov) — `story-launch.png`
+**Feed caption (use the image as a single post)**
+```
+Daycell is live. 📓
+
+A journal that's just a markdown file. Notebook-style daily writing, no account, no subscription, works offline.
+
+Free, with every feature. Try it in your browser: link in bio.
+
+Made by one person. Tell me what you'd change.
+
+#journaling #journalingapp #markdown #nosubscription #productivity
+```
+**Alt text:** "Now live. Daycell: a journal that's just a .md file. Free, every feature." on a notebook-style background.
+**Story:** the same image with a **link sticker** to `https://daycell.app/?utm_source=ig-story`. Add a "share your first entry" prompt sticker if you like.
+**Pinned comment:** `try it in your browser, no sign-up: daycell.app`
+
+#### Daily prompt-card Stories (cards 0, 1, 2 and 4)
+Post one card a day in Stories (add a question sticker so people can reply). Use this text as the sticker prompt, with
+no hashtags needed on Stories:
+
+| Card | Story text (on the sticker) |
+|---|---|
+| `ig-03-prompt-n-0.png` | "if today had a commit message, what would it be?" |
+| `ig-03-prompt-n-1.png` | "what did you debug in your life today?" |
+| `ig-03-prompt-n-2.png` | "what's one thing you'd refactor about today?" |
+| `ig-03-prompt-n-4.png` | "write the changelog for this week." |
+
+Once a week, turn one of these into a feed post with the caption from Post 3, swapping in the card's prompt.
 
 #### Don'ts
 - Don't post a Reel without checking it plays with the sound off and the text is readable on a phone.
