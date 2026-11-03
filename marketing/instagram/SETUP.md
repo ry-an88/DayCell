@@ -259,8 +259,10 @@ Link in bio.
 **Alt text:** A grid of squares filling in day by day, one square for every journal entry written.
 **Pinned comment:** `how long is your longest streak? mine's...` (fill in your real number, or leave the line out)
 
-#### Post 7: the tour carousel (Sun 8 Nov) — **not made yet, ask me to build it**
-It uses the real app screenshots. Caption to use once it exists:
+#### Post 7: the tour carousel (Sun 8 Nov)
+**Slides, in order:** `ig-06-tour-1.png` → `ig-06-tour-2.png` → `ig-06-tour-3.png` → `ig-06-tour-4.png` → `ig-06-tour-5.png` → `ig-06-tour-6.png`
+(Made from the real app with the sample journal. Cover "how daycell works, in 6 screens", then the entry cell, the daily prompt and streak, the plain file, the insights panel, and light/dark.)
+**Caption**
 ```
 How Daycell works, in 6 screens.
 
@@ -270,7 +272,8 @@ Free, every feature, no account. Link in bio.
 
 #journalingapp #journaling #markdown #productivity #plaintext
 ```
-**Alt text:** Six screenshots of the Daycell app: writing an entry, choosing a mood, the activity grid, insights, the markdown file and the light theme.
+**Alt text:** Six slides: "how daycell works, in 6 screens"; a journal entry cell with ticked tasks; the daily prompt and a 35-day streak; the entry saved as a plain markdown file; the insights panel with an activity grid; and the app in light and dark on a phone.
+**Pinned comment:** `try it in your browser, no sign-up: daycell.app`
 
 #### Post 9 and Story: launch (Tue 10 Nov) — `story-launch.png`
 **Feed caption (use the image as a single post)**

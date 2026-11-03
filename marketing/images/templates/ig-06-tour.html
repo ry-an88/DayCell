@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="size" content="1080x1350">
+<title>Instagram 06: tour carousel</title>
+<link rel="stylesheet" href="../../brand/brand.css">
+<style>
+  /* ?n=1..6 picks the slide. Real-app crops live in tour/. Slide 4 is ig-04-file.png rendered separately. */
+  body { font-size: 30px; padding: 80px 72px; display: flex; flex-direction: column; gap: 36px; }
+  .top { display: flex; justify-content: space-between; align-items: center; font: 500 26px var(--mono); color: var(--faint); }
+  .top .l { display: flex; align-items: center; gap: 14px; color: var(--text); }
+  h1 { font: 700 64px/1.08 var(--sans); letter-spacing: -.03em; margin: 0; }
+  h1 span { color: var(--accent); }
+  p { font: 400 34px/1.45 var(--sans); color: var(--muted); margin: 0; max-width: 880px; }
+  .shot { border: 2px solid var(--border-strong); border-radius: 18px; overflow: hidden; background: var(--surface); box-shadow: 0 18px 50px -24px rgba(0,0,0,.35); }
+  .shot img { display: block; width: 100%; }
+  .grow { flex: 1; display: grid; align-content: center; justify-items: center; }
+  .phones { display: flex; gap: 28px; justify-content: center; }
+  .phones .shot { width: 330px; }
+  .file { width: 100%; background: var(--code); border: 2px solid var(--border-strong); border-radius: 16px; padding: 38px 42px; font: 30px/1.7 var(--mono); color: var(--muted); }
+  .file .h { color: var(--text); } .file .k { color: var(--accent); }
+  .big { font: 700 92px/1.04 var(--sans); letter-spacing: -.035em; }
+  .foot { font: 500 26px var(--mono); color: var(--faint); display: flex; justify-content: space-between; margin-top: auto; }
+</style></head>
+<body class="light">
+  <div class="top"><span class="l"><span class="logo">d/</span><span>daycell<i>.md</i></span></span><span id="num"></span></div>
+  <div id="slide" style="display:flex;flex-direction:column;gap:36px;flex:1"></div>
+<script>
+  const n = Number(new URLSearchParams(location.search).get('n') || 1);
+  const T = 'tour/';
+  const S = {
+    1: `<div class="grow" style="align-content:center;gap:40px;justify-items:start"><h1 class="big">how daycell works, in <span>6 screens.</span></h1><p>a journal that's just a markdown file. free, every feature, no account.</p></div><div class="foot"><span>real app, sample entries</span><span>swipe →</span></div>`,
+    2: `<h1>each day is a <span>cell.</span></h1><p>write in plain markdown. tick boxes, add tags, set a mood.</p><div class="grow"><div class="shot"><img src="${T}cell.png"></div></div><div class="foot"><span>shift+enter to commit</span><span>swipe →</span></div>`,
+    3: `<h1>a prompt a day, and a <span>streak.</span></h1><p>a quiet counter, an "on this day" look-back, and a prompt when you're stuck.</p><div class="grow"><div class="shot" style="width:500px"><img src="${T}today.png"></div></div><div class="foot"><span>30 prompts built in</span><span>swipe →</span></div>`,
+    4: `<h1>your journal is <span>one plain file.</span></h1><p>open it in VS Code, Obsidian or Notepad. back it up anywhere.</p><div class="grow" style="gap:20px;align-content:center"><div class="file"><div class="h">## 2026-10-08 · 19:30 — long run by the river</div><div><span class="k">mood::</span> good</div><div><span class="k">tags::</span> #health</div><br><div>9 km, no headphones. Best ideas of</div><div>the week came at km 6.</div></div></div><div class="foot"><span>no database, no lock-in</span><span>swipe →</span></div>`,
+    5: `<h1>watch the habit <span>show up.</span></h1><p>an activity grid, mood and tags. share the squares if you like. never the words.</p><div class="grow"><div class="shot" style="width:640px"><img src="${T}insights.png"></div></div><div class="foot"><span>insights panel</span><span>swipe →</span></div>`,
+    6: `<h1>light or dark. <span>free.</span></h1><p>every feature, no account. works offline, on your phone too.</p><div class="grow"><div class="phones"><div class="shot"><img src="${T}phone-light.png"></div><div class="shot"><img src="${T}phone-dark.png"></div></div></div><div class="foot"><span>daycell.app</span><span>link in bio</span></div>`,
+  };
+  document.getElementById('slide').innerHTML = S[n];
+  document.getElementById('num').textContent = n + ' / 6';
+</script></body></html>
