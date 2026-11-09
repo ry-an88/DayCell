@@ -29,6 +29,7 @@ No account, no cloud. Each entry is a "cell"; your journal is a `.md` file you c
 - [Renaming the app](#renaming-the-app)
 - [Naming](#naming)
 - [Decisions log](#decisions-log)
+- [Focus music: how it works](#focus-music-how-it-works)
 - [Known limitations](#known-limitations)
 - [What's been tested (and what hasn't)](#whats-been-tested-and-what-hasnt)
 - [Next steps](#next-steps)
@@ -144,6 +145,15 @@ Text of the old entry.
     a random trick. With reduced motion switched on it stays still.
   - two small buttons in the cell's corner turn the ticker and the robot off (also `/ticker`, `/bot` and the file
     panel). The choice is remembered on that device (`daycell-ticker`, `daycell-bot`).
+- **Focus music (Spotify), desktop and tablet:** a `focus` pill in the top bar opens a small card. Nothing loads
+  from Spotify until you press **connect spotify**, and every visit starts disconnected, so the app stays offline-first.
+  Once connected you get Daycell's own play/pause, progress and time, four focus playlists (deep focus, lo-fi beats,
+  peaceful piano, brain food), **+ paste a link** for your own playlist, album or track, and a focus timer (25 or 50
+  minutes, or off) that pauses the music and cheers when the block ends. Spotify's own small player sits in the card
+  for volume and skipping. Full songs if you're signed in to Spotify in that browser, 30-second previews if not.
+  Closing the card (esc, the arrow or a click elsewhere) keeps the music playing and the pill shows what's on and the
+  time left. The playlist, your links and the timer length are remembered (`daycell-focus`); "connected" never is.
+  Hidden in phone layout for now. Also `/music`. How it works: see [Focus music: how it works](#focus-music-how-it-works).
 - **Daily prompts:** 30 prompts in a dev-flavoured voice ("if today had a commit message, what would it be?").
   You can shuffle them or use one in a new entry. The prompt row in a new entry has a close button (×) that hides it
   for that entry.
@@ -153,7 +163,7 @@ Text of the old entry.
   - mood trend and top tags
 - **A voice:** playful save messages and streak milestones (3, 7, 14, 30, 50, 100, 365 days).
 - **Command palette** (`/` or Ctrl+K): `/new`, `/prompt`, `/today`, `/random`, `/stats`, `/search`, `/trash`,
-  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/ticker`, `/bot`, and the templates (`/review`,
+  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/ticker`, `/bot`, `/music`, and the templates (`/review`,
   `/gratitude`, `/retro`, `/standup`, `/decision`).
 - **Works on any screen:** desktop, iPad and phone, with touch-friendly controls. Text fields are 16px so iOS
   doesn't zoom in, and the layout respects the iPhone/iPad home bar. On a phone the editor is compact (date, time and
@@ -305,12 +315,14 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 
 ## Tests
 
-- `npm ci` once, then `npm test`: builds `dist/` and runs the 17 Playwright smoke tests in `tests/smoke.spec.mjs`
+- `npm ci` once, then `npm test`: builds `dist/` and runs the 18 Playwright smoke tests in `tests/smoke.spec.mjs`
   (Chromium). They cover the landing page and legal pages, writing and reloading, no paywall anywhere, journal
   switching, templates and accents, the year view and image, the reminder file, eject, the move from localStorage to
   IndexedDB, opening offline, Day One import (zip and JSON), the streak image and the status cell's spacing, the
   ticker and robot switching off and staying off with nothing fetched, and the maker poster with its form (including
-  its size on a phone), closing the prompt row, a new entry fitting above a phone keyboard, and the writing box's max height.
+  its size on a phone), closing the prompt row, a new entry fitting above a phone keyboard, the writing box's max height, and focus music (nothing
+  fetched before connect, play/pause, timer, switching playlists, pasting a link, remembered but disconnected after a
+  reload; Spotify's script is replaced by a stand-in, so the test never talks to Spotify).
 - First run on a new machine: `npx playwright install chromium`.
 - `npm run check`: syntax checks with no browser (app script, service worker, manifest). For the launcher,
   `python -m py_compile daycell.py`.
@@ -323,6 +335,9 @@ The site must be served over **HTTPS** (Netlify does this). Live files and the s
 - **The web version never receives journal text.** Entries stay on the user's device: in their file, or in their
   browser until ejected. The only thing sent anywhere is, if analytics
   are switched on, anonymous event counts. The ticker's lines ship inside the app.
+- **Focus music is opt-in.** Spotify's script and player load only after **connect spotify** is pressed, and never on
+  page load. From then on Spotify sees what any embedded Spotify player sees (your IP, its own cookies if you're signed
+  in, what you play). Daycell sends it no journal data and holds no Spotify login or token.
 - **Fonts are self-hosted** on the website, so visitors' browsers don't contact Google. (The launcher still loads
   them from Google Fonts.)
 - **The launcher:**
@@ -420,7 +435,32 @@ category (year planner, not a markdown journal), but it shares the name: worth i
 | 2026-10-14 | `robots.txt` + `sitemap.xml`, schema.org as one linked graph (app, site, Person with `@id`), the app page gets `meta author`, and a "Who makes Daycell?" FAQ saying it isn't on the app stores | Google's AI answer credited daycell.app to the maker of a different Daycell app; the site had no sitemap, so Google had little of its own to go on |
 | 2026-10-16 | **Landing page uses the app's warm palette** and gets more breathing room: stronger secondary and faint text (7:1 and 4.5:1+), looser mono headings, longer line height, hairlines between sections, soft lift on cards | Easier to read; the site now matches the app. The maker window pins the old palette in `site.css` so it looks exactly as before |
 | 2026-10-18 | **Compact phone editor + closable prompt row**: × closes the prompt for that entry; on phones the editor is tighter and the page resizes to the space above the keyboard with the editor pinned to the top | Dip: the prompt row isn't always wanted, and on a phone half the new entry was hidden behind the keyboard |
+| 2026-11-09 | **Focus music: Spotify's embed behind a `focus` pill in the top bar** (option A of three mockups: top-bar pill + drop-down card, side-panel tab, pinned notebook cell). Opt-in connect, nothing loads before it, never auto-connects | Dip finds it hard to focus. The iFrame embed needs no developer app or login; the Web Playback SDK would need Premium, OAuth and a server. Mockups in the project files (`focus-player/`) |
 | 2026-10-18 | **Writing box stops growing at a max height** and scrolls inside | Dip: a long entry pushed the rest of the editor (tags, commit) off screen |
+
+---
+
+## Focus music: how it works
+
+- **Nothing on page load.** `daycell.html` has the pill and the card's markup, but no Spotify code or iframe. The
+  service worker ignores Spotify's addresses.
+- **Connect** (`focusConnect`) checks `navigator.onLine`, then adds one `<script>` tag for
+  `https://open.spotify.com/embed/iframe-api/v1`. When it loads, Spotify calls `window.onSpotifyIframeApiReady(api)`.
+  A 20 s timeout and the script's `onerror` show "try again" instead of hanging.
+- **The player:** `api.createController(el, { uri, width, height: 80 }, ctl => …)` swaps `#fcEmbed` for Spotify's
+  iframe. Daycell keeps the `ctl` (EmbedController) and calls `togglePlay()`, `play()`, `pause()` and
+  `loadEntity(uri)` (or `loadUri` on older versions) when you switch playlist.
+- **State comes back** through `ctl.addListener('playback_update', e => …)`: `isPaused`, `isBuffering`,
+  `position` and `duration` in ms. That drives the play icon, progress bar, times, "playing a preview" (duration ≤ 31 s)
+  and the pill.
+- **Focus timer:** starts on the first "playing" update (`focus.ends`), a 1 s tick updates the pill and card and, at
+  zero, pauses, toasts and makes the robot cheer.
+- **Closing the card** only hides it (`visibility: hidden`), so the iframe and the music keep going. **Disconnect**
+  calls `ctl.destroy()` and puts back a fresh `#fcEmbed`.
+- **Links:** `spotifyUri()` accepts `open.spotify.com/…/{playlist|album|track|episode|show|artist}/ID` (with `intl-xx/`
+  or `?si=`) and `spotify:` URIs, saved in `daycell-focus` (max 8).
+- **No backend.** There's no server, no Spotify developer app, no OAuth and no token: the browser talks to Spotify
+  directly, the same way any page with a Spotify embed does.
 
 ---
 
@@ -432,6 +472,10 @@ category (year planner, not a markdown journal), but it shares the name: worth i
 - **Safari can clear in-browser journals** after 7 days without a visit unless the app is on the home screen. The app
   warns about this and nudges downloads; it can't prevent it.
 - **The journal switcher covers in-browser journals.** Live files are one at a time (open another to switch).
+- **Focus music** depends on Spotify's iFrame API: it offers play/pause/seek and position, but no volume, skip or
+  track names, so those stay in Spotify's own player in the card. Without a Spotify login in the browser it plays
+  30-second previews. Starting playback from Daycell's button can be blocked by the browser until you've clicked
+  inside Spotify's player once. The four built-in playlists are Spotify's own editorial lists and can change.
 - **The QR code** loads a small library from cdnjs. If you're offline, use the address printed in the launcher window.
 - **Older-copy warnings** only know about downloads made in the same browser.
 - **Entries are matched across devices by date + time**, so two different entries saved in the same minute on two
@@ -491,6 +535,10 @@ The live list is [`TASKS.md`](TASKS.md). In short:
    encryption, export to a styled book, images in entries, web push reminders, and the Tauri desktop app.
 
 ### Parked ideas
+
+**Focus music, next** (2026-11-09). An offline brown/pink-noise player (Web Audio, nothing fetched) for when
+there's no connection, and a focus mode that hides the side panel, ticker and robot. Both were liked; built after the
+Spotify player.
 
 **Made by Dip, still open** (2026-10-13). The poster section is built. Still to add once Dip shares them: a photo
 or sketch, more links (LinkedIn, Instagram), and possibly a small "made by Dip" link in the app's file panel. The

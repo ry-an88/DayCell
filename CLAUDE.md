@@ -109,6 +109,10 @@ In order:
       `downloadReminder()` (`.ics`), `saveBlob`, `drawCard()` shared by `streakCard()` and `yearCard()`
       — share images never draw entry text, `ANALYTICS`/`loadAnalytics`/
       `track(event)` (Umami; counts only, never entry text).
+    - **focus music (Spotify embed)** (its own section before the command palette): `FOCUS_LISTS`, `focus` state,
+      `focusPrefs()` (`daycell-focus`: list, custom links, timer), `focusConnect()` loads Spotify's iFrame API only
+      on click, `makeController()`, `renderFocus()`/`renderFocusLists()`, `spotifyUri()`, `initFocus()`. The card
+      `#focusCard` closes with `.closed` (visibility only, so music keeps playing). Never auto-connect on load.
     - **import from Day One:** `startImport()` → `#importInput` → `importDayOne(file)`; `unzipJson()` is a tiny zip
       reader (stored or deflate via `DecompressionStream`), `fromDayOne()` maps entries, `localParts()` converts to the
       entry's time zone.
@@ -173,8 +177,9 @@ In order:
   - redesign (2026-10-13): warm neutrals, off-white light mode, notebook start screen, motion, plus a ticker line and
     a tiny robot in the today cell, each with an off button
   - installable/offline (manifest, icons, service worker), daily reminder `.ics`, analytics hook (off until set)
-  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 17 smoke tests
+  - landing page, privacy, terms, self-hosted fonts, share image; Node build; CI with 18 smoke tests
   - free streak share image (no entry text) and a free Day One importer (zip or JSON)
+  - focus music (2026-11-09): opt-in Spotify embed behind a `focus` pill, with playlists, own links and a focus timer
   - licence: all rights reserved (`LICENSE`); history checked for secrets; file format spec in `docs/`
 - **Not done or not verified:** see `TASKS.md`. Notably: Safari/Firefox and a real iPad,
   the Chrome/Edge file pickers.
