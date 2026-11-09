@@ -24,8 +24,9 @@ Marketing work lives in `marketing/` and is tracked there. Legend: `[x]` done, `
       Cloudflare DNS), submit `https://daycell.app/sitemap.xml`, then use URL inspection → Request indexing on the
       home page. Also send feedback on the wrong AI Mode answer (thumbs down → "not accurate").
 - [ ] **Read the privacy and terms pages** (`site/privacy.html`, `site/terms.html`). They're written plainly but aren't legal advice.
-- [ ] **Analytics (optional but recommended):** make a free Umami Cloud account, add the site, and set
-      `UMAMI_SRC` and `UMAMI_WEBSITE_ID` in Netlify. Nothing else to edit.
+- [x] **Analytics:** Umami Cloud switched on 2026-11-06 (`UMAMI_SRC` and `UMAMI_WEBSITE_ID` set in Netlify).
+      Visitor numbers before that date don't exist. Cloudflare's dashboard doesn't count visits: DNS is grey cloud, so
+      traffic goes straight to Netlify.
 - [ ] **Make the repo public:** GitHub → Settings → General → Danger zone → Change visibility. History was checked on
       2026-10-11: no keys, tokens or journal entries in it.
 - [ ] **Trademark:** search "Daycell" on the UKIPO register (classes 9 and 42) before spending on marketing.

@@ -298,7 +298,8 @@ variable is still set in Netlify, it can be deleted: nothing reads it.
 
 The site must be served over **HTTPS** (Netlify does this). Live files and the service worker require it.
 
-**Analytics** only count events, never journal text: `journal-new`, `journal-open`, `first-entry`, `return-day3`,
+**Analytics** are on (Umami Cloud, since 2026-11-06); check the Umami dashboard for visits, not Cloudflare. Cloudflare
+only serves DNS in grey-cloud mode and never sees page loads, so its traffic charts read near zero. They only count events, never journal text: `journal-new`, `journal-open`, `first-entry`, `return-day3`,
 `reminder`, `streak-card`, `year-card`, `import-dayone`, plus page views.
 
 ---
