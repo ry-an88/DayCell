@@ -351,9 +351,9 @@ test('editor: a long entry stops growing at a max height and scrolls inside the 
 
 // a stand-in for Spotify's iFrame API, so the test needs no network and never talks to Spotify
 const FAKE_SPOTIFY = `window.onSpotifyIframeApiReady && window.onSpotifyIframeApiReady({ createController(el, opts, cb) {
-  const ls = {}; let paused = true; window.__loaded = opts.uri;
+  const ls = {}; let paused = true; window.__loaded = opts.uri; window.__height = opts.height;
   const fire = () => (ls.playback_update || []).forEach(f => f({ data: { isPaused: paused, isBuffering: false, position: 61000, duration: 200000 } }));
-  const f = document.createElement('iframe'); f.className = 'fake-spotify'; el.replaceWith(f);
+  const f = document.createElement('iframe'); f.className = 'fake-spotify'; f.height = opts.height; el.replaceWith(f);
   cb({ addListener(e, fn) { (ls[e] ||= []).push(fn); }, togglePlay() { paused = !paused; fire(); }, play() { paused = false; fire(); },
        pause() { paused = true; fire(); }, loadEntity(u) { window.__loaded = u; }, destroy() { f.remove(); } });
 } });`;
@@ -397,12 +397,29 @@ test('focus music: nothing loads from Spotify until connect, then the card drive
   await page.click('#mOk');
   await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my album');
   expect(await page.evaluate(() => window.__loaded)).toBe('spotify:album:4aawyAB9vmqN3uQ7FjRGTy');
+  // or Spotify's whole "embed" code
+  await page.click('[data-list="+"]');
+  await page.fill('#mInput', '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2j9IlkT5HpFud8XRtbA9x3?utm_source=generator" width="100%" height="352"></iframe>');
+  await page.click('#mOk');
+  await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my playlist');
+  expect(await page.evaluate(() => window.__loaded)).toBe('spotify:playlist:2j9IlkT5HpFud8XRtbA9x3');
+
+  // small player by default; "show songs" makes it the full one with the song list
+  await expect(page.locator('.fake-spotify')).toHaveAttribute('height', '80');
+  await page.click('#fcSize');
+  await expect(page.locator('#fcSize')).toHaveText('hide songs');
+  await expect(page.locator('.fake-spotify')).toHaveAttribute('height', '352');
 
   // the choice is remembered, but a new visit starts disconnected and loads nothing
   await page.reload();
   await expect(page.locator('#focusBtn')).toHaveText('focus');
   await page.click('#focusBtn');
   await expect(page.locator('#fcConnect')).toBeVisible();
-  await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my album');
+  await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my playlist');
   expect(hits).toHaveLength(1);
+  // the full size is remembered too
+  await page.click('#fcConnect');
+  await expect(page.locator('#fcState')).toHaveText('spotify connected');
+  expect(await page.evaluate(() => window.__height)).toBe(352);
+  await expect(page.locator('#fcSize')).toHaveText('hide songs');
 });

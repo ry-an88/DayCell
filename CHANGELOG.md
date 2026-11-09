@@ -7,6 +7,8 @@
 - Daycell's own play/pause, progress and time, four focus playlists, **+ paste a link** for your own Spotify playlist,
   album or track, and a 25/50-minute focus timer that pauses the music when the block ends.
 - Close the card and the music keeps going; the pill shows what's playing and the time left. Also `/music`.
+- **show songs / hide songs** switches Spotify's player between the small one and the full one with the song list
+  (remembered; also `/songs`). **+ paste a link** also accepts Spotify's embed code.
 - Desktop and tablet for now. The privacy policy explains what Spotify receives once you connect.
 
 ## 2026-10-13 · free, a redesign and a livelier today cell

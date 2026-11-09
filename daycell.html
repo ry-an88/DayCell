@@ -444,7 +444,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .eq i:nth-child(1) { height: 60%; } .eq i:nth-child(2) { height: 100%; animation-delay: -.3s; } .eq i:nth-child(3) { height: 40%; animation-delay: -.6s; }
 @keyframes eq { 50% { transform: scaleY(.4); } }
 /* closed = invisible but still laid out, so Spotify's player keeps playing behind it */
-.fcard { position: fixed; top: 50px; right: 12px; width: 360px; max-width: calc(100vw - 24px); z-index: 45; background: var(--chrome); border: 1px solid var(--border-strong); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.28); font: 12px var(--mono); color: var(--muted); transition: opacity .16s ease, transform .16s ease, visibility .16s; }
+.fcard { position: fixed; top: 50px; right: 12px; width: 360px; max-width: calc(100vw - 24px); z-index: 45; max-height: calc(100vh - 62px); max-height: calc(100dvh - 62px); overflow-y: auto; scrollbar-width: thin; background: var(--chrome); border: 1px solid var(--border-strong); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.28); font: 12px var(--mono); color: var(--muted); transition: opacity .16s ease, transform .16s ease, visibility .16s; }
 .fcard.closed { visibility: hidden; opacity: 0; transform: translateY(-6px); pointer-events: none; }
 .fc-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 14px; border-bottom: 1px solid var(--border); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 .fc-head .st { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; font: 500 10.5px var(--mono); letter-spacing: 0; text-transform: none; color: var(--faint); }
@@ -476,7 +476,10 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .fc-timer { font: 500 11px var(--mono); color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .fc-timer b { color: var(--text); font-weight: 600; }
 .fc-embed { min-height: 80px; border-radius: 12px; overflow: hidden; background: var(--code); }
-.fc-embed iframe { display: block; border: 0; border-radius: 12px; }
+.fc-embed iframe { display: block; border: 0; border-radius: 12px; transition: height .25s ease; }
+.fc-row { display: flex; align-items: flex-start; gap: 10px; }
+.fc-row .fc-note { flex: 1; }
+.fc-row .btn { height: 24px; font-size: 11px; padding: 0 8px; flex: none; }
 .fc-note { font: 10.5px/1.6 var(--mono); color: var(--faint); }
 .fc-foot { display: flex; align-items: center; gap: 6px; padding: 10px 10px 10px 14px; border-top: 1px solid var(--border); background: var(--code); border-radius: 0 0 12px 12px; font: 10.5px var(--mono); color: var(--faint); white-space: nowrap; }
 .fc-foot .btn { height: 24px; font-size: 11px; padding: 0 9px; }
@@ -627,7 +630,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
         <span class="fc-timer" id="fcTimer" hidden></span>
       </div>
       <div class="fc-embed" id="fcEmbedWrap"><div id="fcEmbed"></div></div>
-      <div class="fc-note">volume and skipping are in Spotify's player above. full songs if you're signed in to Spotify in this browser, previews if not.</div>
+      <div class="fc-row"><span class="fc-note">volume, skipping and the song list are in Spotify's player. full songs if you're signed in to Spotify here, previews if not.</span><button class="btn ghost" id="fcSize" aria-pressed="false"></button></div>
     </div>
     <div class="fc-foot"><span id="fcTimerIcon"></span>focus timer <span id="fcTimers" style="display:flex;gap:6px"></span><span class="grow"></span><button class="btn ghost" id="fcDisconnect">disconnect</button></div>
   </div>
@@ -2430,20 +2433,23 @@ const FOCUS_LISTS = [
   { k: 'brain', name: 'brain food', uri: 'spotify:playlist:37i9dQZF1DWXLeA8Omikj7' },
 ];
 const FOCUS_TIMERS = [25, 50, 0];  // minutes; 0 = no timer
+const FOCUS_SIZES = { small: 80, full: 352 };  // Spotify's compact player, and its full one with the song list
+const focusHeight = () => focusPrefs().full ? FOCUS_SIZES.full : FOCUS_SIZES.small;
 const focus = { status: 'off', msg: '', api: null, ctl: null, playing: false, buffering: false, pos: 0, dur: 0, ends: 0, tick: null, wait: null, pill: '' };
-// remembered between visits: the chosen playlist, links you added, the timer length (never "connected")
+// remembered between visits: the chosen playlist, links you added, the timer length, small or full player (never "connected")
 function focusPrefs() {
-  const d = { list: 'deep', custom: [], timer: 25 };
+  const d = { list: 'deep', custom: [], timer: 25, full: false };
   try { return Object.assign(d, JSON.parse(store.get(STORE_KEY + '-focus') || '{}')); } catch { return d; }
 }
 function setFocusPrefs(patch) { store.set(STORE_KEY + '-focus', JSON.stringify(Object.assign(focusPrefs(), patch))); }
 const focusLists = () => [...FOCUS_LISTS, ...focusPrefs().custom];
 function focusList() { const k = focusPrefs().list; return focusLists().find(l => l.k === k) || FOCUS_LISTS[0]; }
-// accepts open.spotify.com links (with or without a locale prefix) and spotify: URIs
+// accepts open.spotify.com links (with or without a locale prefix), spotify: URIs, and Spotify's
+// "embed" code (the link is picked out of its src)
 function spotifyUri(s) {
   s = String(s || '').trim();
-  const m = s.match(/^spotify:(playlist|album|track|episode|show|artist):([A-Za-z0-9]{10,40})$/)
-    || s.match(/^https?:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|episode|show|artist)\/([A-Za-z0-9]{10,40})/);
+  const m = s.match(/\bspotify:(playlist|album|track|episode|show|artist):([A-Za-z0-9]{10,40})\b/)
+    || s.match(/https?:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|episode|show|artist)\/([A-Za-z0-9]{10,40})/);
   return m ? `spotify:${m[1]}:${m[2]}` : null;
 }
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
@@ -2474,7 +2480,7 @@ function focusConnect() {
 }
 function makeController() {
   // Spotify swaps this placeholder for its iframe
-  focus.api.createController($('#fcEmbed'), { uri: focusList().uri, width: '100%', height: 80 }, ctl => {
+  focus.api.createController($('#fcEmbed'), { uri: focusList().uri, width: '100%', height: focusHeight() }, ctl => {
     clearTimeout(focus.wait);
     focus.ctl = ctl;
     ctl.addListener('playback_update', e => {
@@ -2497,6 +2503,13 @@ function focusDisconnect() {
   $('#fcEmbedWrap').innerHTML = '<div id="fcEmbed"></div>';
   setFocus('off');
 }
+// small (80px) or full (352px, with the song list): resizing the iframe is enough, Spotify's player re-lays itself out
+function focusSize(full = !focusPrefs().full) {
+  setFocusPrefs({ full });
+  const f = $('#fcEmbedWrap iframe'), h = focusHeight();
+  if (f) { f.height = h; f.style.height = h + 'px'; }
+  renderFocus();
+}
 function focusToggle() { if (focus.ctl) focus.ctl.togglePlay(); }
 function focusLoad(l) {
   setFocusPrefs({ list: l.k });
@@ -2509,7 +2522,7 @@ function focusLoad(l) {
   renderFocusLists(); renderFocus();
 }
 async function focusAddLink() {
-  const v = await ask('add from spotify', 'paste a playlist, album or track link. in Spotify: share → copy link.', 'add', '', 'cancel', { input: '', suffix: '' });
+  const v = await ask('add from spotify', 'paste a playlist, album or track link (share → copy link), or Spotify\'s embed code.', 'add', '', 'cancel', { input: '', suffix: '' });
   if (!v) return;
   const uri = spotifyUri(v);
   if (!uri) return toast("that doesn't look like a spotify link.");
@@ -2554,6 +2567,9 @@ function renderFocus() {
   s.querySelector('span').textContent = on ? 'spotify connected' : focus.msg || 'not connected';
   $('#fcConnect').textContent = st === 'err' ? 'try again' : 'connect spotify';
   $('#fcPlay').disabled = !on;
+  const full = focusPrefs().full;
+  $('#fcSize').textContent = full ? 'hide songs' : 'show songs';
+  $('#fcSize').setAttribute('aria-pressed', String(full));
   $('#fcPlay').innerHTML = I(focus.playing ? 'pause' : 'play', 16);
   $('#fcPlay').title = focus.playing ? 'Pause' : 'Play';
   $('#fcName').textContent = l.name;
@@ -2582,6 +2598,7 @@ function initFocus() {
   $('#fcConnect').onclick = focusConnect;
   $('#fcDisconnect').onclick = focusDisconnect;
   $('#fcPlay').onclick = focusToggle;
+  $('#fcSize').onclick = () => focusSize();
   $('#fcLists').addEventListener('click', ev => {
     const rm = ev.target.closest('[data-rm]');
     if (rm) { ev.stopPropagation(); return focusRemoveLink(rm.dataset.rm); }
@@ -2635,6 +2652,7 @@ const COMMANDS = [
   { k: 'ticker', d: 'turn the quote and fact line on or off', run: toggleTicker },
   { k: 'bot', d: 'turn the little robot on or off', run: toggleBot },
   { k: 'music', d: 'focus music: open the spotify player', run: () => toggleFocusCard(true) },
+  { k: 'songs', d: 'focus music: show or hide the song list', run: () => { toggleFocusCard(true); focusSize(); } },
   ...TEMPLATES.map(t => ({ k: t.k, d: `template · ${t.d}`, run: () => newFromTemplate(t) })),
 ];
 let palIdx = 0, palItems = [];
