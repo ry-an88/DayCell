@@ -149,10 +149,11 @@ Text of the old entry.
   from Spotify until you press **connect spotify**, and every visit starts disconnected, so the app stays offline-first.
   Once connected you get Daycell's own play/pause, progress and time, four focus playlists (deep focus, lo-fi beats,
   peaceful piano, brain food), **+ paste a link** for your own playlist, album or track, and a focus timer (25 or 50
-  minutes, or off) that pauses the music and cheers when the block ends. Spotify's own small player sits in the card
-  for volume and skipping. Full songs if you're signed in to Spotify in that browser, 30-second previews if not.
+  minutes, or off) that pauses the music and cheers when the block ends. Spotify's own player sits in the card for
+  volume and skipping: small (80px) by default, or **show songs** for the full one (352px) with the cover and a
+  scrolling song list you can click; the choice is remembered. **+ paste a link** also takes Spotify's whole embed code. Full songs if you're signed in to Spotify in that browser, 30-second previews if not.
   Closing the card (esc, the arrow or a click elsewhere) keeps the music playing and the pill shows what's on and the
-  time left. The playlist, your links and the timer length are remembered (`daycell-focus`); "connected" never is.
+  time left. The playlist, your links, the timer length and the player size are remembered (`daycell-focus`); "connected" never is.
   Hidden in phone layout for now. Also `/music`. How it works: see [Focus music: how it works](#focus-music-how-it-works).
 - **Daily prompts:** 30 prompts in a dev-flavoured voice ("if today had a commit message, what would it be?").
   You can shuffle them or use one in a new entry. The prompt row in a new entry has a close button (×) that hides it
@@ -163,7 +164,7 @@ Text of the old entry.
   - mood trend and top tags
 - **A voice:** playful save messages and streak milestones (3, 7, 14, 30, 50, 100, 365 days).
 - **Command palette** (`/` or Ctrl+K): `/new`, `/prompt`, `/today`, `/random`, `/stats`, `/search`, `/trash`,
-  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/ticker`, `/bot`, `/music`, and the templates (`/review`,
+  `/files`, `/theme`, `/save`, `/download`, `/eject`, `/remind`, `/streak`, `/year`, `/import`, `/ticker`, `/bot`, `/music`, `/songs`, and the templates (`/review`,
   `/gratitude`, `/retro`, `/standup`, `/decision`).
 - **Works on any screen:** desktop, iPad and phone, with touch-friendly controls. Text fields are 16px so iOS
   doesn't zoom in, and the layout respects the iPhone/iPad home bar. On a phone the editor is compact (date, time and
@@ -458,8 +459,11 @@ category (year planner, not a markdown journal), but it shares the name: worth i
   zero, pauses, toasts and makes the robot cheer.
 - **Closing the card** only hides it (`visibility: hidden`), so the iframe and the music keep going. **Disconnect**
   calls `ctl.destroy()` and puts back a fresh `#fcEmbed`.
+- **Small / full:** `focusSize()` sets the iframe's height to 80 or 352 px (`FOCUS_SIZES`, saved as `full` in
+  `daycell-focus`); Spotify's player switches between its compact layout and the full one with the song list by itself.
+  The card scrolls if the window is too short.
 - **Links:** `spotifyUri()` accepts `open.spotify.com/…/{playlist|album|track|episode|show|artist}/ID` (with `intl-xx/`
-  or `?si=`) and `spotify:` URIs, saved in `daycell-focus` (max 8).
+  or `?si=`), `spotify:` URIs and pasted embed code (the link is found anywhere in the text), saved in `daycell-focus` (max 8).
 - **No backend.** There's no server, no Spotify developer app, no OAuth and no token: the browser talks to Spotify
   directly, the same way any page with a Spotify embed does.
 
