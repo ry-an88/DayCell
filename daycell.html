@@ -433,6 +433,55 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .pal-item.on { background: var(--accent-soft); }
 .pal-foot { display: flex; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--border); font: 10.5px var(--mono); color: var(--faint); background: var(--code); }
 
+/* ---------- focus music: menubar pill + drop-down card (Spotify loads only after "connect") ---------- */
+.fpill { display: inline-flex; align-items: center; gap: 8px; height: 30px; max-width: 240px; padding: 0 12px; border: 1px solid var(--border); border-radius: 15px; font: var(--mono-w) 12px var(--mono); color: var(--muted); white-space: nowrap; transition: border-color .12s, color .12s, background .12s; }
+.fpill:hover, .fpill[aria-expanded="true"] { border-color: var(--border-strong); color: var(--text); }
+.fpill.on { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--text); background: var(--accent-soft); }
+.fpill b { font-weight: inherit; overflow: hidden; text-overflow: ellipsis; }
+.fpill .t { color: var(--faint); font-variant-numeric: tabular-nums; }
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; flex: none; }
+.eq i { width: 2px; background: var(--accent); border-radius: 1px; transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
+.eq i:nth-child(1) { height: 60%; } .eq i:nth-child(2) { height: 100%; animation-delay: -.3s; } .eq i:nth-child(3) { height: 40%; animation-delay: -.6s; }
+@keyframes eq { 50% { transform: scaleY(.4); } }
+/* closed = invisible but still laid out, so Spotify's player keeps playing behind it */
+.fcard { position: fixed; top: 50px; right: 12px; width: 360px; max-width: calc(100vw - 24px); z-index: 45; background: var(--chrome); border: 1px solid var(--border-strong); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.28); font: 12px var(--mono); color: var(--muted); transition: opacity .16s ease, transform .16s ease, visibility .16s; }
+.fcard.closed { visibility: hidden; opacity: 0; transform: translateY(-6px); pointer-events: none; }
+.fc-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 14px; border-bottom: 1px solid var(--border); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.fc-head .st { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; font: 500 10.5px var(--mono); letter-spacing: 0; text-transform: none; color: var(--faint); }
+.fc-head .st i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.fc-head .st.ok i { background: var(--ok); }
+.fc-head .st.busy i { background: var(--amber); animation: pulse 1s infinite; }
+.fc-head .st.err i { background: var(--danger); }
+.fc-body { padding: 12px 14px 14px; display: grid; gap: 12px; }
+.fc-intro { font: 12px/1.7 var(--mono); color: var(--muted); }
+.fc-intro b { color: var(--text); font-weight: 550; }
+.fc-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.fc-chip { height: 26px; padding: 0 10px; border: 1px solid var(--border); border-radius: 13px; font: 11px var(--mono); color: var(--muted); background: var(--surface); display: inline-flex; align-items: center; gap: 6px; transition: border-color .12s, color .12s; }
+.fc-chip:hover { border-color: var(--border-strong); color: var(--text); }
+.fc-chip.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.fc-chip.add { border-style: dashed; color: var(--faint); }
+.fc-chip .rm { margin-right: -4px; opacity: .6; }
+.fc-chip .rm:hover { opacity: 1; }
+.fc-foot .fc-chip { height: 22px; }
+.fc-now { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.fc-pp { width: 38px; height: 38px; border-radius: 50%; background: var(--text); color: var(--chrome); display: grid; place-items: center; transition: background .12s, transform .08s; }
+.fc-pp:hover:not(:disabled) { background: var(--accent); }
+.fc-pp:active:not(:disabled) { transform: scale(.95); }
+.fc-pp svg { fill: currentColor; stroke: none; }
+.fc-t b { display: block; font: 600 13px var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-t > span { font-size: 11px; color: var(--faint); }
+.fc-bar { height: 3px; border-radius: 2px; background: var(--grid); overflow: hidden; margin-top: 6px; }
+.fc-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .5s linear; }
+.fc-time { display: flex; justify-content: space-between; font: 10.5px var(--mono); color: var(--faint); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.fc-timer { font: 500 11px var(--mono); color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fc-timer b { color: var(--text); font-weight: 600; }
+.fc-embed { min-height: 80px; border-radius: 12px; overflow: hidden; background: var(--code); }
+.fc-embed iframe { display: block; border: 0; border-radius: 12px; }
+.fc-note { font: 10.5px/1.6 var(--mono); color: var(--faint); }
+.fc-foot { display: flex; align-items: center; gap: 6px; padding: 10px 10px 10px 14px; border-top: 1px solid var(--border); background: var(--code); border-radius: 0 0 12px 12px; font: 10.5px var(--mono); color: var(--faint); white-space: nowrap; }
+.fc-foot .btn { height: 24px; font-size: 11px; padding: 0 9px; }
+@media (max-width: 600px) { .fpill, .fcard { display: none !important; } }  /* desktop and tablet for now */
+
 /* ---------- small screens ---------- */
 .btn { white-space: nowrap; }
 .scrim { display: none; }
@@ -510,6 +559,7 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
     <button class="ib" id="ejectBtn" title="Eject journal" hidden></button>
     <div class="grow"></div>
     <div class="kernel" id="kernel"><i class="led"></i><span>idle</span></div>
+    <button class="fpill" id="focusBtn" title="Focus music" aria-expanded="false" aria-controls="focusCard"></button>
     <button class="ib" id="themeBtn" title="Toggle theme"></button>
   </header>
 
@@ -561,6 +611,27 @@ main { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 </div>
 <input type="file" id="uploadInput" accept=".md,.markdown,text/markdown,text/plain" hidden>
 <input type="file" id="importInput" accept=".zip,.json,application/zip,application/json" hidden>
+<div class="fcard closed" id="focusCard" role="dialog" aria-label="Focus music">
+  <div class="fc-head"><span id="fcIcon"></span>focus <span class="st" id="fcState"><i></i><span>not connected</span></span><span class="grow"></span><button class="ib" id="fcClose" title="Close (esc)"></button></div>
+  <div class="fc-body" id="fcOff">
+    <div class="fc-intro">play a <b>Spotify</b> playlist while you write. <b>nothing loads from Spotify until you press connect</b>, so daycell keeps working offline.</div>
+    <div><button class="btn primary" id="fcConnect">connect spotify</button></div>
+    <div class="fc-note">full songs if you're signed in to Spotify in this browser, 30-second previews if not. no Spotify account is linked to daycell.</div>
+  </div>
+  <div id="fcOn" hidden>
+    <div class="fc-body">
+      <div class="fc-chips" id="fcLists"></div>
+      <div class="fc-now">
+        <button class="fc-pp" id="fcPlay" title="Play / pause"></button>
+        <div class="fc-t"><b id="fcName"></b><span id="fcSub">loading…</span><div class="fc-bar"><i id="fcBar"></i></div><div class="fc-time"><span id="fcPos">0:00</span><span id="fcDur">0:00</span></div></div>
+        <span class="fc-timer" id="fcTimer" hidden></span>
+      </div>
+      <div class="fc-embed" id="fcEmbedWrap"><div id="fcEmbed"></div></div>
+      <div class="fc-note">volume and skipping are in Spotify's player above. full songs if you're signed in to Spotify in this browser, previews if not.</div>
+    </div>
+    <div class="fc-foot"><span id="fcTimerIcon"></span>focus timer <span id="fcTimers" style="display:flex;gap:6px"></span><span class="grow"></span><button class="btn ghost" id="fcDisconnect">disconnect</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"><span></span><button>undo</button></div>
 <div class="modal" id="modal" hidden>
   <div class="dialog" role="dialog" aria-modal="true">
@@ -596,6 +667,10 @@ const P = {
   bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   quote: '<path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/>',
   bot: '<path d="M12 8V4"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  headphones: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  pause: '<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+  timer: '<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/>',
+  up: '<path d="m18 15-6-6-6 6"/>',
   image: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
 };
 const I = (n, s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`;
@@ -2343,6 +2418,194 @@ function loadAnalytics() {
 }
 function track(ev) { try { if (window.umami) window.umami.track(ev); } catch {} }
 
+/* ============ focus music (Spotify embed) ============ */
+// Opt-in: nothing is fetched from Spotify until "connect" is pressed, and every visit starts disconnected, so the
+// app stays offline-first. Uses Spotify's public iFrame API: no developer app, no tokens, nothing linked to daycell.
+// Spotify's player stays visible in the card because the API has no volume, skip or track names.
+const FOCUS_API = 'https://open.spotify.com/embed/iframe-api/v1';
+const FOCUS_LISTS = [
+  { k: 'deep', name: 'deep focus', uri: 'spotify:playlist:37i9dQZF1DWZeKCadgRdKQ' },
+  { k: 'lofi', name: 'lo-fi beats', uri: 'spotify:playlist:37i9dQZF1DWWQRwui0ExPn' },
+  { k: 'piano', name: 'peaceful piano', uri: 'spotify:playlist:37i9dQZF1DX4sWSpwq3LiO' },
+  { k: 'brain', name: 'brain food', uri: 'spotify:playlist:37i9dQZF1DWXLeA8Omikj7' },
+];
+const FOCUS_TIMERS = [25, 50, 0];  // minutes; 0 = no timer
+const focus = { status: 'off', msg: '', api: null, ctl: null, playing: false, buffering: false, pos: 0, dur: 0, ends: 0, tick: null, wait: null, pill: '' };
+// remembered between visits: the chosen playlist, links you added, the timer length (never "connected")
+function focusPrefs() {
+  const d = { list: 'deep', custom: [], timer: 25 };
+  try { return Object.assign(d, JSON.parse(store.get(STORE_KEY + '-focus') || '{}')); } catch { return d; }
+}
+function setFocusPrefs(patch) { store.set(STORE_KEY + '-focus', JSON.stringify(Object.assign(focusPrefs(), patch))); }
+const focusLists = () => [...FOCUS_LISTS, ...focusPrefs().custom];
+function focusList() { const k = focusPrefs().list; return focusLists().find(l => l.k === k) || FOCUS_LISTS[0]; }
+// accepts open.spotify.com links (with or without a locale prefix) and spotify: URIs
+function spotifyUri(s) {
+  s = String(s || '').trim();
+  const m = s.match(/^spotify:(playlist|album|track|episode|show|artist):([A-Za-z0-9]{10,40})$/)
+    || s.match(/^https?:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|episode|show|artist)\/([A-Za-z0-9]{10,40})/);
+  return m ? `spotify:${m[1]}:${m[2]}` : null;
+}
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
+
+function toggleFocusCard(open) {
+  const c = $('#focusCard');
+  open = open ?? c.classList.contains('closed');
+  c.classList.toggle('closed', !open);
+  $('#focusBtn').setAttribute('aria-expanded', String(open));
+  if (open) setTimeout(() => (focus.status === 'on' ? $('#fcPlay') : $('#fcConnect')).focus(), 20);
+}
+function setFocus(status, msg = '') { focus.status = status; focus.msg = msg; renderFocus(); }
+
+function focusConnect() {
+  if (focus.status === 'on' || focus.status === 'busy') return;
+  if (!navigator.onLine) return setFocus('err', "you're offline. connect needs the internet.");
+  setFocus('busy', 'connecting…');
+  track('focus-connect');
+  clearTimeout(focus.wait);
+  focus.wait = setTimeout(() => { if (focus.status === 'busy') setFocus('err', "spotify didn't answer. try again."); }, 20000);
+  if (focus.api) return makeController();
+  window.onSpotifyIframeApiReady = api => { focus.api = api; if (focus.status === 'busy') makeController(); };
+  if (!document.getElementById('spotifyApi')) {
+    const sc = Object.assign(document.createElement('script'), { id: 'spotifyApi', src: FOCUS_API, async: true });
+    sc.onerror = () => { sc.remove(); clearTimeout(focus.wait); setFocus('err', "couldn't reach spotify. try again."); };
+    document.head.append(sc);
+  }
+}
+function makeController() {
+  // Spotify swaps this placeholder for its iframe
+  focus.api.createController($('#fcEmbed'), { uri: focusList().uri, width: '100%', height: 80 }, ctl => {
+    clearTimeout(focus.wait);
+    focus.ctl = ctl;
+    ctl.addListener('playback_update', e => {
+      const d = e.data || {};
+      focus.playing = !d.isPaused;
+      focus.buffering = !!d.isBuffering;
+      focus.pos = d.position || 0;
+      focus.dur = d.duration || 0;
+      if (focus.playing && !focus.ends) startFocusTimer();
+      renderFocus();
+    });
+    focus.tick = focus.tick || setInterval(focusTick, 1000);
+    setFocus('on');
+  });
+}
+function focusDisconnect() {
+  try { focus.ctl && focus.ctl.destroy(); } catch {}
+  clearInterval(focus.tick); clearTimeout(focus.wait);
+  Object.assign(focus, { ctl: null, playing: false, buffering: false, pos: 0, dur: 0, ends: 0, tick: null });
+  $('#fcEmbedWrap').innerHTML = '<div id="fcEmbed"></div>';
+  setFocus('off');
+}
+function focusToggle() { if (focus.ctl) focus.ctl.togglePlay(); }
+function focusLoad(l) {
+  setFocusPrefs({ list: l.k });
+  Object.assign(focus, { pos: 0, dur: 0 });
+  if (focus.ctl) {
+    const wasPlaying = focus.playing;
+    focus.ctl.loadEntity ? focus.ctl.loadEntity(l.uri) : focus.ctl.loadUri(l.uri);
+    if (wasPlaying) setTimeout(() => focus.ctl && focus.ctl.play(), 800);
+  }
+  renderFocusLists(); renderFocus();
+}
+async function focusAddLink() {
+  const v = await ask('add from spotify', 'paste a playlist, album or track link. in Spotify: share → copy link.', 'add', '', 'cancel', { input: '', suffix: '' });
+  if (!v) return;
+  const uri = spotifyUri(v);
+  if (!uri) return toast("that doesn't look like a spotify link.");
+  const p = focusPrefs(), type = uri.split(':')[1];
+  if (p.custom.length >= 8) return toast('8 links max. remove one first.');
+  const n = p.custom.filter(c => c.name.startsWith('my ' + type)).length;
+  const l = { k: 'c' + uid(), name: `my ${type}${n ? ' ' + (n + 1) : ''}`, uri };
+  setFocusPrefs({ custom: [...p.custom, l] });
+  focusLoad(l);
+}
+function focusRemoveLink(k) {
+  const p = focusPrefs();
+  setFocusPrefs({ custom: p.custom.filter(c => c.k !== k), list: p.list === k ? 'deep' : p.list });
+  if (p.list === k) focusLoad(FOCUS_LISTS[0]); else renderFocusLists();
+}
+function startFocusTimer() {
+  const m = focusPrefs().timer;
+  focus.ends = m ? Date.now() + m * 60000 : 0;
+}
+function focusTick() {
+  if (focus.ends && Date.now() >= focus.ends) {
+    focus.ends = 0;
+    if (focus.ctl && focus.playing) focus.ctl.pause();
+    toast('focus block done. stand up, stretch, then go again.', null, 6000);
+    botCheer();
+  }
+  renderFocus();
+}
+function renderFocusLists() {
+  const cur = focusList().k;
+  $('#fcLists').innerHTML = focusLists().map(l => `<button class="fc-chip${l.k === cur ? ' on' : ''}" data-list="${esc(l.k)}">${esc(l.name)}${l.k.startsWith('c') ? `<span class="rm" data-rm="${esc(l.k)}" title="remove">${I('x', 11)}</span>` : ''}</button>`).join('')
+    + `<button class="fc-chip add" data-list="+">+ paste a link</button>`;
+  const t = focusPrefs().timer;
+  $('#fcTimers').innerHTML = FOCUS_TIMERS.map(m => `<button class="fc-chip${m === t ? ' on' : ''}" data-timer="${m}">${m ? m + 'm' : 'off'}</button>`).join('');
+}
+function renderFocus() {
+  const st = focus.status, on = st === 'on', live = on || st === 'busy', l = focusList();
+  $('#fcOff').hidden = live;
+  $('#fcOn').hidden = !live;
+  const s = $('#fcState');
+  s.className = 'st' + (on ? ' ok' : st === 'busy' ? ' busy' : st === 'err' ? ' err' : '');
+  s.querySelector('span').textContent = on ? 'spotify connected' : focus.msg || 'not connected';
+  $('#fcConnect').textContent = st === 'err' ? 'try again' : 'connect spotify';
+  $('#fcPlay').disabled = !on;
+  $('#fcPlay').innerHTML = I(focus.playing ? 'pause' : 'play', 16);
+  $('#fcPlay').title = focus.playing ? 'Pause' : 'Play';
+  $('#fcName').textContent = l.name;
+  const preview = focus.dur && focus.dur <= 31000;
+  $('#fcSub').textContent = !on ? 'connecting…' : focus.buffering ? 'buffering…' : focus.playing ? (preview ? 'playing a preview' : 'playing') : focus.dur ? 'paused' : 'press play';
+  $('#fcBar').style.width = focus.dur ? Math.min(100, focus.pos / focus.dur * 100) + '%' : '0';
+  $('#fcPos').textContent = mmss(focus.pos);
+  $('#fcDur').textContent = mmss(focus.dur);
+  const left = focus.ends ? mmss(focus.ends - Date.now()) : '';
+  $('#fcTimer').hidden = !left;
+  $('#fcTimer').innerHTML = `<b>${left}</b> left`;
+  // the pill: what's on, without opening anything (only touched when it changes, so the bars keep moving)
+  const pill = on
+    ? `${focus.playing ? '<span class="eq"><i></i><i></i><i></i></span>' : I('headphones', 14)}<b>${esc(l.name)}</b>${left ? `<span class="t">· ${left}</span>` : ''}`
+    : `${I('headphones', 14)}<b>focus</b>`;
+  if (pill !== focus.pill) { $('#focusBtn').innerHTML = focus.pill = pill; }
+  $('#focusBtn').classList.toggle('on', on && focus.playing);
+}
+function initFocus() {
+  $('#fcIcon').innerHTML = I('headphones', 14);
+  $('#fcClose').innerHTML = I('up', 15);
+  $('#fcTimerIcon').innerHTML = I('timer', 13);
+  renderFocusLists(); renderFocus();
+  $('#focusBtn').onclick = () => toggleFocusCard();
+  $('#fcClose').onclick = () => toggleFocusCard(false);
+  $('#fcConnect').onclick = focusConnect;
+  $('#fcDisconnect').onclick = focusDisconnect;
+  $('#fcPlay').onclick = focusToggle;
+  $('#fcLists').addEventListener('click', ev => {
+    const rm = ev.target.closest('[data-rm]');
+    if (rm) { ev.stopPropagation(); return focusRemoveLink(rm.dataset.rm); }
+    const b = ev.target.closest('[data-list]');
+    if (!b) return;
+    if (b.dataset.list === '+') return focusAddLink();
+    const l = focusLists().find(x => x.k === b.dataset.list);
+    if (l && l.k !== focusList().k) focusLoad(l);
+  });
+  $('#fcTimers').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-timer]');
+    if (!b) return;
+    setFocusPrefs({ timer: +b.dataset.timer });
+    focus.ends = 0;
+    if (focus.playing) startFocusTimer();
+    renderFocusLists(); renderFocus();
+  });
+  // a click anywhere else closes the card; the music keeps playing
+  document.addEventListener('mousedown', ev => {
+    if ($('#focusCard').classList.contains('closed') || !$('#modal').hidden) return;
+    if (!ev.target.closest('#focusCard, #focusBtn')) toggleFocusCard(false);
+  });
+}
+
 /* ============ command palette ============ */
 function openPanel(name) { state.panel = name; store.set(STORE_KEY + '-panel', name); renderPanel(); }
 const COMMANDS = [
@@ -2371,6 +2634,7 @@ const COMMANDS = [
   { k: 'import', d: 'import a Day One export (.zip or .json)', run: startImport },
   { k: 'ticker', d: 'turn the quote and fact line on or off', run: toggleTicker },
   { k: 'bot', d: 'turn the little robot on or off', run: toggleBot },
+  { k: 'music', d: 'focus music: open the spotify player', run: () => toggleFocusCard(true) },
   ...TEMPLATES.map(t => ({ k: t.k, d: `template · ${t.d}`, run: () => newFromTemplate(t) })),
 ];
 let palIdx = 0, palItems = [];
@@ -2536,6 +2800,7 @@ document.addEventListener('keydown', ev => {
     return;
   }
   if (!$('#palette').hidden) return;
+  if (k === 'Escape' && !$('#focusCard').classList.contains('closed')) { toggleFocusCard(false); $('#focusBtn').focus(); return; }
   if ((ev.ctrlKey || ev.metaKey) && k.toLowerCase() === 's') { ev.preventDefault(); $('#tbSave').click(); return; }
   if ((ev.ctrlKey || ev.metaKey) && k.toLowerCase() === 'k') { ev.preventDefault(); openPalette(); return; }
   if (state.editingId && ev.target.closest && ev.target.closest('.cell.editing')) {
@@ -2589,6 +2854,7 @@ function webExtras() {
   applyAccent(store.get(STORE_KEY + '-accent'));
   $('#fileIcon').innerHTML = I('file', 13);
   $('#themeBtn').innerHTML = I('contrast', 16);
+  initFocus();
   $('.rail [data-panel="contents"]').innerHTML = I('list', 18);
   $('.rail [data-panel="files"]').innerHTML = I('folder', 18);
   $('.rail [data-panel="insights"]').innerHTML = I('activity', 18);

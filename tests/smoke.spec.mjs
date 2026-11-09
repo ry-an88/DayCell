@@ -348,3 +348,61 @@ test('editor: a long entry stops growing at a max height and scrolls inside the 
   expect(m.scrolls).toBe(true);
   expect(m.oy).toBe('auto');
 });
+
+// a stand-in for Spotify's iFrame API, so the test needs no network and never talks to Spotify
+const FAKE_SPOTIFY = `window.onSpotifyIframeApiReady && window.onSpotifyIframeApiReady({ createController(el, opts, cb) {
+  const ls = {}; let paused = true; window.__loaded = opts.uri;
+  const fire = () => (ls.playback_update || []).forEach(f => f({ data: { isPaused: paused, isBuffering: false, position: 61000, duration: 200000 } }));
+  const f = document.createElement('iframe'); f.className = 'fake-spotify'; el.replaceWith(f);
+  cb({ addListener(e, fn) { (ls[e] ||= []).push(fn); }, togglePlay() { paused = !paused; fire(); }, play() { paused = false; fire(); },
+       pause() { paused = true; fire(); }, loadEntity(u) { window.__loaded = u; }, destroy() { f.remove(); } });
+} });`;
+
+test('focus music: nothing loads from Spotify until connect, then the card drives the player', async ({ page }) => {
+  const hits = [];
+  await page.route('https://open.spotify.com/**', route => { hits.push(route.request().url()); route.fulfill({ contentType: 'text/javascript', body: FAKE_SPOTIFY }); });
+  await page.goto(APP);
+  await newJournal(page, 'focus');
+  await expect(page.locator('#focusBtn')).toHaveText('focus');
+  await page.click('#focusBtn');
+  await expect(page.locator('#focusCard')).not.toHaveClass(/closed/);
+  await expect(page.locator('#fcConnect')).toBeVisible();
+  expect(hits).toEqual([]);  // opening the card is still offline
+
+  await page.click('#fcConnect');
+  await expect(page.locator('#fcState')).toHaveText('spotify connected');
+  expect(hits).toEqual(['https://open.spotify.com/embed/iframe-api/v1']);
+  await expect(page.locator('.fake-spotify')).toHaveCount(1);
+  expect(await page.evaluate(() => window.__loaded)).toBe('spotify:playlist:37i9dQZF1DWZeKCadgRdKQ');
+
+  // daycell's own play button, progress and focus timer
+  await page.click('#fcPlay');
+  await expect(page.locator('#focusBtn')).toHaveClass(/on/);
+  await expect(page.locator('#fcSub')).toHaveText('playing');
+  await expect(page.locator('#fcPos')).toHaveText('1:01');
+  await expect(page.locator('#fcTimer')).toContainText(/2[45]:\d\d left/);
+
+  // switch playlist, then close the card: the music keeps going and the pill says what's on
+  await page.click('[data-list="piano"]');
+  expect(await page.evaluate(() => window.__loaded)).toBe('spotify:playlist:37i9dQZF1DX4sWSpwq3LiO');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#focusCard')).toHaveClass(/closed/);
+  await expect(page.locator('#focusBtn')).toContainText('peaceful piano');
+  await expect(page.locator('.fake-spotify')).toHaveCount(1);
+
+  // paste your own link
+  await page.click('#focusBtn');
+  await page.click('[data-list="+"]');
+  await page.fill('#mInput', 'https://open.spotify.com/intl-en/album/4aawyAB9vmqN3uQ7FjRGTy?si=abc');
+  await page.click('#mOk');
+  await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my album');
+  expect(await page.evaluate(() => window.__loaded)).toBe('spotify:album:4aawyAB9vmqN3uQ7FjRGTy');
+
+  // the choice is remembered, but a new visit starts disconnected and loads nothing
+  await page.reload();
+  await expect(page.locator('#focusBtn')).toHaveText('focus');
+  await page.click('#focusBtn');
+  await expect(page.locator('#fcConnect')).toBeVisible();
+  await expect(page.locator('#fcLists .fc-chip.on')).toHaveText('my album');
+  expect(hits).toHaveLength(1);
+});

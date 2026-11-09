@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-09 · focus music
+
+- A `focus` pill in the top bar opens a small player card. Press **connect spotify** to load Spotify's player; nothing
+  is fetched from Spotify before that, and each visit starts disconnected.
+- Daycell's own play/pause, progress and time, four focus playlists, **+ paste a link** for your own Spotify playlist,
+  album or track, and a 25/50-minute focus timer that pauses the music when the block ends.
+- Close the card and the music keeps going; the pill shows what's playing and the time left. Also `/music`.
+- Desktop and tablet for now. The privacy policy explains what Spotify receives once you connect.
+
 ## 2026-10-13 · free, a redesign and a livelier today cell
 
 **Licence**
